@@ -1,4 +1,9 @@
 rich-bums/
-├── frontend/
-├── backend/
-└── README.md
+├── bot.py
+├── requirements.txt
+├── .env
+├── web/
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
+└── tonconnect-manifest.json
