@@ -235,6 +235,7 @@
                     <circle cx="50" cy="15" r="5" fill="#4CAF50"/>
                 </svg>
             </div>
+            <!-- الضغط هنا يتم بسلاسة وبدون أي نافذة منبثقة -->
             <button class="btn-primary-action locked" id="feed-btn" onclick="startFeedingSilently()" data-i18n="feedBtn">إطعام (Feed me)</button>
         </div>
 
@@ -290,7 +291,7 @@
         </div>
     </div>
 
-    <!-- المحفظة والإيداع التلقائي بدون حد أقصى -->
+    <!-- المحفظة والإيداع التلقائي -->
     <div id="tab-balance" class="page-view">
         <div class="card">
             <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والإيداع</div>
@@ -302,7 +303,7 @@
         </div>
     </div>
 
-    <!-- الشريط السفلي (تم حذف تبويب المهام بالكامل) -->
+    <!-- الشريط السفلي (4 أزرار - بدون مهام) -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-home', this)">
             <div class="nav-icon">🏠</div>
@@ -323,7 +324,6 @@
     </nav>
 
     <script>
-        // عنوان محفظتك الخاصة لاستقبال الإيداعات
         const ADMIN_WALLET = "UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X";
 
         let currentLang = 'ar';
@@ -450,6 +450,7 @@
             }
         }
 
+        // تم إلغاء الرسالة المنبثقة alert بداخل الدالة نهائياً
         function startFeedingSilently() {
             if (!isWalletConnected) {
                 tonConnectUI.openModal();
