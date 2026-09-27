@@ -1,71 +1,433 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Rich Bums</title>
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- TON Connect SDK -->
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background-color: #1a150e; color: #fff; text-align: center; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
-    
-    /* Top Header */
-    .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.3); }
-    .btn-ton { background: #0088cc; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    
-    /* Main Character Area */
-    .game-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-    .bum-avatar { width: 180px; height: auto; margin-bottom: 20px; }
-    .btn-feed { background: #f39c12; color: #fff; font-size: 18px; font-weight: bold; padding: 12px 40px; border: none; border-radius: 12px; width: 80%; max-width: 300px; cursor: pointer; box-shadow: 0 4px #d35400; }
-    .btn-feed:active { transform: translateY(2px); box-shadow: 0 2px #d35400; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAM MAX - TIRED RICH</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- TON Connect SDK -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --card-border: #2a2a2a;
+            --accent-gold: #f5b83d;
+            --accent-gold-light: #ffd875;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --nav-bg: rgba(18, 18, 18, 0.95);
+        }
 
-    /* Bottom Navigation */
-    .navbar { display: flex; justify-content: space-around; background: #110d08; padding: 12px 0; border-top: 1px solid #332717; }
-    .nav-item { color: #888; font-size: 12px; text-decoration: none; display: flex; flex-direction: column; align-items: center; }
-    .nav-item.active { color: #f39c12; }
-  </style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        /* Header Bar */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(13, 13, 13, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-wallet {
+            background: linear-gradient(135deg, var(--accent-gold), #d49311);
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-faq {
+            background: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Main Container & Screens */
+        .container {
+            padding: 16px;
+            flex: 1;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Hero Character Section (Home Screen) */
+        .character-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .avatar-container {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-gold);
+            box-shadow: 0 0 25px rgba(245, 184, 61, 0.3);
+            overflow: hidden;
+            background: #151515;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-feed {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 300px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-gold-light), var(--accent-gold));
+            color: #000;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(245, 184, 61, 0.4);
+            transition: transform 0.1s;
+            text-align: center;
+        }
+
+        .btn-feed:active {
+            transform: scale(0.97);
+        }
+
+        /* Cards and Lists */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            padding: 0 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            cursor: pointer;
+            flex: 1;
+            height: 100%;
+        }
+
+        .nav-item.active {
+            color: var(--accent-gold);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Special Central AI Button */
+        .nav-item.ai-center {
+            position: relative;
+            top: -15px;
+        }
+
+        .nav-item.ai-center .nav-icon-wrapper {
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, var(--accent-gold-light), var(--accent-gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(245, 184, 61, 0.5);
+            border: 4px solid var(--bg-color);
+        }
+
+        .nav-item.ai-center span {
+            margin-top: 2px;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <div class="header">
-    <button class="btn-ton">FAQ</button>
-    <div id="ton-connect"></div>
-  </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="brand-title">GRAM MAX</div>
+        <div class="header-actions">
+            <button class="btn-faq">FAQ</button>
+            <div id="ton-connect-btn"></div>
+        </div>
+    </header>
 
-  <!-- Game Main View -->
-  <div class="game-area">
-    <img src="https://cdn-icons-png.flaticon.com/512/4825/4825038.png" class="bum-avatar" alt="Bum Character">
-    <button class="btn-feed" onclick="feedBum()">Feed me</button>
-  </div>
+    <!-- Main Screens Container -->
+    <main class="container">
 
-  <!-- Navigation Bar -->
-  <div class="navbar">
-    <div class="nav-item active">🏠 Home</div>
-    <div class="nav-item">👥 Friends</div>
-    <div class="nav-item">🤖 Trading</div>
-    <div class="nav-item">📋 Tasks</div>
-    <div class="nav-item">👛 Balance</div>
-  </div>
+        <!-- 1. Home Screen -->
+        <section id="screen-home" class="screen active">
+            <div class="character-section">
+                <div class="avatar-container">
+                    <img src="assets/character.png" alt="Character" onerror="this.src='https://via.placeholder.com/200/1a1a1a/f5b83d?text=BUM';">
+                </div>
+                <button class="btn-feed" onclick="switchTab('restaurant')">إطعام (Feed me)</button>
+            </div>
 
-  <script>
-    // Init Telegram WebApp
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <span class="card-title">حالة الاستثمار النشط</span>
+                </div>
+                <div class="info-row">
+                    <span>الوجبة الحالية:</span>
+                    <span class="info-value">Noodles</span>
+                </div>
+                <div class="info-row">
+                    <span>الوقت المتبقي:</span>
+                    <span class="info-value" id="timer">07:26:17</span>
+                </div>
+                <div class="info-row">
+                    <span>الأرباح المكتسبة:</span>
+                    <span class="info-value" style="color: #4caf50;">+0.05 TON</span>
+                </div>
+            </div>
+        </section>
 
-    // Init TON Connect Wallet
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/' + location.pathname.split('/')[1] + '/' + location.pathname.split('/')[2] + '/main/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect'
-    });
+        <!-- 2. Restaurant / Food Screen -->
+        <section id="screen-restaurant" class="screen">
+            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">قائمة الطعام والاستثمار</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🍜 Noodles</span>
+                    <span style="color: var(--accent-gold); font-weight: bold;">0.1 TON</span>
+                </div>
+                <div class="info-row">
+                    <span>مدة الدورة:</span>
+                    <span class="info-value">24 ساعة</span>
+                </div>
+                <div class="info-row">
+                    <span>الربح المتوقع:</span>
+                    <span class="info-value">0.05 TON</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 10px;">شراء الوجبة</button>
+            </div>
+        </section>
 
-    function feedBum() {
-      tg.HapticFeedback.impactOccurred('medium');
-      alert('تم إطعام المشرد! +10 TRASH');
-    }
-  </script>
+        <!-- 3. AI Trading Screen -->
+        <section id="screen-trading" class="screen">
+            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">التداول الآلي (AI Trading)</h2>
+            <div class="card">
+                <p style="color: var(--text-muted); font-size: 14px;">خطط التداول بالذكاء الاصطناعي لتحقيق عائد آلي على رصيد TON الخاص بك.</p>
+            </div>
+        </section>
+
+        <!-- 4. Friends / Referrals Screen -->
+        <section id="screen-friends" class="screen">
+            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">دعوة الأصدقاء</h2>
+            <div class="card">
+                <div class="info-row">
+                    <span>عمولة المستوى 1:</span>
+                    <span class="info-value">5%</span>
+                </div>
+                <div class="info-row">
+                    <span>عمولة المستوى 2:</span>
+                    <span class="info-value">3%</span>
+                </div>
+                <div class="info-row">
+                    <span>عمولة المستوى 3:</span>
+                    <span class="info-value">2%</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 10px;">نسخ رابط الدعوة</button>
+            </div>
+        </section>
+
+        <!-- 5. Tasks Screen -->
+        <section id="screen-tasks" class="screen">
+            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">المهام اليومية</h2>
+            <div class="card">
+                <div class="card-header">
+                    <span>الاشتراك بقناة التليجرام</span>
+                    <span style="color: var(--accent-gold);">+0.01 TON</span>
+                </div>
+                <button class="btn-faq" style="width: 100%; margin-top: 8px;">تحقق</button>
+            </div>
+        </section>
+
+        <!-- 6. Balance Screen -->
+        <section id="screen-balance" class="screen">
+            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">المحفظة والرصيد</h2>
+            <div class="card" style="text-align: center; padding: 24px;">
+                <span style="color: var(--text-muted); font-size: 14px;">إجمالي الرصيد</span>
+                <h1 style="color: var(--accent-gold); margin: 10px 0;">0.00 TON</h1>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn-feed" style="flex: 1; padding: 10px; font-size: 14px; margin: 0;">إيداع</button>
+                    <button class="btn-faq" style="flex: 1; padding: 10px; font-size: 14px;">سحب</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('friends')">
+            <span class="nav-icon">👥</span>
+            <span>Friends</span>
+        </div>
+        <div class="nav-item ai-center" onclick="switchTab('trading')">
+            <div class="nav-icon-wrapper">🤖</div>
+            <span>AI Trading</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tasks')">
+            <span class="nav-icon">☷</span>
+            <span>Tasks</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('balance')">
+            <span class="nav-icon">💼</span>
+            <span>Balance</span>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
+
+        // Initialize TON Connect UI
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://crypto-max-app.github.io/crypto-max-app-HPAu/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-btn'
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            if (tabName === 'restaurant') {
+                document.getElementById('screen-restaurant').classList.add('active');
+                return;
+            }
+
+            const targetScreen = document.getElementById(`screen-${tabName}`);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+
+            // Highlight nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabsMap = { 'home': 0, 'friends': 1, 'trading': 2, 'tasks': 3, 'balance': 4 };
+            if (tabsMap[tabName] !== undefined) {
+                navItems[tabsMap[tabName]].classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
