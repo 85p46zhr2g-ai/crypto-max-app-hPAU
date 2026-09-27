@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GRAM MAX</title>
-  <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
   <style>
@@ -21,7 +20,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       margin: 0;
       padding: 15px;
       padding-bottom: 80px;
@@ -35,7 +34,6 @@
 
     .header h2 {
       margin: 0 0 10px 0;
-      letter-spacing: 1px;
       color: #38bdf8;
     }
 
@@ -44,7 +42,6 @@
       padding: 15px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
 
     .balance-card span {
@@ -58,13 +55,8 @@
       font-size: 28px;
     }
 
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .card {
       background: var(--card-bg);
@@ -74,22 +66,9 @@
       border: 1px solid var(--border-color);
     }
 
-    .card h4 {
-      margin: 0 0 8px 0;
-      color: #38bdf8;
-      font-size: 16px;
-    }
-
-    .card p {
-      margin: 4px 0;
-      font-size: 13px;
-      color: var(--text-sub);
-    }
-
-    .card .profit {
-      color: #22c55e;
-      font-weight: bold;
-    }
+    .card h4 { margin: 0 0 8px 0; color: #38bdf8; }
+    .card p { margin: 4px 0; font-size: 13px; color: var(--text-sub); }
+    .profit { color: #22c55e; font-weight: bold; }
 
     input {
       width: 100%;
@@ -100,12 +79,19 @@
       background: #0f172a;
       color: #fff;
       box-sizing: border-box;
-      font-size: 14px;
     }
 
-    input:focus {
-      outline: none;
-      border-color: var(--accent-color);
+    .admin-wallet-box {
+      background: #0f172a;
+      border: 1px dashed var(--accent-color);
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      word-break: break-all;
+      text-align: center;
+      color: #38bdf8;
+      margin: 8px 0;
     }
 
     button {
@@ -116,149 +102,105 @@
       border: none;
       border-radius: 8px;
       font-weight: bold;
-      font-size: 14px;
       cursor: pointer;
       margin-top: 5px;
-      transition: background 0.2s;
-    }
-
-    button:hover {
-      background: var(--accent-hover);
-    }
-
-    .stats-box {
-      background: var(--card-bg);
-      padding: 15px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      margin-top: 15px;
     }
 
     .nav-bar {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: #0f172a;
       display: flex;
       justify-content: space-around;
       padding: 12px 0;
       border-top: 1px solid var(--border-color);
-      z-index: 100;
     }
 
     .nav-btn {
-      background: none;
-      border: none;
-      color: var(--text-sub);
-      font-size: 13px;
-      width: auto;
-      margin: 0;
-      padding: 5px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
+      background: none; border: none;
+      color: var(--text-sub); font-size: 13px;
+      display: flex; flex-direction: column; align-items: center;
     }
 
-    .nav-btn.active {
-      color: #38bdf8;
-      font-weight: bold;
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid var(--border-color);
-      margin: 20px 0;
-    }
+    .nav-btn.active { color: #38bdf8; font-weight: bold; }
+    hr { border: none; border-top: 1px solid var(--border-color); margin: 20px 0; }
   </style>
 </head>
 <body>
 
-  <!-- الرأس وعرض الرصيد -->
   <div class="header">
     <h2>GRAM MAX</h2>
     <div class="balance-card">
-      <span>الرصيد المتاح</span>
+      <span>الرصيد الداخلي المتاح</span>
       <h1 id="user-balance">0.00 GRAM</h1>
     </div>
   </div>
 
   <div class="content">
-    <!-- 1. قسم الاستثمار -->
+    <!-- قسم الاستثمار -->
     <div id="tab-invest" class="tab-content active">
-      <h3 style="font-size: 16px; margin-bottom: 12px;">💎 مستويات الاستثمار</h3>
+      <h3>💎 مستويات الاستثمار</h3>
       <div id="investment-levels"></div>
     </div>
 
-    <!-- 2. قسم الأصدقاء والإحالات -->
+    <!-- قسم الإحالات -->
     <div id="tab-friends" class="tab-content">
-      <h3 style="font-size: 16px;">👥 برنامج الإحالات</h3>
-      <p style="font-size: 13px; color: var(--text-sub);">شارك الرابط الخاص بك مع أصدقائك للربح:</p>
-      
+      <h3>👥 برنامج الإحالات</h3>
       <div class="card">
         <input type="text" id="ref-link" readonly value="جاري تحميل الرابط...">
         <button onclick="copyRefLink()">📋 نسخ رابط الإحالة</button>
       </div>
-
-      <div class="stats-box">
-        <p style="margin: 0;">عدد الإحالات الناجحة: <b id="ref-count" style="color: #38bdf8;">0</b></p>
+      <div class="card">
+        <p>عدد الإحالات الناجحة: <b id="ref-count" style="color: #38bdf8;">0</b></p>
       </div>
     </div>
 
-    <!-- 3. قسم المحفظة والشحن والسحب -->
+    <!-- قسم المحفظة والشحن -->
     <div id="tab-wallet" class="tab-content">
       <div class="card">
-        <h3>⚡ إيداع وشحن الرصيد</h3>
-        <p>أدخل المبلغ المطلوبة إضافته لحسابك الداخلي:</p>
+        <h3>⚡ شحن الرصيد (الإيداع)</h3>
+        <p>حَوّل المبلغ إلى محفظة الأدمن الرسمية أدناه ثم أدخل قيمة الشحن:</p>
+        
+        <!-- محفظة الأدمن التي يتم الإيداع إليها -->
+        <div class="admin-wallet-box" id="admin-wallet-address">
+          UQBr...XZ5X (محفظة الأدمن الرسمية)
+        </div>
+
         <input type="number" id="deposit-amount" placeholder="الكمية بـ GRAM" min="1">
-        <button onclick="handleDeposit()">شحن الرصيد</button>
+        <button onclick="handleDeposit()">⚡ إرسال إشعار الإيداع للأدمن</button>
       </div>
 
       <hr>
 
       <div class="card">
         <h3>📫 طلب سحب الأرباح</h3>
-        <p>سيتم خصم المبلغ المباشر من رصيدك الوهمي الداخلي وإرسال الطلب للمشرف:</p>
-        <input type="text" id="withdraw-address" placeholder="عنوان المحفظة">
+        <p>خصم فوري من رصيدك الداخلي وإرسال طلب مع رقم تسلسلي للأدمن:</p>
+        <input type="text" id="withdraw-address" placeholder="عنوان محفظتك لتلقي المال">
         <input type="number" id="withdraw-amount" placeholder="مبلغ السحب بـ GRAM" min="1">
-        <button onclick="handleWithdraw()">إرسال طلب السحب 📨</button>
+        <button onclick="handleWithdraw()">📨 إرسال طلب السحب</button>
       </div>
     </div>
   </div>
 
-  <!-- شريط التنقل السفلي -->
   <div class="nav-bar">
-    <button onclick="switchTab('invest', this)" class="nav-btn active">
-      <span>💎</span>
-      <span>الاستثمار</span>
-    </button>
-    <button onclick="switchTab('friends', this)" class="nav-btn">
-      <span>👥</span>
-      <span>الأصدقاء</span>
-    </button>
-    <button onclick="switchTab('wallet', this)" class="nav-btn">
-      <span>👛</span>
-      <span>المحفظة</span>
-    </button>
+    <button onclick="switchTab('invest', this)" class="nav-btn active"><span>💎</span><span>الاستثمار</span></button>
+    <button onclick="switchTab('friends', this)" class="nav-btn"><span>👥</span><span>الأصدقاء</span></button>
+    <button onclick="switchTab('wallet', this)" class="nav-btn"><span>👛</span><span>المحفظة</span></button>
   </div>
 
-  <!-- منطق التطبيق (JavaScript) -->
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // اسم البوت الخاص بك لإنشاء رابط الإحالة
     const BOT_USERNAME = "GramMax3_Bot";
+    const ADMIN_WALLET = "UQBr_XZ5X_YOUR_ADMIN_WALLET_ADDRESS"; // عنوان محفظتك (الأدمن)
 
-    // بيانات المستخدم في الجلسة الحالية
     let userData = {
       balance: 0.00,
       refCount: 0,
       userId: tg.initDataUnsafe?.user?.id || '12345678'
     };
 
-    // بيانات مستويات الاستثمار الـ 5
     const levels = [
       { id: 1, name: "المستوى 1", cost: 1, return: 1.15, profit: "0.15+", duration: "12 ساعة" },
       { id: 2, name: "المستوى 2", cost: 2, return: 2.30, profit: "0.30+", duration: "24 ساعة" },
@@ -268,117 +210,79 @@
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('admin-wallet-address').innerText = ADMIN_WALLET;
+      document.getElementById('ref-link').value = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
       updateUI();
       renderLevels();
-      
-      // إعداد رابط الإحالة الخاص بالمستخدم
-      const refLink = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
-      document.getElementById('ref-link').value = refLink;
     });
 
-    // تحديث الواجهة والكرت الخاص بالرصيد
     function updateUI() {
       document.getElementById('user-balance').innerText = `${userData.balance.toFixed(2)} GRAM`;
       document.getElementById('ref-count').innerText = userData.refCount;
     }
 
-    // عرض كروت المستويات
     function renderLevels() {
       const container = document.getElementById('investment-levels');
       container.innerHTML = '';
-
       levels.forEach(lvl => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
           <h4>🔹 ${lvl.name}</h4>
-          <p>مبلغ الاستثمار: <b>${lvl.cost} GRAM</b></p>
-          <p>العائد التجميعي: <b>${lvl.return} GRAM</b></p>
-          <p>الربح الصافي: <span class="profit">${lvl.profit} GRAM</span></p>
-          <p>المدة الزمنية: <b>${lvl.duration}</b></p>
-          <button onclick="startInvestment(${lvl.cost}, ${parseFloat(lvl.profit)}, '${lvl.duration}')">استثمار (${lvl.cost} GRAM)</button>
+          <p>الاستثمار: <b>${lvl.cost} GRAM</b> | الربح: <span class="profit">${lvl.profit}</span></p>
+          <p>العائد الكلي: <b>${lvl.return} GRAM</b> | المدة: <b>${lvl.duration}</b></p>
+          <button onclick="startInvestment(${lvl.cost}, ${parseFloat(lvl.profit)})">استثمار (${lvl.cost} GRAM)</button>
         `;
         container.appendChild(card);
       });
     }
 
-    // التنفيذ عند الضغط على الاستثمار
-    function startInvestment(cost, profit, duration) {
+    function startInvestment(cost, profit) {
       if (userData.balance < cost) {
-        tg.showAlert("⚠️ رصيدك المتاح غير كافٍ لهذا المستوى!");
+        tg.showAlert("⚠️ رصيدك الداخلي لا يكفي! يرجى الشحن أولاً.");
         return;
       }
-
       userData.balance -= cost;
       updateUI();
-      
-      tg.showAlert(`✅ تم بدء الاستثمار بنجاح!\nسيتم إضافة العائد والربح (${cost + profit} GRAM) إلى رصيدك الداخلي تلقائياً بعد انتهاء مدة (${duration}).`);
+      tg.showAlert(`✅ تم بدء الاستثمار! سيتم إضافة العائد (${cost + profit} GRAM) للرصيد الداخلي عند الإنتهاء.`);
     }
 
-    // عند طلب الشحن/الإيداع
     function handleDeposit() {
-      const amountInput = document.getElementById('deposit-amount');
-      const amount = parseFloat(amountInput.value);
-
+      const amount = parseFloat(document.getElementById('deposit-amount').value);
       if (!amount || amount <= 0) {
-        tg.showAlert("يرجى إدخال مبلغ إيداع صحيح.");
+        tg.showAlert("أدخل مبلغ الإيداع بشكل صحيح.");
         return;
       }
-
-      tg.showAlert(`📥 تم إرسال طلب شحن الرصيد بقيمة ${amount} GRAM للمشرف.\nسيتم إضافة المبلغ لرصيدك فور التأكيد.`);
-      amountInput.value = '';
+      tg.showAlert(`📥 تم إرسال طلب الشحن بقيمة ${amount} GRAM للتحقق.\nبعد تأكيد وصول الإيداع لمحفظة الأدمن، سيظهر في رصيدك الداخلي.`);
     }
 
-    // عند طلب السحب
     function handleWithdraw() {
-      const addressInput = document.getElementById('withdraw-address');
-      const amountInput = document.getElementById('withdraw-amount');
-
-      const address = addressInput.value.trim();
-      const amount = parseFloat(amountInput.value);
+      const address = document.getElementById('withdraw-address').value.trim();
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
 
       if (!address || !amount || amount <= 0) {
-        tg.showAlert("يرجى إدخال عنوان المحفظة والمبلغ بشكل صحيح.");
+        tg.showAlert("أدخل عنوان المحفظة والمبلغ بشكل صحيح.");
         return;
       }
-
       if (amount > userData.balance) {
-        tg.showAlert("❌ رصيدك الوهمي الداخلي غير كافٍ لاتمام هذا السحب!");
+        tg.showAlert("❌ رصيدك الداخلي الحالي لا يكفي لهذا السحب.");
         return;
       }
 
-      // خصم المبلغ من الرصيد الداخلي
       userData.balance -= amount;
       updateUI();
-
-      // إنشاء رقم تسلسلي
       const serialNum = "SN-" + Math.floor(100000 + Math.random() * 900000);
-
-      tg.showAlert(`📤 تم إرسال طلب السحب بنجاح!\n\nالمبلغ: ${amount} GRAM\nالرقم التسلسلي: ${serialNum}\nالمحفظة: ${address}\n\nتم خصم المبلغ من رصيدك الداخلي وفي انتظار موافقة المشرف.`);
-
-      addressInput.value = '';
-      amountInput.value = '';
+      tg.showAlert(`📤 تم طلب السحب بنجاح!\nالرقم التسلسلي: ${serialNum}\nتم خصم ${amount} GRAM من رصيدك الداخلي، وسيتم إرسال المال لك يدوياً من الأدمن.`);
     }
 
-    // نسخ رابط الإحالة
     function copyRefLink() {
-      const refInput = document.getElementById('ref-link');
-      refInput.select();
-      refInput.setSelectionRange(0, 99999);
-      
-      navigator.clipboard.writeText(refInput.value).then(() => {
-        tg.showAlert("📋 تم نسخ رابط الإحالة بنجاح!");
-      }).catch(() => {
-        document.execCommand('copy');
-        tg.showAlert("📋 تم نسخ رابط الإحالة!");
-      });
+      navigator.clipboard.writeText(document.getElementById('ref-link').value);
+      tg.showAlert("📋 تم نسخ رابط الإحالة!");
     }
 
-    // التبديل بين التبويبات
     function switchTab(tabName, btnElement) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-
       document.getElementById(`tab-${tabName}`).classList.add('active');
       btnElement.classList.add('active');
     }
