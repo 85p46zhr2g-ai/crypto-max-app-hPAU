@@ -3,18 +3,19 @@ import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, MenuButtonWebApp, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-# إعداد التسجيلات
+# إعدادات التسجيل
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-# التوكن ورابط التطبيق
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+# التوكن ورابط التطبيق الخاص بك
+BOT_TOKEN = "7901357038:AAFi2I3r0K89iGjAn8_VvY8_fO1Qy0WzU9M"  # ضع التوكن الخاص بك هنا إذا كان مختلفاً
 MINI_APP_URL = "https://gram-max.vercel.app/index.html?v=6.0"
+ADMIN_ID = 5821731671 # ID الأدمن الخاص بك لاستلام الإشعارات
 
-# الأمر /start
+# أمر /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
-    # ضبط القائمة السفلية للبوت لتكون قائمة تطبيق مصغر دائماً
+    # تثبيت زر التطبيق المصغر في القائمة السفلية للبوت دائماً
     await context.bot.set_chat_menu_button(
         chat_id=update.effective_chat.id,
         menu_button=MenuButtonWebApp(text="🚀 فتح التطبيق", web_app=WebAppInfo(url=MINI_APP_URL))
@@ -26,7 +27,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"من خلال البوت يمكنك إدارة حسابك، متابعة رصيدك، تنفيذ المهام، الاستثمار، وربط محفظتك.\n"
     )
 
-    # أزرار التفاعل تحت الرسالة الترحيبية
+    # الأزرار الرئيسية
     keyboard = [
         [
             InlineKeyboardButton("📢 القناة الرسمية", url="https://t.me/GramMaxChannel"),
@@ -40,20 +41,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(welcome_text, reply_markup=reply_markup, parse_mode='Markdown')
 
-# قائمة /help
+# الأوامر القائمة المختصرة
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("لأي استفسار أو مساعدة، تواصل مع الدعم الفني: @FastHelp3")
+    await update.message.reply_text("🆘 **الدعم الفني**\n\nلأي استفسار أو مشكلة في الإيداع والسحب، تواصل مع الدعم: @FastHelp3", parse_mode='Markdown')
 
-# دالة إرسال إشعار سحب / إيداع من السيرفر
-async def send_notification(app: Application, user_id: int, title: str, details: str):
-    msg = f"🔔 **{title}**\n\n{details}"
-    await app.bot.send_message(chat_id=user_id, text=msg, parse_mode='Markdown')
+async def terms_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("📜 **الشروط والأحكام**\n\n1. يمنع استخدام أكثر من حساب بطرق غير مشروعة.\n2. جميع عمليات السحب تخضع للمراجعة وتنفذ خلال 24 ساعة.\n3. رسوم السحب هي 2%.", parse_mode='Markdown')
 
 def main():
     application = Application.builder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("terms", terms_command))
 
     print("GRAM MAX Bot is Running...")
     application.run_polling()
