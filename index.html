@@ -16,6 +16,7 @@
             --border-color: #282828;
             --status-green: #00e676;
             --lock-bg: #121212;
+            --danger-red: #ff5252;
         }
 
         * {
@@ -53,21 +54,25 @@
             color: var(--accent-yellow);
         }
 
-        .header-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
+        .balance-card {
+            background: linear-gradient(135deg, #1f1b0e 0%, #181818 100%);
+            border: 1px solid var(--accent-yellow);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
         }
 
-        .btn-pill {
-            background-color: #22222b;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
+        .balance-title {
             font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .balance-value {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent-yellow);
         }
 
         .page-view {
@@ -86,7 +91,6 @@
             padding: 16px;
             margin-bottom: 16px;
             border: 1px solid var(--border-color);
-            position: relative;
         }
 
         .card.locked {
@@ -137,7 +141,7 @@
             font-weight: 600;
         }
 
-        .btn-invest {
+        .btn-action {
             width: 100%;
             background-color: var(--accent-yellow);
             color: #000;
@@ -150,22 +154,22 @@
             margin-top: 10px;
         }
 
-        .btn-invest:disabled {
+        .btn-action:disabled {
             background-color: #333;
             color: #777;
             cursor: not-allowed;
         }
 
-        .deposit-input {
+        .custom-input {
             width: 100%;
             padding: 14px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
             background: #0d0d0d;
             color: #fff;
-            margin: 12px 0;
+            margin: 10px 0;
             outline: none;
-            font-size: 18px;
+            font-size: 16px;
             text-align: center;
             font-weight: bold;
         }
@@ -216,19 +220,24 @@
     <header>
         <div class="brand-title">GRAM MAX</div>
         <div class="header-actions">
-            <button class="btn-pill" onclick="toggleLanguage()">🌐 <span id="lang-btn">EN</span></button>
             <div id="ton-connect-btn"></div>
         </div>
     </header>
 
-    <!-- الرئيسية: خطط الاستثمار المتعاقبة -->
+    <!-- الرئيسية: الرصيد الداخلي ومستويات الاستثمار -->
     <div id="tab-home" class="page-view active">
         
-        <!-- المستوى 1 (مفتوح تلقائياً) -->
+        <!-- كارت الرصيد الداخلي -->
+        <div class="balance-card">
+            <div class="balance-title">رصيدك الداخلي المتاح</div>
+            <div class="balance-value"><span id="user-balance">0.00</span> TON</div>
+        </div>
+
+        <!-- المستوى 1 -->
         <div class="card" id="level-1-card">
             <div class="card-header-title">
                 <span>⚡ الاستثمار - المستوى 1</span>
-                <span class="badge active" id="badge-1">متاح للبدء</span>
+                <span class="badge active" id="badge-1">متاح</span>
             </div>
             <div class="info-row">
                 <span class="info-label">قيمة الاستثمار:</span>
@@ -238,18 +247,14 @@
                 <span class="info-label">الأرباح المتوقعة:</span>
                 <span class="info-value" style="color: var(--status-green);">+1.5 TON</span>
             </div>
-            <div class="info-row">
-                <span class="info-label">مدة الدورة:</span>
-                <span class="info-value">24 ساعة</span>
-            </div>
-            <button class="btn-invest" id="btn-lvl-1" onclick="investLevel(1, 1)">بدء الاستثمار الآن (1 TON)</button>
+            <button class="btn-action" id="btn-lvl-1" onclick="investFromBalance(1, 1)">استثمار من الرصيد الداخلي (1 TON)</button>
         </div>
 
-        <!-- المستوى 2 (يفتح بعد استثمار المستوى 1) -->
+        <!-- المستوى 2 -->
         <div class="card locked" id="level-2-card">
             <div class="card-header-title">
                 <span>🚀 الاستثمار - المستوى 2</span>
-                <span class="badge" id="badge-2">مغلق (أكمل المستوى 1)</span>
+                <span class="badge" id="badge-2">مغلق</span>
             </div>
             <div class="info-row">
                 <span class="info-label">قيمة الاستثمار:</span>
@@ -259,18 +264,14 @@
                 <span class="info-label">الأرباح المتوقعة:</span>
                 <span class="info-value" style="color: var(--status-green);">+8.0 TON</span>
             </div>
-            <div class="info-row">
-                <span class="info-label">مدة الدورة:</span>
-                <span class="info-value">24 ساعة</span>
-            </div>
-            <button class="btn-invest" id="btn-lvl-2" onclick="investLevel(2, 5)" disabled>مغلق حالياً</button>
+            <button class="btn-action" id="btn-lvl-2" onclick="investFromBalance(2, 5)" disabled>مغلق (أكمل المستوى 1)</button>
         </div>
 
-        <!-- المستوى 3 (يفتح بعد استثمار المستوى 2) -->
+        <!-- المستوى 3 -->
         <div class="card locked" id="level-3-card">
             <div class="card-header-title">
                 <span>💎 الاستثمار - المستوى 3</span>
-                <span class="badge" id="badge-3">مغلق (أكمل المستوى 2)</span>
+                <span class="badge" id="badge-3">مغلق</span>
             </div>
             <div class="info-row">
                 <span class="info-label">قيمة الاستثمار:</span>
@@ -280,19 +281,7 @@
                 <span class="info-label">الأرباح المتوقعة:</span>
                 <span class="info-value" style="color: var(--status-green);">+17.5 TON</span>
             </div>
-            <div class="info-row">
-                <span class="info-label">مدة الدورة:</span>
-                <span class="info-value">24 ساعة</span>
-            </div>
-            <button class="btn-invest" id="btn-lvl-3" onclick="investLevel(3, 10)" disabled>مغلق حالياً</button>
-        </div>
-
-        <div class="card">
-            <div class="card-header-title">📢 القنوات والدعم</div>
-            <a href="https://t.me/FastHelp3" class="info-row" style="text-decoration: none; color: inherit;" target="_blank">
-                <span>💬 قناة الدعم الفني المباشر</span>
-                <span>↗</span>
-            </a>
+            <button class="btn-action" id="btn-lvl-3" onclick="investFromBalance(3, 10)" disabled>مغلق (أكمل المستوى 2)</button>
         </div>
     </div>
 
@@ -319,23 +308,42 @@
                 <span class="info-label">إجمالي الدعوات:</span>
                 <span class="info-value">0</span>
             </div>
-            <button class="btn-invest" style="margin-top: 10px;" onclick="copyReferralLink()">🔗 نسخ رابط الإحالة</button>
+            <button class="btn-action" style="margin-top: 10px;" onclick="copyReferralLink()">🔗 نسخ رابط الإحالة</button>
         </div>
     </div>
 
-    <!-- المحفظة والإيداع التلقائي -->
+    <!-- المحفظة والإيداع والسحب -->
     <div id="tab-balance" class="page-view">
+        
+        <!-- قسم الإيداع -->
         <div class="card">
-            <div class="card-header-title">💼 المحفظة والإيداع السريع</div>
-            <p style="font-size: 12px; color: var(--text-sub);">أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON)</p>
+            <div class="card-header-title">📥 الإيداع الشحن</div>
+            <p style="font-size: 12px; color: var(--text-sub);">الحد الأدنى للإيداع هو 1 TON</p>
             
-            <input type="number" id="custom-amount" class="deposit-input" placeholder="1" min="1" step="any" value="1">
+            <input type="number" id="deposit-amount" class="custom-input" placeholder="1" min="1" value="1" oninput="validateMinInput(this)">
             
-            <button class="btn-invest" onclick="sendAutoDeposit()">⚡ إيداع الآن تلقائياً</button>
+            <button class="btn-action" onclick="sendAutoDeposit()">⚡ شحن الرصيد الداخلي</button>
         </div>
+
+        <!-- قسم السحب -->
+        <div class="card">
+            <div class="card-header-title">📤 طلب سحب الأرباح</div>
+            <p style="font-size: 12px; color: var(--text-sub);">الحد الأدنى للسحب 1 TON - ضريبة السحب 2%</p>
+            
+            <input type="text" id="withdraw-wallet" class="custom-input" placeholder="عنوان محفظة TON الخاصة بك">
+            <input type="number" id="withdraw-amount" class="custom-input" placeholder="المبلغ (مثال: 1)" min="1" value="1" oninput="validateMinInput(this)">
+            
+            <div class="info-row" style="margin: 5px 0;">
+                <span class="info-label">الخصم الإجمالي (شامل 2%):</span>
+                <span class="info-value" id="net-withdraw-display">1.02 TON</span>
+            </div>
+
+            <button class="btn-action" style="background-color: var(--accent-yellow);" onclick="requestWithdrawal()">📤 إرسال طلب السحب للأدمن</button>
+        </div>
+
     </div>
 
-    <!-- الشريط السفلي بدون تبويب المهام -->
+    <!-- الشريط السفلي -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-home', this)">
             <div class="nav-icon">🏠</div>
@@ -358,7 +366,8 @@
     <script>
         const ADMIN_WALLET = "UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X";
 
-        let currentLang = 'ar';
+        let internalBalance = 0.00; // الرصيد الداخلي
+        let withdrawSequenceNumber = 1000; // بداية أرقام التوصل للسحب
         let isWalletConnected = false;
 
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -367,75 +376,43 @@
         });
 
         tonConnectUI.onStatusChange(wallet => {
-            if (wallet) {
-                isWalletConnected = true;
-            } else {
-                isWalletConnected = false;
-            }
+            isWalletConnected = !!wallet;
         });
 
-        function switchTab(tabId, element) {
-            if (!isWalletConnected && tabId !== 'tab-home') {
-                alert("يرجى ربط المحفظة أولاً من الأعلى لتفعيل كافة الخانات!");
-                tonConnectUI.openModal();
-                return;
+        function updateBalanceDisplay() {
+            document.getElementById('user-balance').innerText = internalBalance.toFixed(2);
+        }
+
+        // منع إدخال أي رقم أقل من 1
+        function validateMinInput(element) {
+            let val = parseFloat(element.value);
+            if (isNaN(val) || val < 1) {
+                element.value = 1;
             }
+            
+            // حساب الضريبة عند كتابة مبلغ السحب
+            if (element.id === 'withdraw-amount') {
+                let amount = parseFloat(element.value) || 1;
+                let totalWithFee = amount * 1.02; // ضريبة 2%
+                document.getElementById('net-withdraw-display').innerText = totalWithFee.toFixed(2) + " TON";
+            }
+        }
+
+        function switchTab(tabId, element) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
         }
 
-        async function investLevel(level, amount) {
-            if (!isWalletConnected) {
-                tonConnectUI.openModal();
-                return;
-            }
-
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [
-                    {
-                        address: ADMIN_WALLET,
-                        amount: Math.floor(amount * 1000000000).toString()
-                    }
-                ]
-            };
-
-            try {
-                await tonConnectUI.sendTransaction(transaction);
-                
-                // بعد نفاذ المعاملة بنجاح، يتم تحديث الزر وفتح المستوى التالي
-                const currentBtn = document.getElementById(`btn-lvl-${level}`);
-                currentBtn.innerText = "جاري الاستثمار... ⏳";
-                currentBtn.disabled = true;
-
-                const nextLevel = level + 1;
-                const nextCard = document.getElementById(`level-${nextLevel}-card`);
-                const nextBtn = document.getElementById(`btn-lvl-${nextLevel}`);
-                const nextBadge = document.getElementById(`badge-${nextLevel}`);
-
-                if (nextCard) {
-                    nextCard.classList.remove('locked');
-                    nextBtn.disabled = false;
-                    nextBtn.innerText = `بدء الاستثمار الآن (${nextBtn.getAttribute('onclick').match(/\d+/g)[1]} TON)`;
-                    nextBadge.classList.add('active');
-                    nextBadge.innerText = "متاح للبدء";
-                }
-
-            } catch (e) {
-                console.log("Transaction cancelled.");
-            }
-        }
-
+        // الإيداع الخارجي عبر المحفظة لشحن الرصيد الداخلي
         async function sendAutoDeposit() {
             if (!isWalletConnected) {
                 tonConnectUI.openModal();
                 return;
             }
 
-            const inputField = document.getElementById('custom-amount');
-            const amountVal = parseFloat(inputField.value);
+            const amountVal = parseFloat(document.getElementById('deposit-amount').value);
             
             if (isNaN(amountVal) || amountVal < 1) {
                 alert("الحد الأدنى للإيداع هو 1 TON");
@@ -454,14 +431,85 @@
 
             try {
                 await tonConnectUI.sendTransaction(transaction);
+                // إضافة المبلغ للرصيد الداخلي فور النجاح
+                internalBalance += amountVal;
+                updateBalanceDisplay();
+                alert(`تم شحن حسابك بنجاح بمبلغ ${amountVal} TON!`);
             } catch (e) {
                 console.log("Transaction cancelled.");
             }
         }
 
-        function copyReferralLink() {
-            navigator.clipboard.writeText("https://t.me/GramMaxBot?start=ref");
-            alert("تم نسخ رابط الإحالة!");
+        // الاستثمار المباشر من الرصيد الداخلي فقط (بدون محفظة)
+        function investFromBalance(level, cost) {
+            if (internalBalance < cost) {
+                alert(`رصيدك الداخلي غير كافٍ! تحتاج إلى ${cost} TON للبدء.`);
+                return;
+            }
+
+            // خصم القيمة من الرصيد الداخلي
+            internalBalance -= cost;
+            updateBalanceDisplay();
+
+            // تحديث البطاقات وفتح المستوى التالي
+            const currentBtn = document.getElementById(`btn-lvl-${level}`);
+            currentBtn.innerText = "نشط حالياً ⚡";
+            currentBtn.disabled = true;
+
+            const nextLevel = level + 1;
+            const nextCard = document.getElementById(`level-${nextLevel}-card`);
+            const nextBtn = document.getElementById(`btn-lvl-${nextLevel}`);
+            const nextBadge = document.getElementById(`badge-${nextLevel}`);
+
+            if (nextCard) {
+                nextCard.classList.remove('locked');
+                nextBtn.disabled = false;
+                let nextCost = nextLevel === 2 ? 5 : 10;
+                nextBtn.innerText = `استثمار من الرصيد الداخلي (${nextCost} TON)`;
+                nextBadge.classList.add('active');
+                nextBadge.innerText = "متاح";
+            }
+
+            alert(`تم تفعيل المستوى ${level} بنجاح وخصم ${cost} TON من رصيدك الداخلي!`);
+        }
+
+        // إرسال طلب السحب للأدمن مع الرقم التسلسلي والضريبة 2%
+        function requestWithdrawal() {
+            const walletAddr = document.getElementById('withdraw-wallet').value.trim();
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const totalDeduction = amount * 1.02; // خصم المبلغ + 2% ضريبة
+
+            if (!walletAddr) {
+                alert("يرجى إدخال عنوان محفظتك لاستلام الأموال!");
+                return;
+            }
+
+            if (isNaN(amount) || amount < 1) {
+                alert("الحد الأدنى للسحب هو 1 TON!");
+                return;
+            }
+
+            if (internalBalance < totalDeduction) {
+                alert(`رصيدك الداخلي غير كافٍ! المبلغ المطلوب مع ضريبة 2% هو ${totalDeduction.toFixed(2)} TON.`);
+                return;
+            }
+
+            // خصم المبلغ إدارياً
+            internalBalance -= totalDeduction;
+            updateBalanceDisplay();
+
+            // توليد الرقم التسلسلي للطلب
+            withdrawSequenceNumber++;
+            const orderHash = `#WD-${withdrawSequenceNumber}`;
+
+            // إرسال إشعار عبر WebApp
+            const telegramMsg = `طلب سحب جديد ${orderHash}\nالمبلغ: ${amount} TON\nالعنوان: ${walletAddr}`;
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.sendData(telegramMsg);
+            }
+
+            alert(`تم تسجيل طلب السحب بنجاح!\nالرقم التسلسلي: ${orderHash}\nالمبلغ الخالص: ${amount} TON (تم خصم 2% ضريبة)\nسيتم التدقيق والإرسال بواسطة الأدمن قريباً.`);
         }
     </script>
 </body>
