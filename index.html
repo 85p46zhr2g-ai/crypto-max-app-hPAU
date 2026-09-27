@@ -8,14 +8,14 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --text-color: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --success-color: #22c55e;
+            --bg-color: #0b0c10;
+            --card-bg: #15181e;
+            --gold-primary: #f5b027;
+            --gold-glow: #ffc107;
+            --ton-blue: #0088cc;
+            --text-color: #ffffff;
+            --text-muted: #8e95a5;
+            --border-color: #232730;
         }
 
         * {
@@ -29,208 +29,325 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding: 16px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
             min-height: 100vh;
+            padding-bottom: 75px;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            text-align: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header h1 {
-            font-size: 22px;
-            color: var(--accent-color);
-            margin-bottom: 4px;
-        }
-
-        .header p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .user-info {
+        /* Top Header Navigation */
+        .top-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 8px;
+            padding: 4px 0;
         }
 
-        .balance-box {
-            text-align: center;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 12px 0;
+        .left-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
-        .balance-title {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .balance-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            color: #000;
+        .btn-wallet {
+            background-color: var(--ton-blue);
+            color: #fff;
             border: none;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 14px;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 136, 204, 0.4);
+        }
+
+        .btn-pill {
+            background-color: #1f242d;
+            color: #c5c9d3;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            width: 100%;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--gold-primary);
+            letter-spacing: 0.5px;
+        }
+
+        /* Circle Character Area */
+        .circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0 10px 0;
+            position: relative;
+        }
+
+        .golden-circle {
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            border: 3px solid var(--gold-primary);
+            box-shadow: 0 0 25px rgba(245, 176, 39, 0.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(245, 176, 39, 0.1) 0%, rgba(11, 12, 16, 0.8) 70%);
+            position: relative;
+        }
+
+        .avatar-placeholder {
+            width: 80px;
+            height: 80px;
+            background-color: var(--ton-blue);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
-        .btn:active {
-            transform: scale(0.98);
-            opacity: 0.9;
+        /* Feed Me Golden Button */
+        .btn-feed {
+            background: linear-gradient(180deg, #fcd34d 0%, #f5b027 100%);
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(245, 176, 39, 0.4);
+            transition: transform 0.1s;
         }
 
-        .btn-outline {
-            background-color: transparent;
-            color: var(--text-color);
+        .btn-feed:active {
+            transform: scale(0.97);
+        }
+
+        /* Card Section */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
             border: 1px solid var(--border-color);
         }
 
-        .section-title {
-            font-size: 16px;
+        .card-header {
+            color: var(--gold-primary);
+            font-size: 15px;
             font-weight: bold;
             margin-bottom: 12px;
+        }
+
+        .info-row {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
-        .support-box {
-            text-align: center;
-            padding: 12px;
+        .info-label {
+            color: var(--text-muted);
         }
 
-        .support-box a {
-            color: var(--accent-color);
-            text-decoration: none;
+        .info-value {
             font-weight: bold;
         }
 
-        footer {
-            margin-top: auto;
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-secondary);
-            padding: 12px 0;
+        .text-green {
+            color: #22c55e;
+        }
+
+        /* Channels & Tasks Links */
+        .channel-btn {
+            background-color: #1f242d;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #0e1014;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 11px;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--gold-primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .center-ai-btn {
+            background: radial-gradient(circle, var(--gold-primary) 0%, #d97706 100%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -18px;
+            box-shadow: 0 0 15px rgba(245, 176, 39, 0.6);
+            border: 2px solid #0e1014;
         }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر والمعلومات الأساسية -->
+    <!-- الهيدر العلوي -->
+    <div class="top-header">
+        <div class="left-actions">
+            <button class="btn-wallet" onclick="connectWallet()">
+                Connect Wallet <span style="font-size: 11px;">💎</span>
+            </button>
+            <button class="btn-pill" onclick="openFAQ()">FAQ</button>
+            <button class="btn-pill" onclick="toggleLanguage()">🌐 AR/EN</button>
+        </div>
+        <div class="app-title">GRAM MAX</div>
+    </div>
+
+    <!-- الشعار الدائري الذهبي -->
+    <div class="circle-container">
+        <div class="golden-circle">
+            <div class="avatar-placeholder">❓</div>
+        </div>
+    </div>
+
+    <!-- زر الإطعام والاستثمار الذهبي الرئيسي -->
+    <button class="btn-feed" onclick="feedAction()">
+        إطعام (Feed me)
+    </button>
+
+    <!-- بطاقة حالة الاستثمار النشط -->
     <div class="card">
-        <div class="header">
-            <h1>GRAM MAX</h1>
-            <p>التطبيق المصغر لمنصة الاستثمار والخدمات</p>
+        <div class="card-header">حالة الاستثمار النشط</div>
+        <div class="info-row">
+            <span class="info-label">الوجبة الحالية:</span>
+            <span class="info-value">Noodles</span>
         </div>
-
-        <div class="user-info" id="userInfo">
-            <span id="userName">مرحباً...</span>
-            <span id="userId" style="font-size: 11px; color: var(--text-secondary);">ID: -</span>
+        <div class="info-row">
+            <span class="info-label">الوقت المتبقي:</span>
+            <span class="info-value">07:26:17</span>
         </div>
-
-        <div class="balance-box">
-            <div class="balance-title">رصيدك الحالي</div>
-            <div class="balance-value"><span id="userBalance">0.00</span> <small style="font-size: 14px;">GRAM</small></div>
+        <div class="info-row">
+            <span class="info-label">الأرباح المكتسبة:</span>
+            <span class="info-value text-green">TON 0.05+</span>
         </div>
     </div>
 
-    <!-- شبكة التصفح الرئيسية -->
-    <div class="nav-grid">
-        <button class="btn" onclick="openInvest()">
-            📈 الاستثمار
-        </button>
-        <button class="btn btn-outline" onclick="openWithdraw()">
-            💸 السحب
-        </button>
-        <button class="btn btn-outline" onclick="openTasks()">
-            📋 المهام
-        </button>
-        <button class="btn btn-outline" onclick="openReferrals()">
-            👥 الإحالات
-        </button>
-    </div>
-
-    <!-- قسم الدعم والإعدادات -->
+    <!-- قسم القنوات والسياسات -->
     <div class="card">
-        <div class="section-title">⚙️ الدعم والتواصل</div>
-        <div class="support-box">
-            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">لأي استفسارات أو مواجهة مشاكل يرجى التواصل معنا:</p>
-            <a href="https://t.me/FastHelp3" target="_blank" class="btn btn-outline">
-                💬 التواصل مع الدعم الفني (@FastHelp3)
-            </a>
-        </div>
+        <div class="card-header">📢 القنوات والشروط</div>
+        <a href="https://t.me/FastHelp3" class="channel-btn" target="_blank">
+            <span>💬 قناة الدعم والدعم الفني</span>
+            <span>↗</span>
+        </a>
+        <a href="#" class="channel-btn" onclick="openPolicy()">
+            <span>📜 سياسة الاستخدام والشروط</span>
+            <span>ℹ️</span>
+        </a>
     </div>
 
-    <footer>
-        GRAM MAX Mini App &copy; 2026
-    </footer>
+    <!-- شريط التصفح السفلي -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('friends')">
+            <span class="nav-icon">👥</span>
+            <span>Friends</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('ai')">
+            <div class="center-ai-btn">🤖</div>
+            <span style="margin-top: 2px;">AI Trading</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tasks')">
+            <span class="nav-icon">📋</span>
+            <span>Tasks</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('balance')">
+            <span class="nav-icon">💼</span>
+            <span>Balance</span>
+        </div>
+    </div>
 
     <script>
-        // تهيئة Telegram WebApp SDK
         const tg = window.Telegram.WebApp;
-        tg.expand(); // توسيع الشاشة بالكامل
+        tg.expand();
 
-        // جلب بيانات المستخدم من تلجرام
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('userName').innerText = `مرحباً، ${user.first_name}`;
-            document.getElementById('userId').innerText = `ID: ${user.id}`;
+        function connectWallet() {
+            tg.showAlert('يرجى إرسال عنوان محفظة TON الخاصة بك في محادثة البوت لربطها.');
         }
 
-        // الوظائف البرمجية للأزرار
-        function openInvest() {
-            tg.sendData(JSON.stringify({ action: 'invest' }));
-            tg.showAlert('قسم الاستثمار: يمكنك متابعة الخطط الاستثمارية المتاحة عبر البوت.');
+        function openFAQ() {
+            tg.showAlert('الأسئلة الشائعة:\n1. كيف يتم الاستثمار؟ قم بالضغط على Feed me لتنشيط الخطط.\n2. متى يتم السحب؟ فور اكتمال مدة الخطة.');
         }
 
-        function openWithdraw() {
-            tg.showAlert('قسم السحب: تأكد من ربط محفظة TON الخاصة بك في البوت أولاً.');
+        function toggleLanguage() {
+            tg.showAlert('تم تغيير اللغة / Language Switched');
         }
 
-        function openTasks() {
-            tg.showAlert('قسم المهام: لا توجد مهام متاحة حالياً، يرجى المتابعة لاحقاً.');
+        function feedAction() {
+            tg.showAlert('تم تشغيل خيار الإطعام/الاستثمار بنجاح!');
         }
 
-        function openReferrals() {
-            tg.showAlert('قسم الإحالات: يمكنك نسخ رابط الإحالة الخاص بك مباشرة من محادثة البوت.');
+        function openPolicy() {
+            tg.showAlert('سياسة الاستخدام:\n- الحسابات المزدوجة ممنوعة.\n- يتم السحب تلقائياً إلى محفظتك المربوطة.');
+        }
+
+        function switchTab(tabName) {
+            if(tabName === 'balance') {
+                tg.showAlert('قسم الرصيد والسحب: انتقل للبوت للتحقق من كافة التفاصيل.');
+            } else if(tabName === 'friends') {
+                tg.showAlert('قسم الإحالات: انسخ رابط إحالتك من محادثة البوت.');
+            } else if(tabName === 'tasks') {
+                tg.showAlert('قسم المهام: لا توجد مهام جديدة حالياً.');
+            }
         }
     </script>
 </body>
