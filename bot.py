@@ -1,5 +1,5 @@
 import sqlite3
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 
 # ---------------------------------------------------------
@@ -44,7 +44,7 @@ def init_db():
 init_db()
 
 # ---------------------------------------------------------
-# لوحة التحكم الرئيسية (إضافة زر الشروط والأحكام)
+# لوحة التحكم الرئيسية (الأزرار الأساسية)
 # ---------------------------------------------------------
 def get_main_keyboard():
     keyboard = [
@@ -52,8 +52,7 @@ def get_main_keyboard():
         ["📈 الاستثمار", "📋 المهام"],
         ["💳 ربط المحفظة", "💸 السحب"],
         ["👥 الإحالات", "👤 الملف الشخصي"],
-        ["🌐 اختيار اللغة", "⚙️ الإعدادات"],
-        ["📜 الشروط والأحكام"]
+        ["🌐 اختيار اللغة", "⚙️ الإعدادات"]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -92,9 +91,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         conn.commit()
 
     conn.close()
+
+    # زر شفاف لفتح Mini App
+    miniapp_keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🚀 فتح التطبيق المصغر", web_app=WebAppInfo(url="https://crypto-max-app-hpau.onrender.com"))]
+    ])
+
     await update.message.reply_text(
-        "أهلاً بك في بوت GRAM MAX! 🚀\nاختر من القائمة أدناه للبدء:",
+        "أهلاً بك في بوت GRAM MAX! 🚀\nيمكنك استخدام الأزرار أدناه أو فتح التطبيق المصغر مباشرة:",
         reply_markup=get_main_keyboard()
+    )
+    await update.message.reply_text(
+        "اضغط أدناه لفتح واجهة GRAM MAX المصغرة:",
+        reply_markup=miniapp_keyboard
     )
 
 # ---------------------------------------------------------
@@ -119,34 +128,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     balance = user[4] if user else 0.0
     wallet = user[5] if user else None
 
-    # 📜 الشروط والأحكام
-    if text == "📜 الشروط والأحكام":
-        terms_text = (
-            "📜 **الشروط والأحكام**\n\n"
-            "مرحبًا بك في **GRAM MAX**.\n\n"
-            "باستخدامك لهذا البوت أو Mini App فإنك تقر بأنك قرأت وفهمت ووافقت على هذه الشروط والأحكام. إذا كنت لا توافق عليها، يرجى عدم استخدام الخدمة.\n\n"
-            "1️⃣ **القبول والاستخدام:** يوافق المستخدم على الالتزام بهذه الشروط وجميع القواعد والتعليمات المعروضة داخل البوت.\n"
-            "2️⃣ **الحساب:** كل حساب مرتبط بحساب Telegram الخاص بالمستخدم. يتحمل المستخدم مسؤولية الحفاظ على حسابه وعدم استخدام حسابات متعددة للتحايل.\n"
-            "3️⃣ **الرصيد والمكافآت:** جميع الأرصدة والمكافآت الظاهرة هي أرصدة رقمية داخل النظام تخضع للقواعد الشروط المحددة.\n"
-            "4️⃣ **الإيداعات:** يجب التأكد من صحة عنوان المحفظة والشبكة والمبلغ قبل إرسال أي معاملة عبر شبكة TON.\n"
-            "5️⃣ **الاستثمارات والعوائد:** الاستثمارات تخضع للشروط المحددة داخل التطبيق، ولا يوجد أي ضمان بتحقيق أرباح.\n"
-            "6️⃣ **السحب:** تخضع طلبات السحب للحد الأدنى والرسوم المطبقة وقواعد التحقق.\n"
-            "7️⃣ **الإحالات:** يحصل المستخدم على مكافآت وفق النسب القائمة وُيمنع إنشاء حسابات وهمية.\n"
-            "8️⃣ **المهام:** يجب تنفيذ المهام بطريقة حقيقية ويُمنع استخدام البوتات أو وسائل الغش.\n"
-            "9️⃣ **منع الغش والتلاعب:** يحق للإدارة إيقاف الحسابات المخالفة أو المستغلة للثغرات.\n"
-            "🔟 **المحفظة:** لا تطلب الإدارة أبداً عبارات الاسترداد أو الكلمات السرية أو OTP.\n"
-            "1️⃣1️⃣ **توفر الخدمة:** قد يتم تحديث أو تعديل الخدمات لأسباب فنية أو تنظيمية.\n"
-            "1️⃣2️⃣ **الرسوم:** قد تطبق رسوم على عمليات السحب مع إشعار المستخدم بها.\n"
-            "1️⃣3️⃣ **الخصوصية:** نلتزم بالتعامل مع بيانات المستخدم وفق سياسة الخصوصية.\n"
-            "1️⃣4️⃣ **إخلاء المسؤولية:** الخدمة ليست جهة مالية أو بنكاً وما يعرض لا يعتبر نصيحة مالية.\n"
-            "1️⃣5️⃣ **التعديلات:** تحتفظ الإدارة بحق تحديث الشروط واستمرار استخدامك يعتبر موافقة عليها.\n"
-            "1️⃣6️⃣ **التواصل والدعم:** يمكنك التواصل مع الدعم الفني عبر قسم الدعم.\n\n"
-            "⚠️ **تنبيه:** استخدام الخدمة يتم على مسؤولية المستخدم الخاصة."
-        )
-        await update.message.reply_text(terms_text, parse_mode="Markdown")
-
     # 1. 👤 الملف الشخصي
-    elif text == "👤 الملف الشخصي":
+    if text == "👤 الملف الشخصي":
         wallet_text = wallet if wallet else "غير مرتبطة"
         msg = f"👤 **الملف الشخصي**\n\n🆔 المعرف: `{user_id}`\n💰 الرصيد: **{balance:.2f} GRAM**\n💳 المحفظة: `{wallet_text}`"
         await update.message.reply_text(msg, parse_mode="Markdown")
@@ -160,9 +143,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 3. 💳 ربط المحفظة
     elif text == "💳 ربط المحفظة":
-        await update.message.reply_text("أرسل عنوان محفظة TON الخاصة بك الآن (مثال: `EQ...`):", parse_mode="Markdown")
+        await update.message.reply_text("أرسل عنوان محفظة TON الخاصة بك الآن (مثال: `EQ...` أو `UQ...`):", parse_mode="Markdown")
 
-    elif text.startswith("EQ") or text.startswith("UQ") or len(text) > 30:
+    elif text.startswith("EQ") or text.startswith("UQ") or (len(text) > 30 and not text.startswith("/")):
         cursor.execute("UPDATE users SET wallet_address = ? WHERE user_id = ?", (text.strip(), user_id))
         conn.commit()
         await update.message.reply_text(f"✅ تم حفظ عنوان المحفظة بنجاح:\n`{text.strip()}`", parse_mode="Markdown")
