@@ -1,557 +1,333 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GRAM MAX - TIRED RICH</title>
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- TON Connect SDK -->
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #0d0d0d;
-            --card-bg: #1a1a1a;
-            --card-border: #2a2a2a;
-            --accent-gold: #f5b83d;
-            --accent-gold-light: #ffd875;
-            --text-main: #ffffff;
-            --text-muted: #a0a0a0;
-            --nav-bg: rgba(18, 18, 18, 0.95);
+const TelegramBot = require('node-telegram-bot-api');
+const sqlite3 = require('sqlite3').verbose();
+
+// ---------------------------------------------------------
+// الإعدادات الرئيسية (تم التعديل بالقيم الخاصة بك)
+// ---------------------------------------------------------
+const TOKEN = '8307817242:AAFXPfxIENWJU7jNq5ReHbky_pPspks20j0';
+const ADMIN_ID = 8183652969;
+const SUPPORT_USERNAME = '@FastHelp3';
+
+// ---------------------------------------------------------
+// تهيئة قاعدة البيانات SQLite
+// ---------------------------------------------------------
+const db = new sqlite3.Database('./database.db');
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY,
+    first_name TEXT,
+    username TEXT,
+    language TEXT DEFAULT 'ar',
+    balance REAL DEFAULT 0.0,
+    wallet_address TEXT DEFAULT NULL,
+    referred_by INTEGER DEFAULT NULL,
+    joined_date DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS withdraw_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    amount REAL,
+    wallet_address TEXT,
+    status TEXT DEFAULT 'PENDING',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS investments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    level INTEGER,
+    amount REAL,
+    profit REAL,
+    ends_at DATETIME,
+    status TEXT DEFAULT 'ACTIVE'
+  )`);
+});
+
+// ---------------------------------------------------------
+// النصوص المترجمة للغتين العربية والإنجليزية
+// ---------------------------------------------------------
+const TEXTS = {
+  ar: {
+    welcome: "أهلاً بك في بوت GRAM MAX! 🚀\nاختر من القائمة أدناه للبدء:",
+    main_menu: "🏠 الرئيسية",
+    invest: "📈 الاستثمار",
+    tasks: "📋 المهام",
+    wallet: "💳 ربط المحفظة",
+    withdraw: "💸 السحب",
+    referrals: "👥 الإحالات",
+    profile: "👤 الملف الشخصي",
+    stars: "⭐ Star",
+    lang: "🌐 اختيار اللغة",
+    settings: "⚙️ الإعدادات",
+    support: "💬 الدعم الفني",
+    no_wallet: "⚠️ لم تقم بربط محفظتك بعد! اضغط على (💳 ربط المحفظة) أولاً.",
+    insufficient_balance: "❌ رصيدك غير كافٍ لإتمام عملية السحب.",
+    withdraw_success: "✅ تم تسجيل طلب السحب بنجاح وسيتم مراجعته من الإدارة.",
+    already_invested: "🔒 لا يمكن بدء استثمار جديد إلا بعد انتهاء الاستثمار السابق.",
+    wallet_saved: "✅ تم حفظ عنوان المحفظة بنجاح:"
+  },
+  en: {
+    welcome: "Welcome to GRAM MAX Bot! 🚀\nChoose from the menu below:",
+    main_menu: "🏠 Main Menu",
+    invest: "📈 Investment",
+    tasks: "📋 Tasks",
+    wallet: "💳 Connect Wallet",
+    withdraw: "💸 Withdraw",
+    referrals: "👥 Referrals",
+    profile: "👤 Profile",
+    stars: "⭐ Star",
+    lang: "🌐 Language",
+    settings: "⚙️ Settings",
+    support: "💬 Support",
+    no_wallet: "⚠️ You haven't linked a wallet yet! Click (💳 Connect Wallet) first.",
+    insufficient_balance: "❌ Insufficient balance for withdrawal.",
+    withdraw_success: "✅ Withdrawal request submitted successfully for admin approval.",
+    already_invested: "🔒 You cannot start a new investment until the current one finishes.",
+    wallet_saved: "✅ Wallet address saved successfully:"
+  }
+};
+
+// ---------------------------------------------------------
+// تشغيل البوت ودوال المساعدة
+// ---------------------------------------------------------
+const bot = new TelegramBot(TOKEN, { polling: true });
+
+function getUser(userId) {
+  return new Promise((resolve) => {
+    db.get("SELECT * FROM users WHERE user_id = ?", [userId], (err, row) => {
+      resolve(row);
+    });
+  });
+}
+
+function getMainMenuKeyboard(lang = 'ar') {
+  const t = TEXTS[lang] || TEXTS.ar;
+  return {
+    reply_markup: {
+      keyboard: [
+        [{ text: t.main_menu }, { text: t.stars }],
+        [{ text: t.invest }, { text: t.tasks }],
+        [{ text: t.wallet }, { text: t.withdraw }],
+        [{ text: t.referrals }, { text: t.profile }],
+        [{ text: t.lang }, { text: t.settings }]
+      ],
+      resize_keyboard: true
+    }
+  };
+}
+
+// ---------------------------------------------------------
+// أمر البداية /start
+// ---------------------------------------------------------
+bot.onText(/\/start(?:\s+(.+))?/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const referrerId = match[1] ? parseInt(match[1]) : null;
+
+  db.get("SELECT * FROM users WHERE user_id = ?", [chatId], (err, user) => {
+    if (!user) {
+      db.run(
+        "INSERT INTO users (user_id, first_name, username, referred_by) VALUES (?, ?, ?, ?)",
+        [chatId, msg.from.first_name, msg.from.username || '', referrerId]
+      );
+      if (referrerId && referrerId !== chatId) {
+        db.run("UPDATE users SET balance = balance + 0.1 WHERE user_id = ?", [referrerId]);
+        bot.sendMessage(referrerId, "🎉 انضم مستخدم جديد عبر رابط الإحالة الخاص بك! حصلت على 0.1 GRAM");
+      }
+    }
+  });
+
+  bot.sendMessage(chatId, TEXTS.ar.welcome, getMainMenuKeyboard('ar'));
+});
+
+// ---------------------------------------------------------
+// معالجة القوائم الرئيسية والتفاعل مع الرسائل
+// ---------------------------------------------------------
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text;
+
+  if (!text || text.startsWith('/')) return;
+
+  const user = await getUser(chatId);
+  const lang = user ? user.language : 'ar';
+  const t = TEXTS[lang] || TEXTS.ar;
+
+  // 1. 🌐 اختيار اللغة
+  if (text === TEXTS.ar.lang || text === TEXTS.en.lang) {
+    return bot.sendMessage(chatId, "اختر لغتك المفضلة / Select your language:", {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "🇸🇦 العربية", callback_data: "set_lang_ar" }],
+          [{ text: "🇬🇧 English", callback_data: "set_lang_en" }]
+        ]
+      }
+    });
+  }
+
+  // 2. 👤 الملف الشخصي
+  if (text === t.profile || text === TEXTS.ar.profile || text === TEXTS.en.profile) {
+    const walletText = (user && user.wallet_address) ? user.wallet_address : "غير مرتبطة";
+    const balance = user ? user.balance.toFixed(2) : "0.00";
+    const profileMsg = lang === 'ar' 
+      ? `👤 **الملف الشخصي**\n\n🆔 المعرف: \`${chatId}\`\n💰 الرصيد: **${balance} GRAM**\n💳 المحفظة: \`${walletText}\``
+      : `👤 **Profile**\n\n🆔 ID: \`${chatId}\`\n💰 Balance: **${balance} GRAM**\n💳 Wallet: \`${walletText}\``;
+
+    return bot.sendMessage(chatId, profileMsg, { parse_mode: 'Markdown', ...getMainMenuKeyboard(lang) });
+  }
+
+  // 3. 👥 الإحالات
+  if (text === t.referrals || text === TEXTS.ar.referrals || text === TEXTS.en.referrals) {
+    const botInfo = await bot.getMe();
+    const refLink = `https://t.me/${botInfo.username}?start=${chatId}`;
+    const refMsg = lang === 'ar'
+      ? `👥 **نظام الإحالات**\n\nقم بدعوة أصدقائك واحصل على عمولات مجزية:\n• المستوى 1: 5%\n• المستوى 2: 3%\n• المستوى 3: 2%\n\nرابط الإحالة الخاص بك:\n\`${refLink}\``
+      : `👥 **Referral System**\n\nInvite your friends and earn commissions:\n• Level 1: 5%\n• Level 2: 3%\n• Level 3: 2%\n\nYour referral link:\n\`${refLink}\``;
+
+    return bot.sendMessage(chatId, refMsg, { parse_mode: 'Markdown' });
+  }
+
+  // 4. 💳 ربط المحفظة
+  if (text === t.wallet || text === TEXTS.ar.wallet || text === TEXTS.en.wallet) {
+    return bot.sendMessage(chatId, lang === 'ar' 
+      ? "أرسل عنوان محفظة TON الخاصة بك الآن (مثال: `EQ...`):" 
+      : "Send your TON wallet address now (e.g. `EQ...`):", { parse_mode: 'Markdown' });
+  }
+
+  // حفظ المحفظة في قاعدة البيانات
+  if (text.startsWith('EQ') || text.startsWith('UQ') || text.length > 30) {
+    db.run("UPDATE users SET wallet_address = ? WHERE user_id = ?", [text.trim(), chatId]);
+    return bot.sendMessage(chatId, `${t.wallet_saved}\n\`${text.trim()}\``, { parse_mode: 'Markdown' });
+  }
+
+  // 5. 📋 المهام
+  if (text === t.tasks || text === TEXTS.ar.tasks || text === TEXTS.en.tasks) {
+    return bot.sendMessage(chatId, "📋 **المهام المتاحة:**\n\nلا توجد مهام متاحة حالياً، يرجى المتابعة لاحقاً.");
+  }
+
+  // 6. 💸 السحب (منع السحب بدون محفظة وخصم الرصيد)
+  if (text === t.withdraw || text === TEXTS.ar.withdraw || text === TEXTS.en.withdraw) {
+    if (!user || !user.wallet_address) {
+      return bot.sendMessage(chatId, t.no_wallet);
+    }
+
+    if (user.balance <= 0) {
+      return bot.sendMessage(chatId, t.insufficient_balance);
+    }
+
+    const amountToWithdraw = user.balance;
+    db.run("UPDATE users SET balance = 0 WHERE user_id = ?", [chatId]);
+    db.run(
+      "INSERT INTO withdraw_requests (user_id, amount, wallet_address) VALUES (?, ?, ?)",
+      [chatId, amountToWithdraw, user.wallet_address],
+      function (err) {
+        const requestId = this.lastID;
+        bot.sendMessage(chatId, t.withdraw_success);
+
+        // إشعار الأدمن لإدارة الطلب
+        bot.sendMessage(
+          ADMIN_ID,
+          `🚨 **طلب سحب جديد #${requestId}**\n\nالمستخدم: ${msg.from.first_name} (\`${chatId}\`)\nالمبلغ: **${amountToWithdraw.toFixed(2)} GRAM**\nالمحفظة: \`${user.wallet_address}\``,
+          {
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  { text: "✅ موافقة", callback_data: `approve_withdraw_${requestId}` },
+                  { text: "❌ رفض وإعادة الرصيد", callback_data: `reject_withdraw_${requestId}` }
+                ]
+              ]
+            }
+          }
+        );
+      }
+    );
+    return;
+  }
+
+  // 7. 📈 الاستثمار (منع الاستثمار المتعدد حتى انتهاء الحالي)
+  if (text === t.invest || text === TEXTS.ar.invest || text === TEXTS.en.invest) {
+    db.get(
+      "SELECT * FROM investments WHERE user_id = ? AND status = 'ACTIVE'",
+      [chatId],
+      (err, activeInvest) => {
+        if (activeInvest) {
+          return bot.sendMessage(chatId, t.already_invested);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 90px;
-            overflow-x: hidden;
-        }
-
-        /* Header Bar */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: rgba(13, 13, 13, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .brand-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--accent-gold);
-            letter-spacing: 1px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-wallet {
-            background: linear-gradient(135deg, var(--accent-gold), #d49311);
-            color: #000;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-faq {
-            background: var(--card-bg);
-            color: var(--text-muted);
-            border: 1px solid var(--card-border);
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* Main Container & Screens */
-        .container {
-            padding: 16px;
-            flex: 1;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* Hero Character Section (Home Screen) */
-        .character-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .avatar-container {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 4px solid var(--accent-gold);
-            box-shadow: 0 0 25px rgba(245, 184, 61, 0.3);
-            overflow: hidden;
-            background: #151515;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .avatar-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .btn-feed {
-            margin-top: 25px;
-            width: 100%;
-            max-width: 300px;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--accent-gold-light), var(--accent-gold));
-            color: #000;
-            border: none;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(245, 184, 61, 0.4);
-            transition: transform 0.1s;
-            text-align: center;
-        }
-
-        .btn-feed:active {
-            transform: scale(0.97);
-        }
-
-        /* Cards and Lists */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--accent-gold);
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .info-value {
-            color: var(--text-main);
-            font-weight: 600;
-        }
-
-        .note-card {
-            background: rgba(245, 184, 61, 0.1);
-            border: 1px solid var(--accent-gold);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 15px;
-            color: var(--accent-gold);
-            font-size: 13px;
-            text-align: center;
-        }
-
-        /* Navigation Bar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            background: var(--nav-bg);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-            padding: 0 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 11px;
-            cursor: pointer;
-            flex: 1;
-            height: 100%;
-        }
-
-        .nav-item.active {
-            color: var(--accent-gold);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        /* Special Central AI Button */
-        .nav-item.ai-center {
-            position: relative;
-            top: -15px;
-        }
-
-        .nav-item.ai-center .nav-icon-wrapper {
-            width: 54px;
-            height: 54px;
-            background: linear-gradient(135deg, var(--accent-gold-light), var(--accent-gold));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #000;
-            font-size: 24px;
-            box-shadow: 0 4px 15px rgba(245, 184, 61, 0.5);
-            border: 4px solid var(--bg-color);
-        }
-
-        .nav-item.ai-center span {
-            margin-top: 2px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="brand-title">GRAM MAX</div>
-        <div class="header-actions">
-            <button class="btn-faq">FAQ</button>
-            <div id="ton-connect-btn"></div>
-        </div>
-    </header>
-
-    <!-- Main Screens Container -->
-    <main class="container">
-
-        <!-- 1. Home Screen -->
-        <section id="screen-home" class="screen active">
-            <div class="character-section">
-                <div class="avatar-container">
-                    <img src="assets/character.png" alt="Character" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=RichBum&backgroundColor=f5b83d';">
-                </div>
-                <button class="btn-feed" onclick="switchTab('restaurant')">إطعام (Feed me)</button>
-            </div>
-
-            <div class="card" style="margin-top: 20px;">
-                <div class="card-header">
-                    <span class="card-title">حالة الاستثمار النشط</span>
-                </div>
-                <div class="info-row">
-                    <span>الوجبة الحالية:</span>
-                    <span class="info-value">المستوى 1</span>
-                </div>
-                <div class="info-row">
-                    <span>الوقت المتبقي:</span>
-                    <span class="info-value" id="timer">07:26:17</span>
-                </div>
-                <div class="info-row">
-                    <span>الأرباح المكتسبة:</span>
-                    <span class="info-value" style="color: #4caf50;">+0.15 GRAM</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. Restaurant / Food Screen -->
-        <section id="screen-restaurant" class="screen">
-            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">💰 الاستثمارات</h2>
-            
-            <!-- المستوى 1 -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">المستوى 1</span>
-                    <span style="color: var(--accent-gold); font-weight: bold;">1 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💵 الاستثمار:</span>
-                    <span class="info-value">1 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>⏱️ المدة:</span>
-                    <span class="info-value">12 ساعة</span>
-                </div>
-                <div class="info-row">
-                    <span>📈 الربح:</span>
-                    <span class="info-value" style="color: #4caf50;">0.15 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💰 العائد الإجمالي:</span>
-                    <span class="info-value" style="color: var(--accent-gold-light);">1.15 GRAM</span>
-                </div>
-                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
-            </div>
-
-            <!-- المستوى 2 -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">المستوى 2</span>
-                    <span style="color: var(--accent-gold); font-weight: bold;">2 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💵 الاستثمار:</span>
-                    <span class="info-value">2 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>⏱️ المدة:</span>
-                    <span class="info-value">24 ساعة</span>
-                </div>
-                <div class="info-row">
-                    <span>📈 الربح:</span>
-                    <span class="info-value" style="color: #4caf50;">0.30 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💰 العائد الإجمالي:</span>
-                    <span class="info-value" style="color: var(--accent-gold-light);">2.30 GRAM</span>
-                </div>
-                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
-            </div>
-
-            <!-- المستوى 3 -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">المستوى 3</span>
-                    <span style="color: var(--accent-gold); font-weight: bold;">5 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💵 الاستثمار:</span>
-                    <span class="info-value">5 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>⏱️ المدة:</span>
-                    <span class="info-value">48 ساعة</span>
-                </div>
-                <div class="info-row">
-                    <span>📈 الربح:</span>
-                    <span class="info-value" style="color: #4caf50;">0.70 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💰 العائد الإجمالي:</span>
-                    <span class="info-value" style="color: var(--accent-gold-light);">5.70 GRAM</span>
-                </div>
-                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
-            </div>
-
-            <!-- المستوى 4 -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">المستوى 4</span>
-                    <span style="color: var(--accent-gold); font-weight: bold;">7 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💵 الاستثمار:</span>
-                    <span class="info-value">7 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>⏱️ المدة:</span>
-                    <span class="info-value">72 ساعة (3 أيام)</span>
-                </div>
-                <div class="info-row">
-                    <span>📈 الربح:</span>
-                    <span class="info-value" style="color: #4caf50;">1.30 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💰 العائد الإجمالي:</span>
-                    <span class="info-value" style="color: var(--accent-gold-light);">8.30 GRAM</span>
-                </div>
-                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
-            </div>
-
-            <!-- المستوى 5 -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">المستوى 5</span>
-                    <span style="color: var(--accent-gold); font-weight: bold;">10 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💵 الاستثمار:</span>
-                    <span class="info-value">10 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>⏱️ المدة:</span>
-                    <span class="info-value">120 ساعة (5 أيام)</span>
-                </div>
-                <div class="info-row">
-                    <span>📈 الربح:</span>
-                    <span class="info-value" style="color: #4caf50;">3 GRAM</span>
-                </div>
-                <div class="info-row">
-                    <span>💰 العائد الإجمالي:</span>
-                    <span class="info-value" style="color: var(--accent-gold-light);">13 GRAM</span>
-                </div>
-                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
-            </div>
-
-            <div class="note-card">
-                🔒 لا يمكن بدء استثمار جديد إلا بعد انتهاء الاستثمار السابق.
-            </div>
-        </section>
-
-        <!-- 3. AI Trading Screen -->
-        <section id="screen-trading" class="screen">
-            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">التداول الآلي (AI Trading)</h2>
-            <div class="card">
-                <p style="color: var(--text-muted); font-size: 14px;">خطط التداول بالذكاء الاصطناعي لتحقيق عائد آلي على رصيد GRAM الخاص بك.</p>
-            </div>
-        </section>
-
-        <!-- 4. Friends / Referrals Screen -->
-        <section id="screen-friends" class="screen">
-            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">دعوة الأصدقاء</h2>
-            <div class="card">
-                <div class="info-row">
-                    <span>عمولة المستوى 1:</span>
-                    <span class="info-value">5%</span>
-                </div>
-                <div class="info-row">
-                    <span>عمولة المستوى 2:</span>
-                    <span class="info-value">3%</span>
-                </div>
-                <div class="info-row">
-                    <span>عمولة المستوى 3:</span>
-                    <span class="info-value">2%</span>
-                </div>
-                <button class="btn-feed" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 10px;">نسخ رابط الدعوة</button>
-            </div>
-        </section>
-
-        <!-- 5. Tasks Screen -->
-        <section id="screen-tasks" class="screen">
-            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">المهام اليومية</h2>
-            <div class="card">
-                <div class="card-header">
-                    <span>الاشتراك بقناة التليجرام</span>
-                    <span style="color: var(--accent-gold);">+0.01 GRAM</span>
-                </div>
-                <button class="btn-faq" style="width: 100%; margin-top: 8px;">تحقق</button>
-            </div>
-        </section>
-
-        <!-- 6. Balance Screen -->
-        <section id="screen-balance" class="screen">
-            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">المحفظة والرصيد</h2>
-            <div class="card" style="text-align: center; padding: 24px;">
-                <span style="color: var(--text-muted); font-size: 14px;">إجمالي الرصيد</span>
-                <h1 style="color: var(--accent-gold); margin: 10px 0;">0.00 GRAM</h1>
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn-feed" style="flex: 1; padding: 10px; font-size: 14px; margin: 0;">إيداع</button>
-                    <button class="btn-faq" style="flex: 1; padding: 10px; font-size: 14px;">سحب</button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Bottom Navigation Bar (Forced LTR for correct icon order) -->
-    <nav class="bottom-nav" dir="ltr">
-        <div class="nav-item active" onclick="switchTab('home')">
-            <span class="nav-icon">🏠</span>
-            <span>Home</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('friends')">
-            <span class="nav-icon">👥</span>
-            <span>Friends</span>
-        </div>
-        <div class="nav-item ai-center" onclick="switchTab('trading')">
-            <div class="nav-icon-wrapper">🤖</div>
-            <span>AI Trading</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('tasks')">
-            <span class="nav-icon">☷</span>
-            <span>Tasks</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('balance')">
-            <span class="nav-icon">💼</span>
-            <span>Balance</span>
-        </div>
-    </nav>
-
-    <script>
-        // Initialize Telegram WebApp
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        }
-
-        // Initialize TON Connect UI
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://crypto-max-app.github.io/crypto-max-app-HPAu/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-btn'
+        return bot.sendMessage(chatId, "💰 **خطط الاستثمار المتاحة:**\n\nاختر المستوى الذي يناسبك للبدء:", {
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "المستوى 1 (1 GRAM / 12h)", callback_data: "invest_1" }],
+              [{ text: "المستوى 2 (2 GRAM / 24h)", callback_data: "invest_2" }],
+              [{ text: "المستوى 3 (5 GRAM / 48h)", callback_data: "invest_3" }],
+              [{ text: "المستوى 4 (7 GRAM / 72h)", callback_data: "invest_4" }],
+              [{ text: "المستوى 5 (10 GRAM / 120h)", callback_data: "invest_5" }]
+            ]
+          }
         });
+      }
+    );
+    return;
+  }
 
-        // Tab Switching Logic
-        function switchTab(tabName) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  // 8. ⭐ Star
+  if (text === t.stars || text === TEXTS.ar.stars || text === TEXTS.en.stars) {
+    return bot.sendMessage(chatId, "⭐ **شراء نجوم Telegram Stars**\n\nيمكنك دعم البوت أو الشراء من خلال Telegram Stars الرسمية.");
+  }
 
-            if (tabName === 'restaurant') {
-                document.getElementById('screen-restaurant').classList.add('active');
-                return;
-            }
+  // 9. ⚙️ الإعدادات و 💬 الدعم الفني
+  if (text === t.settings || text === TEXTS.ar.settings || text === TEXTS.en.settings) {
+    return bot.sendMessage(chatId, `⚙️ **الإعدادات والتواصل:**\n\nللتواصل مع الدعم الفني: ${SUPPORT_USERNAME}`, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "💬 التواصل مع الدعم الفني", url: `https://t.me/${SUPPORT_USERNAME.replace('@', '')}` }]
+        ]
+      }
+    });
+  }
 
-            const targetScreen = document.getElementById(`screen-${tabName}`);
-            if (targetScreen) {
-                targetScreen.classList.add('active');
-            }
+  if (text === t.main_menu || text === TEXTS.ar.main_menu || text === TEXTS.en.main_menu) {
+    return bot.sendMessage(chatId, t.welcome, getMainMenuKeyboard(lang));
+  }
+});
 
-            // Highlight nav item
-            const navItems = document.querySelectorAll('.nav-item');
-            const tabsMap = { 'home': 0, 'friends': 1, 'trading': 2, 'tasks': 3, 'balance': 4 };
-            if (tabsMap[tabName] !== undefined) {
-                navItems[tabsMap[tabName]].classList.add('active');
-            }
-        }
-    </script>
-</body>
-</html>
+// ---------------------------------------------------------
+// معالجة الأزرار التفاعلية (Callback Queries)
+// ---------------------------------------------------------
+bot.on('callback_query', async (query) => {
+  const chatId = query.message.chat.id;
+  const data = query.data;
+
+  // تغيير اللغة
+  if (data.startsWith('set_lang_')) {
+    const selectedLang = data.replace('set_lang_', '');
+    db.run("UPDATE users SET language = ? WHERE user_id = ?", [selectedLang, chatId]);
+    bot.answerCallbackQuery(query.id, { text: "تم تغيير اللغة بنجاح!" });
+    return bot.sendMessage(chatId, TEXTS[selectedLang].welcome, getMainMenuKeyboard(selectedLang));
+  }
+
+  // موافقة الأدمن على السحب
+  if (data.startsWith('approve_withdraw_')) {
+    const requestId = data.replace('approve_withdraw_', '');
+    db.run("UPDATE withdraw_requests SET status = 'APPROVED' WHERE id = ?", [requestId]);
+    bot.editMessageText(`✅ **تمت الموافقة على الطلب #${requestId}**`, { chat_id: chatId, message_id: query.message.message_id });
+    return;
+  }
+
+  // رفض الأدمن للسحب وإعادة الرصيد
+  if (data.startsWith('reject_withdraw_')) {
+    const requestId = data.replace('reject_withdraw_', '');
+    db.get("SELECT * FROM withdraw_requests WHERE id = ?", [requestId], (err, request) => {
+      if (request) {
+        db.run("UPDATE users SET balance = balance + ? WHERE user_id = ?", [request.amount, request.user_id]);
+        db.run("UPDATE withdraw_requests SET status = 'REJECTED' WHERE id = ?", [requestId]);
+        bot.sendMessage(request.user_id, "❌ تم رفض طلب السحب الخاص بك وإعادة المبلغ لرصيدك.");
+        bot.editMessageText(`❌ **تم رفض الطلب #${requestId} وإعادة المبلغ.**`, { chat_id: chatId, message_id: query.message.message_id });
+      }
+    });
+    return;
+  }
+});
