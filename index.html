@@ -15,6 +15,7 @@
             --text-sub: #a0a0a0;
             --border-color: #282828;
             --status-green: #00e676;
+            --lock-bg: #121212;
         }
 
         * {
@@ -79,69 +80,48 @@
             display: block;
         }
 
-        .locked {
-            opacity: 0.35;
-            pointer-events: none !important;
-            filter: grayscale(1);
-        }
-
-        .hero-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 10px 0 20px 0;
-        }
-
-        .robot-avatar {
-            width: 130px;
-            height: 130px;
-            background: radial-gradient(circle, #2a2208 0%, #121212 70%);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid #3d3106;
-            margin-bottom: 16px;
-        }
-
-        .robot-avatar svg {
-            width: 90px;
-            height: 90px;
-        }
-
-        .btn-primary-action {
-            width: 100%;
-            background-color: var(--accent-yellow);
-            color: #000;
-            border: none;
-            border-radius: 28px;
-            padding: 14px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(250, 187, 24, 0.2);
-        }
-
         .card {
             background-color: var(--card-bg);
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
             border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .card.locked {
+            opacity: 0.5;
+            background-color: var(--lock-bg);
         }
 
         .card-header-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             margin-bottom: 12px;
             color: var(--accent-yellow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #2a2a2a;
+            color: var(--text-sub);
+        }
+
+        .badge.active {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--status-green);
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             font-size: 13px;
         }
 
@@ -157,6 +137,25 @@
             font-weight: 600;
         }
 
+        .btn-invest {
+            width: 100%;
+            background-color: var(--accent-yellow);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-invest:disabled {
+            background-color: #333;
+            color: #777;
+            cursor: not-allowed;
+        }
+
         .deposit-input {
             width: 100%;
             padding: 14px;
@@ -166,7 +165,7 @@
             color: #fff;
             margin: 12px 0;
             outline: none;
-            font-size: 16px;
+            font-size: 18px;
             text-align: center;
             font-weight: bold;
         }
@@ -222,43 +221,76 @@
         </div>
     </header>
 
-    <!-- الرئيسية -->
+    <!-- الرئيسية: خطط الاستثمار المتعاقبة -->
     <div id="tab-home" class="page-view active">
-        <div class="hero-section">
-            <div class="robot-avatar">
-                <svg viewBox="0 0 100 100" fill="none">
-                    <rect x="25" y="30" width="50" height="40" rx="10" fill="#4CAF50"/>
-                    <circle cx="40" cy="45" r="5" fill="#000"/>
-                    <circle cx="60" cy="45" r="5" fill="#000"/>
-                    <rect x="40" y="58" width="20" height="4" rx="2" fill="#000"/>
-                    <line x1="50" y1="18" x2="50" y2="30" stroke="#4CAF50" stroke-width="4"/>
-                    <circle cx="50" cy="15" r="5" fill="#4CAF50"/>
-                </svg>
+        
+        <!-- المستوى 1 (مفتوح تلقائياً) -->
+        <div class="card" id="level-1-card">
+            <div class="card-header-title">
+                <span>⚡ الاستثمار - المستوى 1</span>
+                <span class="badge active" id="badge-1">متاح للبدء</span>
             </div>
-            <!-- الضغط هنا يتم بسلاسة وبدون أي نافذة منبثقة -->
-            <button class="btn-primary-action locked" id="feed-btn" onclick="startFeedingSilently()" data-i18n="feedBtn">إطعام (Feed me)</button>
+            <div class="info-row">
+                <span class="info-label">قيمة الاستثمار:</span>
+                <span class="info-value" style="color: var(--accent-yellow);">1 TON</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">الأرباح المتوقعة:</span>
+                <span class="info-value" style="color: var(--status-green);">+1.5 TON</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">مدة الدورة:</span>
+                <span class="info-value">24 ساعة</span>
+            </div>
+            <button class="btn-invest" id="btn-lvl-1" onclick="investLevel(1, 1)">بدء الاستثمار الآن (1 TON)</button>
         </div>
 
-        <div class="card locked" id="invest-card">
-            <div class="card-header-title" data-i18n="activeInvestment">حالة الاستثمار النشط</div>
-            <div class="info-row">
-                <span class="info-label" data-i18n="currentMeal">الوجبة الحالية:</span>
-                <span class="info-value">Noodles</span>
+        <!-- المستوى 2 (يفتح بعد استثمار المستوى 1) -->
+        <div class="card locked" id="level-2-card">
+            <div class="card-header-title">
+                <span>🚀 الاستثمار - المستوى 2</span>
+                <span class="badge" id="badge-2">مغلق (أكمل المستوى 1)</span>
             </div>
             <div class="info-row">
-                <span class="info-label" data-i18n="timeRemaining">الوقت المتبقي:</span>
-                <span class="info-value" id="timer-display">08:00:00</span>
+                <span class="info-label">قيمة الاستثمار:</span>
+                <span class="info-value" style="color: var(--accent-yellow);">5 TON</span>
             </div>
             <div class="info-row">
-                <span class="info-label" data-i18n="earnedProfits">الأرباح المكتسبة:</span>
-                <span class="info-value" style="color: var(--accent-yellow);" id="profit-display">TON 0.00</span>
+                <span class="info-label">الأرباح المتوقعة:</span>
+                <span class="info-value" style="color: var(--status-green);">+8.0 TON</span>
             </div>
+            <div class="info-row">
+                <span class="info-label">مدة الدورة:</span>
+                <span class="info-value">24 ساعة</span>
+            </div>
+            <button class="btn-invest" id="btn-lvl-2" onclick="investLevel(2, 5)" disabled>مغلق حالياً</button>
+        </div>
+
+        <!-- المستوى 3 (يفتح بعد استثمار المستوى 2) -->
+        <div class="card locked" id="level-3-card">
+            <div class="card-header-title">
+                <span>💎 الاستثمار - المستوى 3</span>
+                <span class="badge" id="badge-3">مغلق (أكمل المستوى 2)</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">قيمة الاستثمار:</span>
+                <span class="info-value" style="color: var(--accent-yellow);">10 TON</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">الأرباح المتوقعة:</span>
+                <span class="info-value" style="color: var(--status-green);">+17.5 TON</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">مدة الدورة:</span>
+                <span class="info-value">24 ساعة</span>
+            </div>
+            <button class="btn-invest" id="btn-lvl-3" onclick="investLevel(3, 10)" disabled>مغلق حالياً</button>
         </div>
 
         <div class="card">
-            <div class="card-header-title" data-i18n="channelsTerms">📢 القنوات والدعم</div>
+            <div class="card-header-title">📢 القنوات والدعم</div>
             <a href="https://t.me/FastHelp3" class="info-row" style="text-decoration: none; color: inherit;" target="_blank">
-                <span data-i18n="supportChannel">💬 قناة الدعم والدعم الفني</span>
+                <span>💬 قناة الدعم الفني المباشر</span>
                 <span>↗</span>
             </a>
         </div>
@@ -267,14 +299,14 @@
     <!-- التداول -->
     <div id="tab-trading" class="page-view">
         <div class="card">
-            <div class="card-header-title" data-i18n="aiBotTitle">🤖 روبوت التداول الذكي</div>
+            <div class="card-header-title">🤖 روبوت التداول الذكي</div>
             <div class="info-row">
-                <span class="info-label" data-i18n="botEfficiency">كفاءة البوت:</span>
+                <span class="info-label">كفاءة البوت:</span>
                 <span class="info-value" style="color: var(--status-green);">99.4%</span>
             </div>
             <div class="info-row">
-                <span class="info-label" data-i18n="serverStatus">حالة الخادم:</span>
-                <span class="info-value" style="color: var(--status-green);" data-i18n="connected">🟢 متصل</span>
+                <span class="info-label">حالة الخادم:</span>
+                <span class="info-value" style="color: var(--status-green);">🟢 متصل</span>
             </div>
         </div>
     </div>
@@ -282,44 +314,44 @@
     <!-- الأصدقاء -->
     <div id="tab-friends" class="page-view">
         <div class="card">
-            <div class="card-header-title" data-i18n="refTitle">👥 برنامج الإحالات</div>
+            <div class="card-header-title">👥 برنامج الإحالات</div>
             <div class="info-row">
-                <span class="info-label" data-i18n="totalInvites">إجمالي الدعوات:</span>
+                <span class="info-label">إجمالي الدعوات:</span>
                 <span class="info-value">0</span>
             </div>
-            <button class="btn-primary-action" style="margin-top: 10px;" onclick="copyReferralLink()" data-i18n="copyRef">🔗 نسخ رابط الإحالة</button>
+            <button class="btn-invest" style="margin-top: 10px;" onclick="copyReferralLink()">🔗 نسخ رابط الإحالة</button>
         </div>
     </div>
 
     <!-- المحفظة والإيداع التلقائي -->
     <div id="tab-balance" class="page-view">
         <div class="card">
-            <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والإيداع</div>
-            <p style="font-size: 12px; color: var(--text-sub);" data-i18n="depositDesc">أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON - بدون حد أقصى)</p>
+            <div class="card-header-title">💼 المحفظة والإيداع السريع</div>
+            <p style="font-size: 12px; color: var(--text-sub);">أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON)</p>
             
-            <input type="number" id="custom-amount" class="deposit-input" placeholder="أدخل المبلغ (مثال: 1)" min="1" step="any" value="1">
+            <input type="number" id="custom-amount" class="deposit-input" placeholder="1" min="1" step="any" value="1">
             
-            <button class="btn-primary-action" onclick="sendAutoDeposit()" data-i18n="depositBtn">⚡ إيداع الآن تلقائياً</button>
+            <button class="btn-invest" onclick="sendAutoDeposit()">⚡ إيداع الآن تلقائياً</button>
         </div>
     </div>
 
-    <!-- الشريط السفلي (4 أزرار - بدون مهام) -->
+    <!-- الشريط السفلي بدون تبويب المهام -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-home', this)">
             <div class="nav-icon">🏠</div>
-            <div data-i18n="navHome">الرئيسية</div>
+            <div>الرئيسية</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-trading', this)">
             <div class="nav-icon">🤖</div>
-            <div data-i18n="navTrading">التداول</div>
+            <div>التداول</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-friends', this)">
             <div class="nav-icon">👥</div>
-            <div data-i18n="navFriends">الأصدقاء</div>
+            <div>الأصدقاء</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-balance', this)">
             <div class="nav-icon">💼</div>
-            <div data-i18n="navBalance">المحفظة</div>
+            <div>المحفظة</div>
         </div>
     </nav>
 
@@ -337,67 +369,14 @@
         tonConnectUI.onStatusChange(wallet => {
             if (wallet) {
                 isWalletConnected = true;
-                document.querySelectorAll('.locked').forEach(el => el.classList.remove('locked'));
             } else {
                 isWalletConnected = false;
-                document.querySelectorAll('#feed-btn, #invest-card').forEach(el => el.classList.add('locked'));
             }
         });
 
-        const i18n = {
-            ar: {
-                feedBtn: "إطعام (Feed me)",
-                activeInvestment: "حالة الاستثمار النشط",
-                currentMeal: "الوجبة الحالية:",
-                timeRemaining: "الوقت المتبقي:",
-                earnedProfits: "الأرباح المكتسبة:",
-                channelsTerms: "📢 القنوات والدعم",
-                supportChannel: "💬 قناة الدعم والدعم الفني",
-                aiBotTitle: "🤖 روبوت التداول الذكي",
-                botEfficiency: "كفاءة البوت:",
-                serverStatus: "حالة الخادم:",
-                connected: "🟢 متصل",
-                refTitle: "👥 برنامج الإحالات",
-                totalInvites: "إجمالي الدعوات:",
-                copyRef: "🔗 نسخ رابط الإحالة",
-                walletTitle: "💼 المحفظة والإيداع",
-                depositDesc: "أدخل كمية TON المراد إيداعها (الحد الأدنى 1 TON - بدون حد أقصى)",
-                depositBtn: "⚡ إيداع الآن تلقائياً",
-                navHome: "الرئيسية",
-                navTrading: "التداول",
-                navFriends: "الأصدقاء",
-                navBalance: "المحفظة",
-                lockMsg: "يرجى ربط المحفظة أولاً من الأعلى لتفعيل كافة الخانات!"
-            },
-            en: {
-                feedBtn: "Feed me",
-                activeInvestment: "Active Investment Status",
-                currentMeal: "Current Meal:",
-                timeRemaining: "Time Remaining:",
-                earnedProfits: "Earned Profits:",
-                channelsTerms: "📢 Channels & Support",
-                supportChannel: "💬 Support Channel",
-                aiBotTitle: "🤖 AI Trading Bot",
-                botEfficiency: "Bot Efficiency:",
-                serverStatus: "Server Status:",
-                connected: "🟢 Connected",
-                refTitle: "👥 Referral Program",
-                totalInvites: "Total Invites:",
-                copyRef: "🔗 Copy Referral Link",
-                walletTitle: "💼 Wallet & Deposit",
-                depositDesc: "Enter TON amount to deposit (Min 1 TON - No Max)",
-                depositBtn: "⚡ Deposit Now Automatically",
-                navHome: "Home",
-                navTrading: "Trading",
-                navFriends: "Friends",
-                navBalance: "Wallet",
-                lockMsg: "Please connect wallet first from top button!"
-            }
-        };
-
         function switchTab(tabId, element) {
             if (!isWalletConnected && tabId !== 'tab-home') {
-                alert(i18n[currentLang].lockMsg);
+                alert("يرجى ربط المحفظة أولاً من الأعلى لتفعيل كافة الخانات!");
                 tonConnectUI.openModal();
                 return;
             }
@@ -407,17 +386,46 @@
             element.classList.add('active');
         }
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'EN' : 'AR';
+        async function investLevel(level, amount) {
+            if (!isWalletConnected) {
+                tonConnectUI.openModal();
+                return;
+            }
 
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (i18n[currentLang][key]) {
-                    el.innerText = i18n[currentLang][key];
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                    {
+                        address: ADMIN_WALLET,
+                        amount: Math.floor(amount * 1000000000).toString()
+                    }
+                ]
+            };
+
+            try {
+                await tonConnectUI.sendTransaction(transaction);
+                
+                // بعد نفاذ المعاملة بنجاح، يتم تحديث الزر وفتح المستوى التالي
+                const currentBtn = document.getElementById(`btn-lvl-${level}`);
+                currentBtn.innerText = "جاري الاستثمار... ⏳";
+                currentBtn.disabled = true;
+
+                const nextLevel = level + 1;
+                const nextCard = document.getElementById(`level-${nextLevel}-card`);
+                const nextBtn = document.getElementById(`btn-lvl-${nextLevel}`);
+                const nextBadge = document.getElementById(`badge-${nextLevel}`);
+
+                if (nextCard) {
+                    nextCard.classList.remove('locked');
+                    nextBtn.disabled = false;
+                    nextBtn.innerText = `بدء الاستثمار الآن (${nextBtn.getAttribute('onclick').match(/\d+/g)[1]} TON)`;
+                    nextBadge.classList.add('active');
+                    nextBadge.innerText = "متاح للبدء";
                 }
-            });
+
+            } catch (e) {
+                console.log("Transaction cancelled.");
+            }
         }
 
         async function sendAutoDeposit() {
@@ -426,10 +434,11 @@
                 return;
             }
 
-            const amountVal = parseFloat(document.getElementById('custom-amount').value);
+            const inputField = document.getElementById('custom-amount');
+            const amountVal = parseFloat(inputField.value);
             
             if (isNaN(amountVal) || amountVal < 1) {
-                alert(currentLang === 'ar' ? "الحد الأدنى للإيداع هو 1 TON" : "Minimum deposit is 1 TON");
+                alert("الحد الأدنى للإيداع هو 1 TON");
                 return;
             }
 
@@ -446,28 +455,13 @@
             try {
                 await tonConnectUI.sendTransaction(transaction);
             } catch (e) {
-                console.log("Cancelled transaction.");
+                console.log("Transaction cancelled.");
             }
-        }
-
-        // تم إلغاء الرسالة المنبثقة alert بداخل الدالة نهائياً
-        function startFeedingSilently() {
-            if (!isWalletConnected) {
-                tonConnectUI.openModal();
-                return;
-            }
-            const btn = document.getElementById('feed-btn');
-            btn.style.opacity = '0.7';
-            btn.innerText = currentLang === 'ar' ? "جاري الإطعام..." : "Feeding...";
-            setTimeout(() => {
-                btn.style.opacity = '1';
-                btn.innerText = currentLang === 'ar' ? "تم الإطعام بنجاح" : "Fed Successfully";
-            }, 800);
         }
 
         function copyReferralLink() {
             navigator.clipboard.writeText("https://t.me/GramMaxBot?start=ref");
-            alert(currentLang === 'ar' ? "تم نسخ رابط الإحالة!" : "Referral link copied!");
+            alert("تم نسخ رابط الإحالة!");
         }
     </script>
 </body>
