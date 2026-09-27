@@ -188,6 +188,17 @@
             font-weight: 600;
         }
 
+        .note-card {
+            background: rgba(245, 184, 61, 0.1);
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 15px;
+            color: var(--accent-gold);
+            font-size: 13px;
+            text-align: center;
+        }
+
         /* Navigation Bar */
         .bottom-nav {
             position: fixed;
@@ -269,7 +280,7 @@
         <section id="screen-home" class="screen active">
             <div class="character-section">
                 <div class="avatar-container">
-                    <img src="assets/character.png" alt="Character" onerror="this.src='https://via.placeholder.com/200/1a1a1a/f5b83d?text=BUM';">
+                    <img src="assets/character.png" alt="Character" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=RichBum&backgroundColor=f5b83d';">
                 </div>
                 <button class="btn-feed" onclick="switchTab('restaurant')">إطعام (Feed me)</button>
             </div>
@@ -280,7 +291,7 @@
                 </div>
                 <div class="info-row">
                     <span>الوجبة الحالية:</span>
-                    <span class="info-value">Noodles</span>
+                    <span class="info-value">المستوى 1</span>
                 </div>
                 <div class="info-row">
                     <span>الوقت المتبقي:</span>
@@ -288,29 +299,142 @@
                 </div>
                 <div class="info-row">
                     <span>الأرباح المكتسبة:</span>
-                    <span class="info-value" style="color: #4caf50;">+0.05 TON</span>
+                    <span class="info-value" style="color: #4caf50;">+0.15 GRAM</span>
                 </div>
             </div>
         </section>
 
         <!-- 2. Restaurant / Food Screen -->
         <section id="screen-restaurant" class="screen">
-            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">قائمة الطعام والاستثمار</h2>
+            <h2 style="margin-bottom: 16px; color: var(--accent-gold);">💰 الاستثمارات</h2>
             
+            <!-- المستوى 1 -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">🍜 Noodles</span>
-                    <span style="color: var(--accent-gold); font-weight: bold;">0.1 TON</span>
+                    <span class="card-title">المستوى 1</span>
+                    <span style="color: var(--accent-gold); font-weight: bold;">1 GRAM</span>
                 </div>
                 <div class="info-row">
-                    <span>مدة الدورة:</span>
+                    <span>💵 الاستثمار:</span>
+                    <span class="info-value">1 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>⏱️ المدة:</span>
+                    <span class="info-value">12 ساعة</span>
+                </div>
+                <div class="info-row">
+                    <span>📈 الربح:</span>
+                    <span class="info-value" style="color: #4caf50;">0.15 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💰 العائد الإجمالي:</span>
+                    <span class="info-value" style="color: var(--accent-gold-light);">1.15 GRAM</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
+            </div>
+
+            <!-- المستوى 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">المستوى 2</span>
+                    <span style="color: var(--accent-gold); font-weight: bold;">2 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💵 الاستثمار:</span>
+                    <span class="info-value">2 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>⏱️ المدة:</span>
                     <span class="info-value">24 ساعة</span>
                 </div>
                 <div class="info-row">
-                    <span>الربح المتوقع:</span>
-                    <span class="info-value">0.05 TON</span>
+                    <span>📈 الربح:</span>
+                    <span class="info-value" style="color: #4caf50;">0.30 GRAM</span>
                 </div>
-                <button class="btn-feed" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 10px;">شراء الوجبة</button>
+                <div class="info-row">
+                    <span>💰 العائد الإجمالي:</span>
+                    <span class="info-value" style="color: var(--accent-gold-light);">2.30 GRAM</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
+            </div>
+
+            <!-- المستوى 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">المستوى 3</span>
+                    <span style="color: var(--accent-gold); font-weight: bold;">5 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💵 الاستثمار:</span>
+                    <span class="info-value">5 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>⏱️ المدة:</span>
+                    <span class="info-value">48 ساعة</span>
+                </div>
+                <div class="info-row">
+                    <span>📈 الربح:</span>
+                    <span class="info-value" style="color: #4caf50;">0.70 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💰 العائد الإجمالي:</span>
+                    <span class="info-value" style="color: var(--accent-gold-light);">5.70 GRAM</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
+            </div>
+
+            <!-- المستوى 4 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">المستوى 4</span>
+                    <span style="color: var(--accent-gold); font-weight: bold;">7 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💵 الاستثمار:</span>
+                    <span class="info-value">7 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>⏱️ المدة:</span>
+                    <span class="info-value">72 ساعة (3 أيام)</span>
+                </div>
+                <div class="info-row">
+                    <span>📈 الربح:</span>
+                    <span class="info-value" style="color: #4caf50;">1.30 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💰 العائد الإجمالي:</span>
+                    <span class="info-value" style="color: var(--accent-gold-light);">8.30 GRAM</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
+            </div>
+
+            <!-- المستوى 5 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">المستوى 5</span>
+                    <span style="color: var(--accent-gold); font-weight: bold;">10 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💵 الاستثمار:</span>
+                    <span class="info-value">10 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>⏱️ المدة:</span>
+                    <span class="info-value">120 ساعة (5 أيام)</span>
+                </div>
+                <div class="info-row">
+                    <span>📈 الربح:</span>
+                    <span class="info-value" style="color: #4caf50;">3 GRAM</span>
+                </div>
+                <div class="info-row">
+                    <span>💰 العائد الإجمالي:</span>
+                    <span class="info-value" style="color: var(--accent-gold-light);">13 GRAM</span>
+                </div>
+                <button class="btn-feed" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">بدء الاستثمار</button>
+            </div>
+
+            <div class="note-card">
+                🔒 لا يمكن بدء استثمار جديد إلا بعد انتهاء الاستثمار السابق.
             </div>
         </section>
 
@@ -318,7 +442,7 @@
         <section id="screen-trading" class="screen">
             <h2 style="margin-bottom: 16px; color: var(--accent-gold);">التداول الآلي (AI Trading)</h2>
             <div class="card">
-                <p style="color: var(--text-muted); font-size: 14px;">خطط التداول بالذكاء الاصطناعي لتحقيق عائد آلي على رصيد TON الخاص بك.</p>
+                <p style="color: var(--text-muted); font-size: 14px;">خطط التداول بالذكاء الاصطناعي لتحقيق عائد آلي على رصيد GRAM الخاص بك.</p>
             </div>
         </section>
 
@@ -348,7 +472,7 @@
             <div class="card">
                 <div class="card-header">
                     <span>الاشتراك بقناة التليجرام</span>
-                    <span style="color: var(--accent-gold);">+0.01 TON</span>
+                    <span style="color: var(--accent-gold);">+0.01 GRAM</span>
                 </div>
                 <button class="btn-faq" style="width: 100%; margin-top: 8px;">تحقق</button>
             </div>
@@ -359,7 +483,7 @@
             <h2 style="margin-bottom: 16px; color: var(--accent-gold);">المحفظة والرصيد</h2>
             <div class="card" style="text-align: center; padding: 24px;">
                 <span style="color: var(--text-muted); font-size: 14px;">إجمالي الرصيد</span>
-                <h1 style="color: var(--accent-gold); margin: 10px 0;">0.00 TON</h1>
+                <h1 style="color: var(--accent-gold); margin: 10px 0;">0.00 GRAM</h1>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     <button class="btn-feed" style="flex: 1; padding: 10px; font-size: 14px; margin: 0;">إيداع</button>
                     <button class="btn-faq" style="flex: 1; padding: 10px; font-size: 14px;">سحب</button>
@@ -369,8 +493,8 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
+    <!-- Bottom Navigation Bar (Forced LTR for correct icon order) -->
+    <nav class="bottom-nav" dir="ltr">
         <div class="nav-item active" onclick="switchTab('home')">
             <span class="nav-icon">🏠</span>
             <span>Home</span>
