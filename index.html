@@ -187,6 +187,7 @@
             text-decoration: none;
             font-size: 14px;
             margin-top: 8px;
+            cursor: pointer;
         }
 
         /* Bottom Navigation Bar */
@@ -233,6 +234,82 @@
             margin-top: -18px;
             box-shadow: 0 0 15px rgba(245, 176, 39, 0.6);
             border: 2px solid #0e1014;
+        }
+
+        /* Modal Terms View */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .modal-content {
+            background-color: var(--bg-color);
+            border-top: 2px solid var(--gold-primary);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 16px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            z-index: 10;
+        }
+
+        .terms-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        .terms-card h4 {
+            color: var(--gold-primary);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .btn-back {
+            background-color: var(--gold-primary);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .alert-warning {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -286,10 +363,10 @@
             <span>💬 قناة الدعم والدعم الفني</span>
             <span>↗</span>
         </a>
-        <a href="#" class="channel-btn" onclick="openPolicy()">
-            <span>📜 سياسة الاستخدام والشروط</span>
+        <div class="channel-btn" onclick="openTermsModal()">
+            <span>📜 الشروط والأحكام</span>
             <span>ℹ️</span>
-        </a>
+        </div>
     </div>
 
     <!-- شريط التصفح السفلي -->
@@ -316,6 +393,110 @@
         </div>
     </div>
 
+    <!-- نافذة الشروط والأحكام (Modal) -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: var(--gold-primary);">📜 الشروط والأحكام</h3>
+                <button class="btn-back" onclick="closeTermsModal()">رجوع ↩</button>
+            </div>
+
+            <div class="terms-card" style="background-color: transparent; border: none; padding: 0;">
+                <p>مرحبًا بك في GRAM MAX.</p>
+                <p style="margin-top: 6px; color: var(--text-muted);">
+                    باستخدامك لهذا البوت أو Mini App فإنك تقر بأنك قرأت وفهمت ووافقت على هذه الشروط والأحكام. إذا كنت لا توافق عليها، يرجى عدم استخدام الخدمة.
+                </p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣ القبول والاستخدام</h4>
+                <p>باستخدام الخدمة، يوافق المستخدم على الالتزام بهذه الشروط وجميع القواعد والتعليمات المعروضة داخل البوت.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>2️⃣ الحساب</h4>
+                <p>يكون كل حساب مرتبطًا بحساب Telegram الخاص بالمستخدم. يتحمل المستخدم مسؤولية الحفاظ على حسابه وعدم استخدام حسابات متعددة للتحايل على أنظمة المكافآت أو الإحالات.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>3️⃣ الرصيد والمكافآت</h4>
+                <p>جميع الأرصدة والمكافآت الظاهرة داخل البوت هي أرصدة رقمية داخل النظام، وتخضع للقواعد والشروط المحددة لكل خدمة أو مهمة أو برنامج مكافآت.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>4️⃣ الإيداعات</h4>
+                <p>إذا كانت الخدمة تتضمن إيداعات باستخدام TON، فيجب على المستخدم التأكد من صحة عنوان المحفظة والشبكة والمبلغ قبل إرسال أي معاملة. المعاملات على البلوكشين قد تكون غير قابلة للعكس، ولا يتحمل النظام مسؤولية الأموال المرسلة إلى عنوان خاطئ بسبب خطأ المستخدم.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>5️⃣ الاستثمارات والعوائد</h4>
+                <p>أي استثمار أو خطة أو دورة زمنية تظهر داخل البوت يجب اعتبارها خاضعة للشروط المحددة لها داخل التطبيق. لا يوجد أي ضمان بأن المستخدم سيحقق ربحًا، ولا ينبغي للمستخدم إيداع أموال لا يستطيع تحمل خسارتها.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>6️⃣ السحب</h4>
+                <p>تخضع طلبات السحب للحد الأدنى للسحب والرسوم وقواعد التحقق المطبقة داخل البوت. قد تستغرق معالجة الطلبات وقتًا حسب حالة الشبكة وإجراءات النظام.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>7️⃣ الإحالات</h4>
+                <p>يحصل المستخدم على مكافآت الإحالة وفق النسب والقواعد المعروضة داخل قسم الإحالات. يُمنع إنشاء حسابات وهمية أو استخدام طرق آلية أو أي وسيلة للتحايل على نظام الإحالة.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>8️⃣ المهام</h4>
+                <p>يجب تنفيذ المهام بطريقة حقيقية ووفق التعليمات المحددة. يُمنع استخدام الروبوتات أو الحسابات الوهمية أو أي وسيلة للتلاعب بنتائج المهام.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>9️⃣ منع الغش والتلاعب</h4>
+                <p>يحق لإدارة النظام إيقاف أو تقييد الحسابات التي يثبت استخدامها للغش أو التلاعب أو استغلال الأخطاء البرمجية أو إساءة استخدام النظام.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>🔟 المحفظة</h4>
+                <p>المستخدم مسؤول عن عنوان محفظته وعن جميع المعاملات التي يوافق عليها. لا تطلب إدارة البوت من المستخدم مشاركة عبارة الاسترداد السرية أو المفتاح الخاص أو رمز Telegram OTP.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣1️⃣ توفر الخدمة</h4>
+                <p>قد يتم تحديث أو تعديل أو إيقاف بعض الخدمات أو الميزات مؤقتًا بسبب الصيانة أو التحديثات أو المشكلات التقنية أو متطلبات قانونية أو تنظيمية.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣2️⃣ الرسوم</h4>
+                <p>قد يتم تطبيق رسوم على بعض العمليات مثل السحب أو المعاملات، ويتم عرض الرسوم للمستخدم قبل إتمام العملية متى كان ذلك ممكنًا.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣3️⃣ الخصوصية</h4>
+                <p>يتم التعامل مع بيانات المستخدم وفق سياسة الخصوصية الخاصة بالخدمة. يجب توضيح البيانات التي يتم جمعها والغرض من استخدامها ومدة الاحتفاظ بها.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣4️⃣ إخلاء المسؤولية</h4>
+                <p>الخدمة ليست جهة مالية أو بنكًا أو مستشارًا ماليًا ما لم ينص على ذلك صراحةً. أي معلومات أو أرقام أو عوائد تظهر داخل التطبيق لا تعتبر نصيحة مالية أو ضمانًا لتحقيق الأرباح.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣5️⃣ التعديلات</h4>
+                <p>تحتفظ إدارة الخدمة بالحق في تحديث هذه الشروط عند الحاجة. استمرار المستخدم في استخدام الخدمة بعد نشر التعديلات يعني قبوله للشروط المحدثة، بالقدر المسموح به قانونيًا.</p>
+            </div>
+
+            <div class="terms-card">
+                <h4>1️⃣6️⃣ التواصل والدعم</h4>
+                <p>في حال وجود مشكلة أو استفسار، يمكن للمستخدم التواصل مع فريق الدعم من خلال قسم «الدعم» داخل البوت.</p>
+            </div>
+
+            <div class="alert-warning">
+                ⚠️ <strong>تنبيه:</strong><br>
+                استخدام الخدمة يتم على مسؤولية المستخدم، ويجب على المستخدم التأكد من أن استخدامه للخدمة متوافق مع القوانين واللوائح المطبقة في بلده.
+            </div>
+
+            <button class="btn-back" style="width: 100%; margin-top: 10px; padding: 14px;" onclick="closeTermsModal()">رجوع ↩</button>
+        </div>
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
@@ -336,8 +517,12 @@
             tg.showAlert('تم تشغيل خيار الإطعام/الاستثمار بنجاح!');
         }
 
-        function openPolicy() {
-            tg.showAlert('سياسة الاستخدام:\n- الحسابات المزدوجة ممنوعة.\n- يتم السحب تلقائياً إلى محفظتك المربوطة.');
+        function openTermsModal() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+
+        function closeTermsModal() {
+            document.getElementById('termsModal').style.display = 'none';
         }
 
         function switchTab(tabName) {
