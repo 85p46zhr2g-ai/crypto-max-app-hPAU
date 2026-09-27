@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>GRAM MAX Mini App</title>
-    <!-- Telegram WebApp Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --bg-color: #0d0d0d;
             --card-bg: #181818;
             --accent-yellow: #fabb18;
-            --accent-hover: #d99f10;
             --text-main: #ffffff;
             --text-sub: #a0a0a0;
             --border-color: #282828;
@@ -32,11 +30,9 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden;
             padding-bottom: 80px;
         }
 
-        /* Top Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -53,7 +49,6 @@
             font-size: 18px;
             font-weight: 800;
             color: var(--accent-yellow);
-            letter-spacing: 0.5px;
         }
 
         .header-actions {
@@ -71,9 +66,6 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
 
         .btn-connect-wallet {
@@ -85,12 +77,8 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        /* Main View Container */
         .page-view {
             display: none;
             padding: 16px;
@@ -101,13 +89,11 @@
             display: block;
         }
 
-        /* Robot Hero Section */
         .hero-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin: 10px 0 20px 0;
         }
 
         .robot-avatar {
@@ -137,15 +123,8 @@
             font-size: 18px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(250, 187, 24, 0.2);
-            transition: transform 0.1s ease;
         }
 
-        .btn-primary-action:active {
-            transform: scale(0.98);
-        }
-
-        /* Card Section */
         .card {
             background-color: var(--card-bg);
             border-radius: 16px;
@@ -158,9 +137,6 @@
             font-size: 14px;
             font-weight: 700;
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
             color: var(--accent-yellow);
         }
 
@@ -184,7 +160,6 @@
             font-weight: 600;
         }
 
-        /* Links & Buttons in Card */
         .link-row {
             display: flex;
             justify-content: space-between;
@@ -199,7 +174,6 @@
             font-weight: 600;
         }
 
-        /* Bottom Fixed Navigation Bar */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -236,69 +210,23 @@
             font-size: 20px;
             margin-bottom: 3px;
         }
-
-        /* Modal Popup */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-box {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 20px;
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .modal-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .modal-btn {
-            background: var(--accent-yellow);
-            color: #000;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 24px;
-            font-weight: 700;
-            margin-top: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <header>
         <div class="brand-title">GRAM MAX</div>
         <div class="header-actions">
-            <button class="btn-pill" onclick="toggleLanguage()">
-                <span id="lang-label">AR/EN</span> 🌐
-            </button>
-            <button class="btn-pill" onclick="showFAQ()">FAQ</button>
-            <button class="btn-connect-wallet" onclick="connectWallet()">
-                💎 <span id="wallet-btn-text">Connect Wallet</span>
-            </button>
+            <button class="btn-pill" onclick="toggleLanguage()">🌐 <span id="lang-btn">EN</span></button>
+            <button class="btn-pill" onclick="alert(i18n[currentLang].faqMsg)">FAQ</button>
+            <button class="btn-connect-wallet" onclick="alert(i18n[currentLang].walletMsg)">💎 <span data-i18n="connectWallet">ربط المحفظة</span></button>
         </div>
     </header>
 
-    <!-- TAB 1: Home / الرئيسية -->
+    <!-- Home Tab -->
     <div id="tab-home" class="page-view active">
         <div class="hero-section">
             <div class="robot-avatar">
-                <!-- Green Robot Icon SVG -->
                 <svg viewBox="0 0 100 100" fill="none">
                     <rect x="25" y="30" width="50" height="40" rx="10" fill="#4CAF50"/>
                     <circle cx="40" cy="45" r="5" fill="#000"/>
@@ -310,99 +238,85 @@
                     <rect x="77" y="40" width="8" height="20" rx="4" fill="#388E3C"/>
                 </svg>
             </div>
-            <button class="btn-primary-action" onclick="feedAction()">إطعام (Feed me)</button>
+            <button class="btn-primary-action" onclick="feedAction()" data-i18n="feedBtn">إطعام (Feed me)</button>
         </div>
 
         <div class="card">
-            <div class="card-header-title">حالة الاستثمار النشط</div>
+            <div class="card-header-title" data-i18n="activeInvestment">حالة الاستثمار النشط</div>
             <div class="info-row">
-                <span class="info-label">الوجبة الحالية:</span>
+                <span class="info-label" data-i18n="currentMeal">الوجبة الحالية:</span>
                 <span class="info-value">Noodles</span>
             </div>
             <div class="info-row">
-                <span class="info-label">الوقت المتبقي:</span>
-                <span class="info-value" id="timer">07:26:17</span>
+                <span class="info-label" data-i18n="timeRemaining">الوقت المتبقي:</span>
+                <span class="info-value">07:26:17</span>
             </div>
             <div class="info-row">
-                <span class="info-label">الأرباح المكتسبة:</span>
+                <span class="info-label" data-i18n="earnedProfits">الأرباح المكتسبة:</span>
                 <span class="info-value" style="color: var(--accent-yellow);">TON 0.05+</span>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header-title">📢 القنوات والشروط</div>
+            <div class="card-header-title" data-i18n="channelsTerms">📢 القنوات والشروط</div>
             <a href="https://t.me/FastHelp3" class="link-row" target="_blank">
-                <span>💬 قناة الدعم والدعم الفني</span>
+                <span data-i18n="supportChannel">💬 قناة الدعم والدعم الفني</span>
                 <span>↗</span>
             </a>
-            <a href="#" class="link-row" onclick="showTerms()">
-                <span>ℹ️ الشروط والأحكام والسياسة</span>
+            <a href="#" class="link-row" onclick="alert(i18n[currentLang].termsMsg)">
+                <span data-i18n="terms">ℹ️ الشروط والأحكام والسياسة</span>
                 <span>ℹ️</span>
             </a>
         </div>
     </div>
 
-    <!-- TAB 2: AI Trading / التداول الذكي -->
+    <!-- AI Trading Tab -->
     <div id="tab-trading" class="page-view">
         <div class="card">
-            <div class="card-header-title">🤖 روبوت التداول الذكي</div>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
-                يعمل الروبوت تلقائياً على تحقيق أفضل عائد استثماري على شبكة TON.
-            </p>
+            <div class="card-header-title" data-i18n="aiBotTitle">🤖 روبوت التداول الذكي</div>
             <div class="info-row">
-                <span class="info-label">كفاءة البوت:</span>
+                <span class="info-label" data-i18n="botEfficiency">كفاءة البوت:</span>
                 <span class="info-value" style="color: var(--status-green);">99.4%</span>
             </div>
             <div class="info-row">
-                <span class="info-label">حالة الخادم:</span>
-                <span class="info-value" style="color: var(--status-green);">🟢 متصل</span>
+                <span class="info-label" data-i18n="serverStatus">حالة الخادم:</span>
+                <span class="info-value" style="color: var(--status-green);" data-i18n="connected">🟢 متصل</span>
             </div>
         </div>
     </div>
 
-    <!-- TAB 3: Friends / الإحالات -->
+    <!-- Friends Tab -->
     <div id="tab-friends" class="page-view">
         <div class="card">
-            <div class="card-header-title">👥 برنامج الإحالات</div>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
-                قم بدعوة أصدقائك واحصل على نسبة 10% من أرباح استثماراتها!
-            </p>
+            <div class="card-header-title" data-i18n="refTitle">👥 برنامج الإحالات</div>
             <div class="info-row">
-                <span class="info-label">إجمالي الدعوات:</span>
-                <span class="info-value">0 أصدقاء</span>
+                <span class="info-label" data-i18n="totalInvites">إجمالي الدعوات:</span>
+                <span class="info-value">0</span>
             </div>
-            <div class="info-row">
-                <span class="info-label">أرباح الإحالات:</span>
-                <span class="info-value" style="color: var(--accent-yellow);">GRAM 0.00</span>
-            </div>
-            <button class="btn-primary-action" style="margin-top: 12px; font-size: 14px;" onclick="copyRefLink()">
-                🔗 نسخ رابط الإحالة
-            </button>
+            <button class="btn-primary-action" style="margin-top: 12px; font-size: 14px;" onclick="copyRef()" data-i18n="copyRef">🔗 نسخ رابط الإحالة</button>
         </div>
     </div>
 
-    <!-- TAB 4: Balance / المحفظة والأنشطة -->
-    <div id="tab-balance" class="page-view">
-        <div class="card">
-            <div class="card-header-title">💼 المحفظة والسحب</div>
-            <div class="info-row">
-                <span class="info-label">رصيدك الحالي:</span>
-                <span class="info-value" style="color: var(--accent-yellow); font-size: 16px;">GRAM 0.00</span>
-            </div>
-            <button class="btn-primary-action" style="margin-top: 12px; font-size: 14px;" onclick="requestWithdraw()">
-                💸 طلب سحب الأرباح
-            </button>
-        </div>
-    </div>
-
-    <!-- TAB 5: Tasks / المهام -->
+    <!-- Tasks Tab -->
     <div id="tab-tasks" class="page-view">
         <div class="card">
-            <div class="card-header-title">📋 المهام اليومية</div>
-            <div class="link-row" onclick="claimTask(this)">
-                <span>انضم لقناتنا الرسمية على Telegram</span>
+            <div class="card-header-title" data-i18n="tasksTitle">📋 المهام اليومية</div>
+            <div class="link-row">
+                <span data-i18n="task1">انضم لقناتنا الرسمية</span>
                 <span style="color: var(--accent-yellow);">+0.1 GRAM</span>
             </div>
+        </div>
+    </div>
+
+    <!-- Balance Tab -->
+    <div id="tab-balance" class="page-view">
+        <div class="card">
+            <div class="card-header-title" data-i18n="walletTitle">💼 المحفظة والسحب</div>
+            <div class="info-row">
+                <span class="info-label" data-i18n="currentBalance">رصيدك الحالي:</span>
+                <span class="info-value" style="color: var(--accent-yellow);">GRAM 0.00</span>
+            </div>
+            <button class="btn-primary-action" style="margin-top: 12px; font-size: 14px;" onclick="alert(i18n[currentLang].withdrawMsg)" data-i18n="withdrawBtn">💸 طلب سحب الأرباح</button>
         </div>
     </div>
 
@@ -410,108 +324,127 @@
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-home', this)">
             <div class="nav-icon">🏠</div>
-            <div>Home</div>
+            <div data-i18n="navHome">Home</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-trading', this)">
             <div class="nav-icon">🤖</div>
-            <div>AI Trading</div>
+            <div data-i18n="navTrading">AI Trading</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-friends', this)">
             <div class="nav-icon">👥</div>
-            <div>Friends</div>
+            <div data-i18n="navFriends">Friends</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-tasks', this)">
             <div class="nav-icon">📋</div>
-            <div>Tasks</div>
+            <div data-i18n="navTasks">Tasks</div>
         </div>
         <div class="nav-item" onclick="switchTab('tab-balance', this)">
             <div class="nav-icon">💼</div>
-            <div>Balance</div>
+            <div data-i18n="navBalance">Balance</div>
         </div>
     </nav>
 
-    <!-- Modal Notification System -->
-    <div id="custom-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div id="modal-title" class="modal-title">تنبيه</div>
-            <div id="modal-body" style="font-size: 13px; color: var(--text-sub);"></div>
-            <button class="modal-btn" onclick="closeModal()">حسناً</button>
-        </div>
-    </div>
-
     <script>
-        // Initialize Telegram WebApp
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if (tg) {
-            tg.expand();
-            tg.ready();
+        let currentLang = 'ar';
+
+        const i18n = {
+            ar: {
+                connectWallet: "ربط المحفظة",
+                feedBtn: "إطعام (Feed me)",
+                activeInvestment: "حالة الاستثمار النشط",
+                currentMeal: "الوجبة الحالية:",
+                timeRemaining: "الوقت المتبقي:",
+                earnedProfits: "الأرباح المكتسبة:",
+                channelsTerms: "📢 القنوات والشروط",
+                supportChannel: "💬 قناة الدعم والدعم الفني",
+                terms: "ℹ️ الشروط والأحكام والسياسة",
+                aiBotTitle: "🤖 روبوت التداول الذكي",
+                botEfficiency: "كفاءة البوت:",
+                serverStatus: "حالة الخادم:",
+                connected: "🟢 متصل",
+                refTitle: "👥 برنامج الإحالات",
+                totalInvites: "إجمالي الدعوات:",
+                copyRef: "🔗 نسخ رابط الإحالة",
+                tasksTitle: "📋 المهام اليومية",
+                task1: "انضم لقناتنا الرسمية",
+                walletTitle: "💼 المحفظة والسحب",
+                currentBalance: "رصيدك الحالي:",
+                withdrawBtn: "💸 طلب سحب الأرباح",
+                navHome: "الرئيسية",
+                navTrading: "التداول",
+                navFriends: "الأصدقاء",
+                navTasks: "المهام",
+                navBalance: "المحفظة",
+                feedMsg: "تم تشغيل الدورة الاستثمارية والإطعام بنجاح!",
+                withdrawMsg: "سيتم إرسال طلب السحب إلى محفظتك المربوطة فور مراجعته.",
+                walletMsg: "سيتم فتح واجهة ربط المحفظة قريباً.",
+                faqMsg: "GRAM MAX نظام استثماري لتنفيذ المهام وتحقيق الأرباح.",
+                termsMsg: "الشروط والأحكام: يُمنع التكرار والحسابات الوهمية.",
+                refCopied: "تم نسخ رابط الإحالة بنجاح!"
+            },
+            en: {
+                connectWallet: "Connect Wallet",
+                feedBtn: "Feed me",
+                activeInvestment: "Active Investment Status",
+                currentMeal: "Current Meal:",
+                timeRemaining: "Time Remaining:",
+                earnedProfits: "Earned Profits:",
+                channelsTerms: "📢 Channels & Terms",
+                supportChannel: "💬 Support Channel",
+                terms: "ℹ️ Terms & Policy",
+                aiBotTitle: "🤖 AI Trading Bot",
+                botEfficiency: "Bot Efficiency:",
+                serverStatus: "Server Status:",
+                connected: "🟢 Connected",
+                refTitle: "👥 Referral Program",
+                totalInvites: "Total Invites:",
+                copyRef: "🔗 Copy Referral Link",
+                tasksTitle: "📋 Daily Tasks",
+                task1: "Join Official Channel",
+                walletTitle: "💼 Wallet & Withdrawal",
+                currentBalance: "Current Balance:",
+                withdrawBtn: "💸 Request Withdrawal",
+                navHome: "Home",
+                navTrading: "AI Trading",
+                navFriends: "Friends",
+                navTasks: "Tasks",
+                navBalance: "Balance",
+                feedMsg: "Investment cycle and feeding started successfully!",
+                withdrawMsg: "Withdrawal request submitted for review.",
+                walletMsg: "Wallet integration interface coming soon.",
+                faqMsg: "GRAM MAX is an investment ecosystem to earn rewards.",
+                termsMsg: "Terms: Fake accounts and duplicate users are prohibited.",
+                refCopied: "Referral link copied successfully!"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'EN' : 'AR';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
         }
 
-        // Tab Switching Logic
         function switchTab(tabId, element) {
-            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
         }
 
-        // Action Handlers
         function feedAction() {
-            showModal("تم تشغيل الدورة الاستثمارية والإطعام بنجاح!");
+            alert(i18n[currentLang].feedMsg);
         }
 
-        function copyRefLink() {
-            const user = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
-            const userId = user ? user.id : "123456";
-            const refLink = `https://t.me/GramMaxBot?start=${userId}`;
-            
-            navigator.clipboard.writeText(refLink).then(() => {
-                showModal("تم نسخ رابط الإحالة بنجاح!");
-            });
-        }
-
-        function connectWallet() {
-            showModal("سيتم فتح واجهة ربط محفظة TON المباشرة قريباً.");
-        }
-
-        function requestWithdraw() {
-            showModal("سيتم إرسال طلب السحب إلى محفظتك المربوطة فور مراجعته.");
-        }
-
-        function showFAQ() {
-            showModal("GRAM MAX هو نظام استثماري ذكي يتيح لك تحقيق الأرباح اليومية عبر مهام التغذية والتداول الذكي.");
-        }
-
-        function showTerms() {
-            showModal("الشروط والأحكام:\n- يُمنع استخدام الحسابات الوهمية.\n- السحب يتم معالجته فور التأكد من صحة المعاملات.");
-        }
-
-        function claimTask(btn) {
-            showModal("تم تنفيذ الميزة وإضافة الرصيد لحسابك!");
-            btn.style.opacity = "0.5";
-            btn.onclick = null;
-        }
-
-        // Modal Controls
-        function showModal(text) {
-            document.getElementById('modal-body').innerText = text;
-            document.getElementById('custom-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('custom-modal').style.display = 'none';
-        }
-
-        function toggleLanguage() {
-            const currentDir = document.dir;
-            if (currentDir === 'rtl') {
-                document.dir = 'ltr';
-                document.getElementById('lang-label').innerText = 'EN/AR';
-            } else {
-                document.dir = 'rtl';
-                document.getElementById('lang-label').innerText = 'AR/EN';
-            }
+        function copyRef() {
+            navigator.clipboard.writeText("https://t.me/GramMaxBot?start=ref");
+            alert(i18n[currentLang].refCopied);
         }
     </script>
 </body>
