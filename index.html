@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GRAM MAX</title>
+  
+  <!-- مكتبة تلجرام للألعاب والتطبيقات المصغرة -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- مكتبة TONConnect الرسمية للربط التلقائي للمحفظة -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
   <style>
     :root {
@@ -27,12 +32,12 @@
       direction: rtl;
     }
 
-    /* نافذة حظر الشاشة لربط المحفظة الإجباري */
+    /* نافذة الحجب التلقائية للربط التلقائي */
     .wallet-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(6px);
       z-index: 9999;
       display: flex;
       justify-content: center;
@@ -44,36 +49,31 @@
       background: var(--card-bg);
       border: 1px solid var(--primary-yellow);
       border-radius: 16px;
-      padding: 20px;
+      padding: 24px 20px;
       width: 100%;
       max-width: 340px;
       text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
     }
 
     .wallet-modal-box h3 {
       color: var(--primary-yellow);
-      margin: 0 0 8px 0;
-      font-size: 18px;
+      margin: 0 0 10px 0;
+      font-size: 19px;
     }
 
     .wallet-modal-box p {
       color: var(--text-sub);
-      font-size: 12px;
-      margin-bottom: 15px;
+      font-size: 12.5px;
+      margin-bottom: 20px;
+      line-height: 1.5;
     }
 
-    .wallet-input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: #0d1117;
-      color: #fff;
-      font-size: 13px;
-      text-align: center;
-      box-sizing: border-box;
-      margin-bottom: 12px;
+    /* حاوية زر TONConnect المباشر */
+    #ton-connect-btn-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
     }
 
     .lang-header {
@@ -167,17 +167,18 @@
 </head>
 <body>
 
-  <!-- النافذة المنبثقة الإجبارية لربط المحفظة (المنع من الدخول) -->
+  <!-- شاشة القفل وتأكيد الربط المباشر بالمحفظة -->
   <div id="wallet-modal" class="wallet-modal-overlay">
     <div class="wallet-modal-box">
-      <h3>ربط محفظة TON</h3>
-      <p>أدخل عنوان محفظتك الشخصية لتأكيد الربط وتفعيل التطبيق</p>
-      <input type="text" id="user-wallet-address" class="wallet-input" placeholder="EQD... أو UQD...">
-      <button class="btn-yellow" onclick="confirmWalletBinding()">تأكيد الربط الآن</button>
+      <h3>ربط محفظة TON تلقائياً</h3>
+      <p>اضغط على الزر أدناه ليتم تحويلك إلى محفظتك مباشرة والتأكيد بنقرة واحدة لتفعيل حسابك وإحالتك.</p>
+      
+      <!-- سيقوم كود الجافاسكربت بوضع زر الربط التلقائي هنا -->
+      <div id="ton-connect-btn-container"></div>
     </div>
   </div>
 
-  <!-- المحتوى الرئيسي (محمي حتى إكمال الربط) -->
+  <!-- المحتوى الرئيسي للمستخدم -->
   <div class="lang-header">
     <span style="font-size: 12px; color: var(--text-sub);">GRAM MAX</span>
     <select class="lang-select">
@@ -212,7 +213,7 @@
     <div id="tab-friends" class="tab-content">
       <div class="level-card">
         <h4 style="color: var(--primary-yellow); margin-top: 0;">👥 دعوة الأصدقاء</h4>
-        <input type="text" id="ref-link" readonly value="جاري التحميل..." style="width:100%; padding:8px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
+        <input type="text" id="ref-link" readonly value="جاري التحميل..." style="width:100%; padding:8px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px; box-sizing:border-box;">
         <button class="btn-yellow" onclick="copyRefLink()">📋 مشاركة الرابط</button>
       </div>
       <div class="level-card">
@@ -224,13 +225,13 @@
     <div id="tab-wallet" class="tab-content">
       <div class="level-card">
         <h4 style="color: var(--primary-yellow); margin-top:0;">💳 المحفظة المربوطة</h4>
-        <p id="connected-wallet-display" style="font-family: monospace; color: var(--primary-yellow); font-size: 11px; word-break: break-all;"></p>
+        <p id="connected-wallet-display" style="font-family: monospace; color: var(--primary-yellow); font-size: 11px; word-break: break-all;">جاري التحقق...</p>
       </div>
 
       <div class="level-card">
         <h4 style="color: var(--primary-yellow); margin-top:0;">⚡ الإيداع والشحن</h4>
-        <input type="text" readonly value="UQBr_XZ5X_ADMIN_WALLET_ADDRESS" style="width:100%; padding:8px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;">
-        <input type="number" id="deposit-amount" placeholder="الكمية بـ GRAM" style="width:100%; padding:8px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
+        <input type="text" readonly value="UQBr_XZ5X_ADMIN_WALLET_ADDRESS" style="width:100%; padding:8px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px; box-sizing:border-box;">
+        <input type="number" id="deposit-amount" placeholder="الكمية بـ GRAM" style="width:100%; padding:8px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px; box-sizing:border-box;">
         <button class="btn-yellow" onclick="handleDeposit()">تأكيد الإيداع</button>
       </div>
     </div>
@@ -254,7 +255,6 @@
       balance: 0.00,
       refCount: 0,
       currentUnlockedLevel: 1,
-      walletAddress: localStorage.getItem('user_wallet') || null,
       userId: tg.initDataUnsafe?.user?.id || '12345678'
     };
 
@@ -266,34 +266,32 @@
       { id: 5, name: "المستوى 5", cost: 10, return: 13.00, profit: "3.00+", duration: "120 ساعة" }
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // التحقق مما إذا كان المستخدم ربط المحفظة مسبقاً
-      if (userData.walletAddress) {
-        document.getElementById('wallet-modal').style.display = 'none';
-        document.getElementById('connected-wallet-display').innerText = userData.walletAddress;
-      }
+    // تهيئة مكتبة TonConnect المباشرة
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test-manifest.json',
+        buttonRootId: 'ton-connect-btn-container'
+    });
 
+    // الاستماع لحالة الربط التلقائي
+    tonConnectUI.onStatusChange(wallet => {
+        if (wallet) {
+            // عند اكتمال الربط الضغطي والموافقة من داخل تطبيق المحفظة
+            const walletAddress = wallet.account.address;
+            document.getElementById('wallet-modal').style.display = 'none';
+            document.getElementById('connected-wallet-display').innerText = walletAddress;
+            
+            tg.showAlert("✅ تم ربط المحفظة بنجاح! تم تفعيل حسابك واحتساب الإحالة.");
+        } else {
+            // إذا لم يتم الربط، تبقى النافذة حارجية
+            document.getElementById('wallet-modal').style.display = 'flex';
+            document.getElementById('connected-wallet-display').innerText = "لم يتم الربط بعد";
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('ref-link').value = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
       renderLevels();
     });
-
-    // تأكيد ربط المحفظة وحساب الإحالة
-    function confirmWalletBinding() {
-      const address = document.getElementById('user-wallet-address').value.trim();
-      
-      if (!address || address.length < 10) {
-        tg.showAlert("⚠️ يرجى إدخال عنوان محفظة TON صحيح (يبدأ بـ EQD أو UQD).");
-        return;
-      }
-
-      // حفظ المحفظة وفتح التطبيق
-      userData.walletAddress = address;
-      localStorage.setItem('user_wallet', address);
-      document.getElementById('wallet-modal').style.display = 'none';
-      document.getElementById('connected-wallet-display').innerText = address;
-
-      tg.showAlert("✅ تم ربط المحفظة وتفعيل حسابك بنجاح! تم احتساب إحالتك الآن.");
-    }
 
     function renderLevels() {
       const container = document.getElementById('investment-levels');
