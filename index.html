@@ -144,6 +144,19 @@
       cursor: pointer;
     }
 
+    .btn-copy {
+      width: 100%;
+      padding: 11px;
+      background: #21262d;
+      color: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
     .btn-claim {
       width: 100%;
       padding: 11px;
@@ -288,8 +301,9 @@
     <div id="tab-friends" class="tab-content">
       <div class="level-card">
         <h4 style="color: var(--primary-yellow); margin-top: 0;" id="txt-friends-title">👥 دعوة الأصدقاء</h4>
-        <input type="text" id="ref-link" readonly value="جاري التحميل..." style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
+        <input type="text" id="ref-link" readonly value="جاري التحميل..." style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px; font-size:12px;">
         <button class="btn-yellow" onclick="shareRefLink()" id="btn-share">📢 مشاركة الرابط مباشر</button>
+        <button class="btn-copy" onclick="copyRefLink()" id="btn-copy">📋 نسخ الرابط</button>
       </div>
       <div class="level-card">
         <p><span id="txt-ref-count">عدد الإحالات المؤكدة</span>: <b id="ref-count" style="color: var(--primary-yellow);">0</b></p>
@@ -368,6 +382,7 @@
         tradeDesc: "ستفتح هذه الميزة قريباً...",
         friendsTitle: "👥 دعوة الأصدقاء",
         btnShare: "📢 مشاركة الرابط مباشر",
+        btnCopy: "📋 نسخ الرابط",
         refCountText: "عدد الإحالات المؤكدة",
         btnConnectWallet: "🔗 ربط المحفظة الإلكترونية",
         walletTitle: "💳 المحفظة المربوطة",
@@ -404,7 +419,8 @@
         alertDepositSent: "📩 تم إرسال الطلب بنجاح!\nسيتم إضافة الرصيد فور تأكيد الوصول.",
         alertDepositFail: "❌ تم إلغاء العملية أو فشل التأكيد.",
         alertNeedWallet: "⚠️ يجب ربط المحفظة أولاً لإتمام العملية.",
-        termsAlert: "سياسة الاستخدام: هذا البوت مخصص للاستثمار والتداول الافتراضي."
+        termsAlert: "سياسة الاستخدام: هذا البوت مخصص للاستثمار والتداول الافتراضي.",
+        copiedSuccess: "📋 تم نسخ رابط الإحالة بنجاح!"
       },
       en: {
         dir: "ltr",
@@ -418,6 +434,7 @@
         tradeDesc: "This feature will be available soon...",
         friendsTitle: "👥 Invite Friends",
         btnShare: "📢 Share Direct Link",
+        btnCopy: "📋 Copy Link",
         refCountText: "Confirmed Referrals",
         btnConnectWallet: "🔗 Connect Wallet",
         walletTitle: "💳 Connected Wallet",
@@ -454,7 +471,8 @@
         alertDepositSent: "📩 Request sent successfully!\nBalance will update upon confirmation.",
         alertDepositFail: "❌ Transaction canceled or confirmation failed.",
         alertNeedWallet: "⚠️ Please connect your wallet first.",
-        termsAlert: "Terms of Use: This bot is intended for virtual trading and investment."
+        termsAlert: "Terms of Use: This bot is intended for virtual trading and investment.",
+        copiedSuccess: "📋 Referral link copied successfully!"
       },
       ru: {
         dir: "ltr",
@@ -468,6 +486,7 @@
         tradeDesc: "Эта функция будет доступна скоро...",
         friendsTitle: "👥 Пригласить друзей",
         btnShare: "📢 Поделиться ссылкой",
+        btnCopy: "📋 Скопировать ссылку",
         refCountText: "Подтвержденные рефералы",
         btnConnectWallet: "🔗 Подключить кошелек",
         walletTitle: "💳 Подключенный кошелек",
@@ -504,7 +523,8 @@
         alertDepositSent: "📩 Запрос успешно отправлен!\nБаланс обновится после подтверждения.",
         alertDepositFail: "❌ Транзакция отменена или произошла ошибка.",
         alertNeedWallet: "⚠️ Пожалуйста, сначала подключите кошелек.",
-        termsAlert: "Условия использования: Данный бот предназначен для виртуальной торговли."
+        termsAlert: "Условия использования: Данный бот предназначен для виртуальной торговли.",
+        copiedSuccess: "📋 Реферальная ссылка скопирована!"
       }
     };
 
@@ -525,17 +545,11 @@
       { id: 5, cost: 10, return: 13.00, profit: 3.00, durationHours: 120 }
     ];
 
-    // إعداد المانفيست المباشر لضمان الاتصال الصحيح بـ Telegram Wallet و DeFi
-    const manifestObject = {
-      url: window.location.href,
-      name: "GRAM MAX App",
-      iconUrl: "https://ton.org/download/ton_symbol.png",
-      termsOfDeliveryUrl: window.location.href
-    };
-    const manifestDataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifestObject));
+    // تحديد رابط المانفيست المستضاف على الموقع المباشر لحل مشكلة الخطأ مع المحافظ
+    const manifestUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/') + 'tonconnect-manifest.json';
 
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: manifestDataUrl,
+        manifestUrl: manifestUrl,
         buttonRootId: 'ton-connect-btn-container'
     });
 
@@ -597,6 +611,7 @@
 
       document.getElementById('txt-friends-title').innerText = lang.friendsTitle;
       document.getElementById('btn-share').innerText = lang.btnShare;
+      document.getElementById('btn-copy').innerText = lang.btnCopy;
       document.getElementById('txt-ref-count').innerText = lang.refCountText;
 
       document.getElementById('btn-connect-wallet').innerText = lang.btnConnectWallet;
@@ -812,6 +827,19 @@
       const url = document.getElementById('ref-link').value;
       const shareText = "Join GRAM MAX and start earning GRAM tokens now!";
       tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`);
+    }
+
+    function copyRefLink() {
+      const lang = translations[currentLang] || translations.ar;
+      const refInput = document.getElementById('ref-link');
+      
+      navigator.clipboard.writeText(refInput.value).then(() => {
+        tg.showAlert(lang.copiedSuccess);
+      }).catch(() => {
+        refInput.select();
+        document.execCommand('copy');
+        tg.showAlert(lang.copiedSuccess);
+      });
     }
 
     function switchTab(tabName, btnElement) {
