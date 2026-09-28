@@ -146,6 +146,37 @@
       cursor: pointer;
     }
 
+    .btn-claim {
+      width: 100%;
+      padding: 11px;
+      background: var(--green-status);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .btn-timer {
+      width: 100%;
+      padding: 11px;
+      background: #1f2937;
+      color: var(--primary-yellow);
+      border: 1px solid var(--primary-yellow);
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: not-allowed;
+    }
+
     .btn-locked {
       width: 100%;
       padding: 11px;
@@ -327,18 +358,19 @@
     let userData = {
       balance: parseFloat(localStorage.getItem('user_balance')) || 0.00,
       refCount: 0,
-      currentUnlockedLevel: 1,
+      currentUnlockedLevel: parseInt(localStorage.getItem('unlocked_level')) || 1,
       userId: tg.initDataUnsafe?.user?.id || '8183652969',
       first_name: tg.initDataUnsafe?.user?.first_name || 'User',
       photo_url: tg.initDataUnsafe?.user?.photo_url || null
     };
 
+    // مدة المستويات بالساعات (موزعة للتطبيق)
     const levels = [
-      { id: 1, name: "المستوى 1", cost: 1, return: 1.15, profit: "0.15+", duration: "12 ساعة" },
-      { id: 2, name: "المستوى 2", cost: 2, return: 2.30, profit: "0.30+", duration: "24 ساعة" },
-      { id: 3, name: "المستوى 3", cost: 5, return: 5.70, profit: "0.70+", duration: "48 ساعة" },
-      { id: 4, name: "المستوى 4", cost: 7, return: 8.30, profit: "1.30+", duration: "72 ساعة" },
-      { id: 5, name: "المستوى 5", cost: 10, return: 13.00, profit: "3.00+", duration: "120 ساعة" }
+      { id: 1, name: "المستوى 1", cost: 1, return: 1.15, profit: 0.15, durationHours: 12, durationText: "12 ساعة" },
+      { id: 2, name: "المستوى 2", cost: 2, return: 2.30, profit: 0.30, durationHours: 24, durationText: "24 ساعة" },
+      { id: 3, name: "المستوى 3", cost: 5, return: 5.70, profit: 0.70, durationHours: 48, durationText: "48 ساعة" },
+      { id: 4, name: "المستوى 4", cost: 7, return: 8.30, profit: 1.30, durationHours: 72, durationText: "72 ساعة" },
+      { id: 5, name: "المستوى 5", cost: 10, return: 13.00, profit: 3.00, durationHours: 120, durationText: "120 ساعة" }
     ];
 
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -359,8 +391,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('user-display-name').innerText = userData.first_name;
       document.getElementById('user-display-id').innerText = `ID: ${userData.userId}`;
-      document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
-      
+      updateBalanceUI();
+
       if (userData.photo_url) {
         document.getElementById('avatar-container').innerHTML = `<img src="${userData.photo_url}">`;
       } else {
@@ -369,7 +401,13 @@
 
       document.getElementById('ref-link').value = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
       renderLevels();
+      setInterval(checkTimers, 1000);
     });
+
+    function updateBalanceUI() {
+      document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
+      localStorage.setItem('user_balance', userData.balance);
+    }
 
     function renderLevels() {
       const container = document.getElementById('investment-levels');
@@ -380,9 +418,21 @@
         const card = document.createElement('div');
         card.className = 'level-card';
 
-        let buttonHTML = isUnlocked 
-          ? `<button class="btn-yellow" onclick="startInvestment(${lvl.id}, ${lvl.cost})">استثمار (${lvl.cost} GRAM)</button>`
-          : `<button class="btn-locked" disabled>🔒 مقفل حتى إكمال المستوى السابق</button>`;
+        let buttonArea = '';
+        const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${lvl.id}`));
+
+        if (!isUnlocked) {
+          buttonArea = `<button class="btn-locked" disabled>🔒 مقفل حتى إكمال المستوى السابق</button>`;
+        } else if (timerData) {
+          const now = Date.now();
+          if (now >= timerData.endTime) {
+            buttonArea = `<button class="btn-claim" onclick="claimProfit(${lvl.id})">🎁 مطالبة بالأرباح (+${lvl.return} GRAM)</button>`;
+          } else {
+            buttonArea = `<button class="btn-timer" id="timer-btn-${lvl.id}" disabled>⏳ جاري الاستثمار...</button>`;
+          }
+        } else {
+          buttonArea = `<button class="btn-yellow" onclick="startInvestment(${lvl.id})">استثمار (${lvl.cost} GRAM)</button>`;
+        }
 
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
@@ -392,13 +442,90 @@
           <div style="font-size:12px; color:var(--text-sub); margin-bottom:8px;">
             <p>الاستثمار: <b style="color:#fff;">${lvl.cost} GRAM</b></p>
             <p>العائد: <b style="color:#fff;">${lvl.return} GRAM</b></p>
-            <p>الربح: <span style="color:var(--green-status); font-weight:bold;">+GRAM ${lvl.profit}</span></p>
-            <p>المدة: <b style="color:#fff;">${lvl.duration}</b></p>
+            <p>الربح: <span style="color:var(--green-status); font-weight:bold;">+GRAM ${lvl.profit.toFixed(2)}</span></p>
+            <p>المدة: <b style="color:#fff;">${lvl.durationText}</b></p>
           </div>
-          ${buttonHTML}
+          <div id="btn-container-${lvl.id}">${buttonArea}</div>
         `;
         container.appendChild(card);
       });
+      checkTimers();
+    }
+
+    function startInvestment(levelId) {
+      const lvl = levels.find(l => l.id === levelId);
+      if (userData.balance < lvl.cost) {
+        tg.showAlert("⚠️ رصيدك المتاح غير كافٍ لإكمال هذا الاستثمار!");
+        return;
+      }
+
+      // خصم المبلغ من الرصيد
+      userData.balance -= lvl.cost;
+      updateBalanceUI();
+
+      // إعداد وقت انتهاء العداد
+      const durationMs = lvl.durationHours * 60 * 60 * 1000;
+      const timerInfo = {
+        startTime: Date.now(),
+        endTime: Date.now() + durationMs,
+        cost: lvl.cost,
+        returnAmount: lvl.return
+      };
+
+      localStorage.setItem(`investment_lvl_${levelId}`, JSON.stringify(timerInfo));
+      tg.showAlert(`✅ تم بدء ${lvl.name} بنجاح! بدأ العداد التنازلي.`);
+      renderLevels();
+    }
+
+    function checkTimers() {
+      levels.forEach(lvl => {
+        const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${lvl.id}`));
+        const btn = document.getElementById(`timer-btn-${lvl.id}`);
+
+        if (timerData && btn) {
+          const now = Date.now();
+          const distance = timerData.endTime - now;
+
+          if (distance <= 0) {
+            renderLevels();
+          } else {
+            let hours = Math.floor(distance / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const hStr = hours < 10 ? '0' + hours : hours;
+            const mStr = minutes < 10 ? '0' + minutes : minutes;
+            const sStr = seconds < 10 ? '0' + seconds : seconds;
+
+            btn.innerText = `⏳ المتبقي: ${hStr}:${mStr}:${sStr}`;
+          }
+        }
+      });
+    }
+
+    function claimProfit(levelId) {
+      const lvl = levels.find(l => l.id === levelId);
+      const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${levelId}`));
+
+      if (!timerData) return;
+
+      // إضافة العائد كاملاً إلى الرصيد
+      userData.balance += lvl.return;
+      updateBalanceUI();
+
+      // حذف العداد المستهلك
+      localStorage.removeItem(`investment_lvl_${levelId}`);
+
+      // فتح المستوى التالي إذا كان هذا أقصى مستوى مفتوح
+      if (levelId === userData.currentUnlockedLevel && userData.currentUnlockedLevel < levels.length) {
+        userData.currentUnlockedLevel += 1;
+        localStorage.setItem('unlocked_level', userData.currentUnlockedLevel);
+        tg.showAlert(`🎉 تم استلام الأرباح (+${lvl.return} GRAM) وفتح ${levels[userData.currentUnlockedLevel - 1].name}!`);
+      } else {
+        tg.showAlert(`🎉 تم استلام الأرباح (+${lvl.return} GRAM) بنجاح!`);
+      }
+
+      renderLevels();
     }
 
     function openWalletModal() {
@@ -423,7 +550,7 @@
       const amount = parseFloat(amountInput);
 
       if (!adminWallet || adminWallet.length < 20) {
-        tg.showAlert("⚠️ يرجى التأكد من كتابة عنوان محفظة المشرف بشكل صحيح وبدون أخطاء.");
+        tg.showAlert("⚠️ يرجى التأكد من كتابة عنوان محفظة المشرف بشكل صحيح.");
         return;
       }
 
@@ -438,7 +565,6 @@
         return;
       }
 
-      // تحويل قيمة TON المطلوبة إلى NanoTON
       const nanoTonAmount = Math.floor(amount * 1000000000).toString();
 
       const transaction = {
@@ -455,11 +581,8 @@
         const result = await tonConnectUI.sendTransaction(transaction);
 
         if (result) {
-          userData.balance += amount;
-          localStorage.setItem('user_balance', userData.balance);
-          document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
-          
-          tg.showAlert(`✅ تم تحويل ${amount} TON بنجاح! وتم إضافة ${amount} GRAM إلى رصيدك.`);
+          // تم الإرسال من المحفظة بنجاح ولكن لن تتم إضافة الرصيد تلقائياً لمنع التلاعب
+          tg.showAlert(`📩 تم إرسال الطلب إلى شبكة TON بنجاح!\n\nسيتم مراجعة العملية وتحديث رصيدك بـ (${amount} GRAM) فور تأكيد وصول الأموال على البلوكشين.`);
           document.getElementById('deposit-amount').value = '';
         }
       } catch (error) {
@@ -471,17 +594,6 @@
       const url = document.getElementById('ref-link').value;
       const shareText = "انضم معي في منصة GRAM MAX واكسب عملات GRAM الرقمية!";
       tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`);
-    }
-
-    function startInvestment(levelId, cost) {
-      if (userData.balance < cost) {
-        tg.showAlert("⚠️ رصيدك المتاح غير كافٍ!");
-        return;
-      }
-      userData.balance -= cost;
-      localStorage.setItem('user_balance', userData.balance);
-      document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
-      tg.showAlert(`✅ تم بدء ${levels[levelId - 1].name} بنجاح!`);
     }
 
     function switchTab(tabName, btnElement) {
