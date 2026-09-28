@@ -36,7 +36,6 @@
             padding-bottom: 80px;
         }
 
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -48,253 +47,89 @@
             z-index: 10;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .user-info { display: flex; align-items: center; gap: 10px; }
         .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            overflow: hidden;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--accent-color); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px; overflow: hidden;
         }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .user-id {
-            font-size: 10px;
-            color: var(--text-secondary);
-        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-details { display: flex; flex-direction: column; }
+        .user-name { font-size: 13px; font-weight: bold; }
+        .user-id { font-size: 10px; color: var(--text-secondary); }
 
         .lang-btn {
-            background: #334155;
-            color: #fff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
+            background: #334155; color: #fff; border: none;
+            padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer;
         }
 
         .lang-dropdown {
-            display: none;
-            position: absolute;
-            top: 50px;
-            left: 16px;
-            background: #1e293b;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            z-index: 100;
+            display: none; position: absolute; top: 50px; left: 16px;
+            background: #1e293b; border: 1px solid var(--border-color);
+            border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 100;
         }
-
         .lang-dropdown.show { display: block; }
-
-        .lang-option {
-            padding: 10px 16px;
-            font-size: 13px;
-            color: #fff;
-            cursor: pointer;
-        }
-
+        .lang-option { padding: 10px 16px; font-size: 13px; color: #fff; cursor: pointer; }
         .lang-option:hover { background: #334155; }
 
-        /* Balance Card */
         .balance-card {
-            background: var(--card-bg);
-            margin: 16px;
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid var(--border-color);
+            background: var(--card-bg); margin: 16px; padding: 20px;
+            border-radius: 16px; text-align: center; border: 1px solid var(--border-color);
         }
+        .balance-title { color: var(--text-secondary); font-size: 13px; margin-bottom: 6px; }
+        .balance-amount { font-size: 30px; font-weight: bold; color: var(--accent-color); }
 
-        .balance-title {
-            color: var(--text-secondary);
-            font-size: 13px;
-            margin-bottom: 6px;
-        }
-
-        .balance-amount {
-            font-size: 30px;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        /* Wallet Connect */
-        .wallet-section {
-            margin: 0 16px 16px;
-            display: flex;
-            justify-content: center;
-        }
-
+        .wallet-section { margin: 0 16px 16px; display: flex; justify-content: center; }
         #ton-connect { width: 100%; }
 
-        /* Cards & Container */
-        .container {
-            padding: 0 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .container { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+        .card { background: var(--card-bg); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); }
+        .card-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--accent-color); }
 
-        .card {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent-color);
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .input-group { display: flex; flex-direction: column; gap: 10px; }
         .input-field {
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 8px;
-            color: var(--text-color);
-            font-size: 14px;
-            outline: none;
-            width: 100%;
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 12px; border-radius: 8px; color: var(--text-color);
+            font-size: 14px; outline: none; width: 100%;
         }
-
-        .input-field:focus { border-color: var(--accent-color); }
 
         .btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            width: 100%;
+            background: var(--accent-color); color: #000; border: none;
+            padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%;
+        }
+        .btn-withdraw { background: var(--red-color); color: #fff; }
+
+        /* Investment Cards */
+        .plan-card {
+            background: #0f172a; border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 14px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .plan-info h4 { font-size: 14px; color: var(--accent-color); margin-bottom: 4px; }
+        .plan-info p { font-size: 12px; color: var(--text-secondary); }
+        .plan-btn {
+            background: var(--accent-color); color: #000; border: none;
+            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;
         }
 
-        .btn-withdraw {
-            background: var(--red-color);
-            color: #fff;
-        }
-
-        .btn:active { opacity: 0.8; }
-
-        /* Admin Dashboard Elements */
-        .admin-toggle-btn {
-            background: #334155;
-            color: #fff;
-            border: 1px solid var(--accent-color);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-            font-size: 12px;
-        }
-
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
-        }
-
+        /* Admin Table */
+        .admin-only { display: none; } /* مخفي افتراضياً للمستخدمين */
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 12px; }
+        th, td { padding: 10px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
         th { background: #0f172a; color: var(--text-secondary); }
-
-        .code-text {
-            font-family: monospace;
-            color: var(--accent-color);
-            background: #0f172a;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-
-        .btn-action {
-            padding: 4px 8px;
-            border: none;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
+        .code-text { font-family: monospace; color: var(--accent-color); background: #0f172a; padding: 2px 4px; border-radius: 4px; }
+        .btn-action { padding: 4px 8px; border: none; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .btn-approve { background: var(--green-color); color: #000; }
         .btn-reject { background: var(--red-color); color: #fff; }
 
-        /* Navigation Bar */
         .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid var(--border-color);
-            z-index: 50;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--card-bg); display: flex; justify-content: space-around;
+            padding: 10px 0; border-top: 1px solid var(--border-color); z-index: 50;
         }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-secondary);
-            font-size: 11px;
-            cursor: pointer;
-        }
-
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-secondary); font-size: 11px; cursor: pointer; }
         .nav-item.active { color: var(--accent-color); }
         .nav-icon { font-size: 18px; }
 
@@ -329,7 +164,7 @@
         <div class="balance-amount" id="user-balance">GRAM 0.00</div>
     </div>
 
-    <!-- TON Connect Button -->
+    <!-- TON Connect -->
     <div class="wallet-section">
         <div id="ton-connect"></div>
     </div>
@@ -364,37 +199,59 @@
             </div>
         </div>
 
-        <!-- Investment Tab -->
+        <!-- Investment Tab (إعادة باقات الاستثمار) -->
         <div id="tab-invest" class="tab-content">
             <div class="card">
-                <div class="card-title" id="txt-invest-title">📈 الاستثمار</div>
-                <p style="color: var(--text-secondary); font-size: 13px;" id="txt-invest-desc">باقات الاستثمار المتاحة قريباً...</p>
+                <div class="card-title" id="txt-invest-title">📈 خطط الاستثمار المتاحة</div>
+                
+                <div class="plan-card">
+                    <div class="plan-info">
+                        <h4>الخطة البرونزية 🥉</h4>
+                        <p>عائد: 5% أسبوعياً | الحد الأدنى: 10 GRAM</p>
+                    </div>
+                    <button class="plan-btn" onclick="subscribePlan('البرونزية', 10)">استثمار</button>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-info">
+                        <h4>الخطة الفضية 🥈</h4>
+                        <p>عائد: 12% أسبوعياً | الحد الأدنى: 50 GRAM</p>
+                    </div>
+                    <button class="plan-btn" onclick="subscribePlan('الفضية', 50)">استثمار</button>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-info">
+                        <h4>الخطة الذهبية 🥇</h4>
+                        <p>عائد: 30% شهرياً | الحد الأدنى: 200 GRAM</p>
+                    </div>
+                    <button class="plan-btn" onclick="subscribePlan('الذهبية', 200)">استثمار</button>
+                </div>
             </div>
         </div>
 
         <!-- Trade Tab -->
         <div id="tab-trade" class="tab-content">
             <div class="card">
-                <div class="card-title" id="txt-trade-title">📊 التداول</div>
-                <p style="color: var(--text-secondary); font-size: 13px;" id="txt-trade-desc">منصة التداول الذكي قريباً...</p>
+                <div class="card-title" id="txt-trade-title">📊 التداول السريع</div>
+                <p style="color: var(--text-secondary); font-size: 13px;" id="txt-trade-desc">منصة التداول المباشرة قريباً...</p>
             </div>
         </div>
 
         <!-- Friends Tab -->
         <div id="tab-friends" class="tab-content">
             <div class="card">
-                <div class="card-title" id="txt-friends-title">👥 الأصدقاء</div>
+                <div class="card-title" id="txt-friends-title">👥 دعوة الأصدقاء</div>
                 <input type="text" class="input-field" id="ref-link" readonly style="margin-bottom: 10px; font-size: 12px;">
                 <button class="btn" id="btn-copy-ref" onclick="copyRefLink()">📋 نسخ رابط الإحالة</button>
             </div>
         </div>
 
-        <!-- Admin Tab -->
-        <div id="tab-admin" class="tab-content">
+        <!-- Admin Tab (خاص بالمشرف فقط) -->
+        <div id="tab-admin" class="tab-content admin-only">
             <div class="card">
-                <div class="card-title">👑 لوحة التحكم وإدارة الطلبات</div>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">مركز التحكم بالمشرفين - السجل المالي المباشر:</p>
-                
+                <div class="card-title">👑 لوحة التحكم والإشراف</div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">طلبات السحب والإيداع الواردة:</p>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -403,11 +260,11 @@
                                 <th>المستخدم</th>
                                 <th>النوع</th>
                                 <th>المبلغ</th>
-                                <th>الحالة / الإجراء</th>
+                                <th>الإجراء</th>
                             </tr>
                         </thead>
                         <tbody id="admin-tx-table">
-                            <!-- سيتم إضافة الطلبات المباشرة هنا -->
+                            <!-- الطلبات تظهر هنا للمشرف -->
                         </tbody>
                     </table>
                 </div>
@@ -434,28 +291,33 @@
             <span class="nav-icon">👥</span>
             <span id="nav-friends">الأصدقاء</span>
         </div>
-        <div class="nav-item" onclick="switchTab('admin', this)">
+        <!-- خيار الإشراف يظهر للمشرف فقط -->
+        <div class="nav-item admin-only" id="nav-admin-btn" onclick="switchTab('admin', this)">
             <span class="nav-icon">👑</span>
             <span>الإشراف</span>
         </div>
     </div>
 
     <script>
-        // بيانات التلجرام للبوت والمشرف
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         if (tg) tg.expand();
 
-        const BOT_TOKEN = "7544062828:AAE_YourActualBotTokenHere"; // توكن البوت الخاص بك
-        const ADMIN_CHAT_ID = "8183652969"; // معرف التلجرام الخاص بالمشرف لاستلام الإشعارات
+        const BOT_TOKEN = "7544062828:AAE_YourActualBotTokenHere";
+        const ADMIN_IDS = ["8183652969", "8500596820"]; // قائمة معرفات المشرفين المسموح لهم
 
         let userData = {
-            id: tg?.initDataUnsafe?.user?.id || '8183652969',
-            name: tg?.initDataUnsafe?.user?.first_name || 'User',
+            id: String(tg?.initDataUnsafe?.user?.id || '8500596820'),
+            name: tg?.initDataUnsafe?.user?.first_name || 'FastHelp',
             photo: tg?.initDataUnsafe?.user?.photo_url || null,
-            balance: parseFloat(localStorage.getItem('user_balance')) || 0.00
+            balance: parseFloat(localStorage.getItem('user_balance')) || 0.90
         };
 
-        // إعداد بيانات المستخدم
+        // التحقق مما إذا كان المستخدم مشرفاً
+        if (ADMIN_IDS.includes(userData.id)) {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+        }
+
+        // إعداد واجهة المستخدم
         document.getElementById('user-name').innerText = userData.name;
         document.getElementById('user-id').innerText = `ID: ${userData.id}`;
         document.getElementById('ref-link').value = `https://t.me/GramMax3_Bot?start=ref_${userData.id}`;
@@ -485,27 +347,27 @@
             localStorage.setItem('user_balance', userData.balance);
         }
 
-        // إرسال التنبيه الفوري لبوت تلجرام الخاص بالمشرف
         function sendTelegramAdminNotification(messageText) {
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: ADMIN_CHAT_ID,
-                    text: messageText,
-                    parse_mode: 'Markdown'
-                })
-            }).catch(e => console.log('Notification sent'));
+            ADMIN_IDS.forEach(adminId => {
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: adminId,
+                        text: messageText,
+                        parse_mode: 'Markdown'
+                    })
+                }).catch(e => console.log('Notice sent'));
+            });
         }
 
-        // إنشاء رقم تسلسلي فريد
         function generateTxId() {
             return 'TX-' + Math.floor(100000 + Math.random() * 900000);
         }
 
-        // إضافة العملية إلى لوحة التحكم
-        function addTransactionToAdminTable(txId, user, type, amount, status) {
+        function addTransactionToAdminTable(txId, user, type, amount) {
             const tbody = document.getElementById('admin-tx-table');
+            if(!tbody) return;
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><span class="code-text">${txId}</span></td>
@@ -528,7 +390,6 @@
             btn.parentElement.innerHTML = '<span style="color:var(--red-color); font-weight:bold;">❌ مرفوض</span>';
         }
 
-        // تنفيذ الإيداع
         async function handleDeposit() {
             const amountInput = document.getElementById('deposit-amount').value;
             const amount = parseFloat(amountInput);
@@ -556,11 +417,8 @@
                 if (result) {
                     alert('✅ تم إرسال الإيداع بنجاح!');
                     document.getElementById('deposit-amount').value = '';
+                    addTransactionToAdminTable(txId, `@${userData.id}`, 'إيداع ⚡', amount);
 
-                    // إضافة للوحة الإشراف
-                    addTransactionToAdminTable(txId, `@${userData.id}`, 'إيداع ⚡', amount, 'قيد الانتظار');
-
-                    // إرسال إشعار للمشرف
                     const notifyText = `⚡ *طلب إيداع جديد*\n\n🔢 *الرقم التسلسلي:* \`${txId}\`\n👤 *المستخدم:* \`${userData.name}\` (ID: \`${userData.id}\`)\n💰 *الكمية:* ${amount} GRAM`;
                     sendTelegramAdminNotification(notifyText);
                 }
@@ -569,7 +427,6 @@
             }
         }
 
-        // تنفيذ السحب
         function handleWithdraw() {
             const address = document.getElementById('withdraw-address').value.trim();
             const amountInput = document.getElementById('withdraw-amount').value;
@@ -602,15 +459,22 @@
 
             alert(`✅ تم تقديم طلب السحب بنجاح!\nالرقم التسلسلي: ${txId}\nالصافي: ${netAmount.toFixed(2)} GRAM`);
 
-            // إضافة للوحة الإشراف
-            addTransactionToAdminTable(txId, `@${userData.id}`, 'سحب 📫', amount, 'قيد الانتظار');
+            addTransactionToAdminTable(txId, `@${userData.id}`, 'سحب 📫', amount);
 
-            // إرسال إشعار للمشرف
             const notifyText = `📫 *طلب سحب جديد*\n\n🔢 *الرقم التسلسلي:* \`${txId}\`\n👤 *المستخدم:* \`${userData.name}\` (ID: \`${userData.id}\`)\n💰 *الكمية الإجمالية:* ${amount} GRAM\n✨ *الصافي للتحويل:* ${netAmount.toFixed(2)} GRAM\n💳 *المحفظة:* \`${address}\``;
             sendTelegramAdminNotification(notifyText);
         }
 
-        // التنقل واللغات
+        function subscribePlan(planName, minAmount) {
+            if (userData.balance < minAmount) {
+                alert(`⚠️ رصيدك غير كافٍ للاستثمار في الخطة ${planName}. الحد الأدنى هو ${minAmount} GRAM`);
+                return;
+            }
+            userData.balance -= minAmount;
+            updateBalanceUI();
+            alert(`🎉 تم الاشتراك بنجاح في الخطة ${planName} بمبلغ ${minAmount} GRAM!`);
+        }
+
         function switchTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -626,108 +490,6 @@
         document.addEventListener('click', () => {
             document.getElementById('lang-dropdown').classList.remove('show');
         });
-
-        const translations = {
-            ar: {
-                balanceTitle: "الرصيد المتاح",
-                connectedWallet: "💳 المحفظة المربوطة",
-                depositTitle: "⚡ الإيداع والشحن",
-                depositPlaceholder: "الكمية المراد شحنها (GRAM)",
-                btnDeposit: "تأكيد الإيداع",
-                withdrawTitle: "📫 سحب الرصيد",
-                withdrawNote: "⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)",
-                withdrawAddrPlaceholder: "عنوان محفظة الاستلام",
-                withdrawAmtPlaceholder: "الكمية المراد سحبها (GRAM)",
-                btnWithdraw: "تأكيد السحب",
-                investTitle: "📈 الاستثمار",
-                investDesc: "باقات الاستثمار المتاحة قريباً...",
-                tradeTitle: "📊 التداول",
-                tradeDesc: "منصة التداول الذكي قريباً...",
-                friendsTitle: "👥 الأصدقاء",
-                btnCopyRef: "📋 نسخ رابط الإحالة",
-                navWallet: "المحفظة",
-                navInvest: "الاستثمار",
-                navTrade: "التداول",
-                navFriends: "الأصدقاء",
-                langText: "العربية 🇸🇦",
-                dir: "rtl"
-            },
-            en: {
-                balanceTitle: "Available Balance",
-                connectedWallet: "💳 Connected Wallet",
-                depositTitle: "⚡ Deposit & Top Up",
-                depositPlaceholder: "Amount to top up (GRAM)",
-                btnDeposit: "Confirm Deposit",
-                withdrawTitle: "📫 Withdraw Balance",
-                withdrawNote: "⚠️ Minimum withdrawal: 1 GRAM (1% fee)",
-                withdrawAddrPlaceholder: "Recipient Wallet Address",
-                withdrawAmtPlaceholder: "Amount to withdraw (GRAM)",
-                btnWithdraw: "Confirm Withdrawal",
-                investTitle: "📈 Investment",
-                investDesc: "Investment packages coming soon...",
-                tradeTitle: "📊 Trading",
-                tradeDesc: "Smart trading platform coming soon...",
-                friendsTitle: "👥 Friends",
-                btnCopyRef: "📋 Copy Referral Link",
-                navWallet: "Wallet",
-                navInvest: "Invest",
-                navTrade: "Trade",
-                navFriends: "Friends",
-                langText: "English 🇺🇸",
-                dir: "ltr"
-            },
-            ru: {
-                balanceTitle: "Доступный баланс",
-                connectedWallet: "💳 Подключенный кошелек",
-                depositTitle: "⚡ Пополнение",
-                depositPlaceholder: "Сумма пополнения (GRAM)",
-                btnDeposit: "Подтвердить депозит",
-                withdrawTitle: "📫 Вывод средств",
-                withdrawNote: "⚠️ Мин. сумма вывода: 1 GRAM (комиссия 1%)",
-                withdrawAddrPlaceholder: "Адрес кошелька",
-                withdrawAmtPlaceholder: "Сумма для вывода (GRAM)",
-                btnWithdraw: "Подтвердить вывод",
-                investTitle: "📈 Инвестиции",
-                investDesc: "Инвестиционные пакеты скоро...",
-                tradeTitle: "📊 Торговля",
-                tradeDesc: "Умная торговая платформа скоро...",
-                friendsTitle: "👥 Друзья",
-                btnCopyRef: "📋 Скопировать ссылку",
-                navWallet: "Кошелек",
-                navInvest: "Инвестиции",
-                navTrade: "Торговля",
-                navFriends: "Друзья",
-                langText: "Русский 🇷🇺",
-                dir: "ltr"
-            }
-        };
-
-        function changeLanguage(lang) {
-            const t = translations[lang];
-            document.documentElement.dir = t.dir;
-            document.getElementById('current-lang').innerText = t.langText;
-            document.getElementById('txt-balance-title').innerText = t.balanceTitle;
-            document.getElementById('txt-connected-wallet').innerText = t.connectedWallet;
-            document.getElementById('txt-deposit-title').innerText = t.depositTitle;
-            document.getElementById('deposit-amount').placeholder = t.depositPlaceholder;
-            document.getElementById('btn-deposit').innerText = t.btnDeposit;
-            document.getElementById('txt-withdraw-title').innerText = t.withdrawTitle;
-            document.getElementById('txt-withdraw-note').innerText = t.withdrawNote;
-            document.getElementById('withdraw-address').placeholder = t.withdrawAddrPlaceholder;
-            document.getElementById('withdraw-amount').placeholder = t.withdrawAmtPlaceholder;
-            document.getElementById('btn-withdraw').innerText = t.btnWithdraw;
-            document.getElementById('txt-invest-title').innerText = t.investTitle;
-            document.getElementById('txt-invest-desc').innerText = t.investDesc;
-            document.getElementById('txt-trade-title').innerText = t.tradeTitle;
-            document.getElementById('txt-trade-desc').innerText = t.tradeDesc;
-            document.getElementById('txt-friends-title').innerText = t.friendsTitle;
-            document.getElementById('btn-copy-ref').innerText = t.btnCopyRef;
-
-            document.getElementById('nav-wallet').innerText = t.navWallet;
-            document.getElementById('nav-invest').innerText = t.navInvest;
-            document.getElementById('nav-trade').innerText = t.navTrade;
-            document.getElementById('nav-friends').innerText = t.navFriends;
-        }
 
         function copyRefLink() {
             const refInput = document.getElementById('ref-link');
