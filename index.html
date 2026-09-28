@@ -161,6 +161,13 @@
             color: white;
         }
 
+        .note-text {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -234,14 +241,15 @@
         <button class="btn-action">تأكيد الإيداع</button>
     </div>
 
-    <!-- قسم السحب (تمت إضافته) -->
+    <!-- قسم سحب الرصيد -->
     <div class="section-card">
         <div class="section-title">📤 سحب الرصيد</div>
+        <div class="note-text">⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)</div>
         <div class="input-group">
             <input type="text" class="input-field" id="withdraw-address" placeholder="عنوان محفظة الاستلام">
         </div>
         <div class="input-group">
-            <input type="number" class="input-field" id="withdraw-amount" placeholder="الكمية المراد سحبها (GRAM)">
+            <input type="number" class="input-field" id="withdraw-amount" placeholder="الكمية المراد سحبها (GRAM)" step="any">
         </div>
         <button class="btn-action btn-withdraw" onclick="handleWithdraw()">تأكيد السحب</button>
     </div>
@@ -284,13 +292,25 @@
         });
 
         function handleWithdraw() {
-            const address = document.getElementById('withdraw-address').value;
-            const amount = document.getElementById('withdraw-amount').value;
-            if(!address || !amount) {
-                alert('يرجى إدخال عنوان المحفظة والكمية المطلوبة للسحب');
+            const address = document.getElementById('withdraw-address').value.trim();
+            const amountInput = document.getElementById('withdraw-amount').value;
+            const amount = parseFloat(amountInput);
+
+            if (!address) {
+                tg.showAlert('⚠️ يرجى إدخال عنوان المحفظة المراد السحب إليها.');
                 return;
             }
-            alert('تم تقديم طلب السحب بنجاح!');
+
+            if (isNaN(amount) || amount < 1) {
+                tg.showAlert('⚠️ عذراً، الحد الأدنى للسحب هو 1 GRAM.');
+                return;
+            }
+
+            // حساب ضريبة السحب (1%) والمبلغ الصافي
+            const fee = amount * 0.01;
+            const netAmount = amount - fee;
+
+            tg.showAlert(`✅ تم تقديم طلب السحب بنجاح!\n\nالمبلغ المطلوب: ${amount} GRAM\nالرسوم (1%): ${fee.toFixed(4)} GRAM\nالمبلغ الصافي للوصول: ${netAmount.toFixed(4)} GRAM`);
         }
     </script>
 </body>
