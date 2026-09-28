@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRAM MAX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -10,136 +10,104 @@
         :root {
             --bg-color: #0f172a;
             --card-bg: #1e293b;
-            --accent-color: #f59e0b;
             --text-color: #f8fafc;
-            --text-secondary: #94a3b8;
-            --green-color: #22c55e;
-            --input-bg: #0f172a;
+            --accent-color: #f59e0b;
+            --green-btn: #16a34a;
             --border-color: #334155;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 75px;
+            margin: 0;
+            padding: 15px;
+            padding-bottom: 80px;
+            direction: rtl;
         }
 
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            position: relative;
-            z-index: 10;
+            margin-bottom: 20px;
         }
 
-        .lang-btn {
-            background: #334155;
-            color: #fff;
-            border: none;
+        .user-badge {
+            background: var(--card-bg);
             padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .lang-dropdown {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 16px;
-            background: #1e293b;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            z-index: 100;
-        }
-
-        .lang-dropdown.show {
-            display: block;
-        }
-
-        .lang-option {
-            padding: 10px 16px;
-            font-size: 14px;
-            color: #fff;
-            cursor: pointer;
+            border-radius: 20px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        .lang-option:hover {
-            background: #334155;
+        .lang-select {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
         }
 
-        /* Balance Card */
+        .app-title {
+            text-align: center;
+            color: var(--accent-color);
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0 20px 0;
+        }
+
         .balance-card {
             background: var(--card-bg);
-            margin: 16px;
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 16px;
             text-align: center;
+            margin-bottom: 15px;
             border: 1px solid var(--border-color);
         }
 
         .balance-title {
-            color: var(--text-secondary);
+            color: #94a3b8;
             font-size: 14px;
             margin-bottom: 8px;
         }
 
         .balance-amount {
-            font-size: 32px;
-            font-weight: bold;
             color: var(--accent-color);
+            font-size: 28px;
+            font-weight: bold;
         }
 
-        /* Wallet Connect */
-        .wallet-section {
-            margin: 0 16px 16px;
-            display: flex;
-            justify-content: center;
-        }
-
-        #ton-connect {
+        .btn-connect {
             width: 100%;
-        }
-
-        /* Content Sections */
-        .container {
-            padding: 0 16px;
+            background: var(--green-btn);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
-            gap: 16px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
-        .card {
+        .section-card {
             background: var(--card-bg);
-            padding: 16px;
-            border-radius: 16px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
             border: 1px solid var(--border-color);
         }
 
-        .card-title {
+        .section-title {
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 12px;
@@ -148,41 +116,36 @@
             gap: 8px;
         }
 
-        .wallet-address-box {
-            background: var(--input-bg);
-            padding: 12px;
+        .wallet-address {
+            background: #0f172a;
+            padding: 10px;
             border-radius: 8px;
             font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
+            font-size: 11px;
             color: var(--accent-color);
-            border: 1px dashed var(--border-color);
+            word-break: break-all;
             text-align: center;
+            border: 1px dashed var(--border-color);
         }
 
-        /* Inputs & Buttons */
         .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            margin-bottom: 12px;
         }
 
         .input-field {
-            background: var(--input-bg);
+            width: 100%;
+            background: #0f172a;
             border: 1px solid var(--border-color);
+            color: white;
             padding: 12px;
             border-radius: 8px;
-            color: var(--text-color);
+            box-sizing: border-box;
             font-size: 14px;
-            outline: none;
+            text-align: center;
+        }
+
+        .btn-action {
             width: 100%;
-        }
-
-        .input-field:focus {
-            border-color: var(--accent-color);
-        }
-
-        .btn {
             background: var(--accent-color);
             color: #000;
             border: none;
@@ -191,37 +154,39 @@
             font-weight: bold;
             font-size: 15px;
             cursor: pointer;
-            width: 100%;
-            transition: opacity 0.2s;
         }
 
-        .btn:active {
-            opacity: 0.8;
+        .btn-withdraw {
+            background: #e11d48;
+            color: white;
         }
 
-        /* Navigation Bar */
+        .note-text {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
         .nav-bar {
             position: fixed;
             bottom: 0;
-            left: 0;
             right: 0;
+            left: 0;
             background: var(--card-bg);
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
             border-top: 1px solid var(--border-color);
-            z-index: 50;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            color: var(--text-secondary);
             font-size: 11px;
+            color: #94a3b8;
             text-decoration: none;
-            cursor: pointer;
         }
 
         .nav-item.active {
@@ -229,251 +194,123 @@
         }
 
         .nav-icon {
-            font-size: 20px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
+            font-size: 18px;
+            margin-bottom: 4px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <div class="header">
-        <div style="font-weight: bold; font-size: 18px;">GRAM MAX</div>
-        <button class="lang-btn" onclick="toggleLangMenu(event)">
-            <span id="current-lang">العربية 🇸🇦</span> ▼
-        </button>
-        <div class="lang-dropdown" id="lang-dropdown">
-            <div class="lang-option" onclick="changeLanguage('ar')">العربية 🇸🇦</div>
-            <div class="lang-option" onclick="changeLanguage('en')">English 🇺🇸</div>
+        <select class="lang-select">
+            <option>العربية 🇸🇦</option>
+            <option>English 🇺🇸</option>
+        </select>
+        <div class="user-badge">
+            <span id="user-id">FastHelp</span>
         </div>
     </div>
 
-    <!-- Balance Card -->
+    <div class="app-title">GRAM MAX</div>
+
     <div class="balance-card">
-        <div class="balance-title" id="txt-balance-title">الرصيد المتاح</div>
+        <div class="balance-title">الرصيد المتاح</div>
         <div class="balance-amount">GRAM 0.90</div>
     </div>
 
-    <!-- Wallet Connect Button -->
-    <div class="wallet-section">
-        <div id="ton-connect"></div>
+    <button class="btn-connect" id="ton-connect-btn">
+        🔗 ربط المحفظة الإلكترونية
+    </button>
+
+    <div class="section-card">
+        <div class="section-title">💳 المحفظة المربوطة</div>
+        <div class="wallet-address" id="wallet-address">
+            لم يتم ربط محفظة بعد
+        </div>
     </div>
 
-    <!-- Main Content Container -->
-    <div class="container">
-
-        <!-- Wallet Tab -->
-        <div id="tab-wallet" class="tab-content active">
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-title" id="txt-connected-wallet">💳 المحفظة المربوطة</div>
-                <div class="wallet-address-box" id="wallet-address">
-                    b04ff85a665863666899b174ebb23db51838d60d11dfcb410:0b3ec42e4d85768f
-                </div>
-            </div>
-
-            <div class="card" style="margin-bottom: 16px;">
-                <div class="card-title" id="txt-deposit-title">⚡ الإيداع والشحن</div>
-                <div class="input-group">
-                    <input type="text" class="input-field" value="op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X-" readonly>
-                    <input type="number" class="input-field" id="deposit-amount" placeholder="الكمية المراد شحنها (GRAM)">
-                    <button class="btn" id="btn-deposit" onclick="handleDeposit()">تأكيد الإيداع</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title" id="txt-withdraw-title">📫 سحب الرصيد</div>
-                <div class="input-group">
-                    <input type="text" class="input-field" id="withdraw-address" placeholder="عنوان المحفظة للمستلم">
-                    <input type="number" class="input-field" id="withdraw-amount" placeholder="الكمية المراد سحبها">
-                    <button class="btn" id="btn-withdraw" onclick="handleWithdraw()">تأكيد السحب</button>
-                </div>
-            </div>
+    <!-- قسم الإيداع والشحن -->
+    <div class="section-card">
+        <div class="section-title">⚡ الإيداع والشحن</div>
+        <div class="input-group">
+            <input type="text" class="input-field" value="-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X" readonly>
         </div>
-
-        <!-- Investment Tab -->
-        <div id="tab-invest" class="tab-content">
-            <div class="card">
-                <div class="card-title" id="txt-invest-title">📈 الاستثمار</div>
-                <p style="color: var(--text-secondary); font-size: 14px;" id="txt-invest-desc">باقات الاستثمار المتاحة قريباً...</p>
-            </div>
+        <div class="input-group">
+            <input type="number" class="input-field" placeholder="الكمية المراد شحنها (GRAM)">
         </div>
-
-        <!-- Trading Tab -->
-        <div id="tab-trade" class="tab-content">
-            <div class="card">
-                <div class="card-title" id="txt-trade-title">📊 التداول</div>
-                <p style="color: var(--text-secondary); font-size: 14px;" id="txt-trade-desc">منصة التداول المباشر قريباً...</p>
-            </div>
-        </div>
-
-        <!-- Friends Tab -->
-        <div id="tab-friends" class="tab-content">
-            <div class="card">
-                <div class="card-title" id="txt-friends-title">👥 الأصدقاء</div>
-                <p style="color: var(--text-secondary); font-size: 14px;" id="txt-friends-desc">دعوة الأصدقاء وكسب المكافآت.</p>
-            </div>
-        </div>
-
+        <button class="btn-action">تأكيد الإيداع</button>
     </div>
 
-    <!-- Navigation Bar -->
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('wallet', this)">
-            <span class="nav-icon">👛</span>
-            <span id="nav-wallet">المحفظة</span>
+    <!-- قسم سحب الرصيد -->
+    <div class="section-card">
+        <div class="section-title">📤 سحب الرصيد</div>
+        <div class="note-text">⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)</div>
+        <div class="input-group">
+            <input type="text" class="input-field" id="withdraw-address" placeholder="عنوان محفظة الاستلام">
         </div>
-        <div class="nav-item" onclick="switchTab('invest', this)">
+        <div class="input-group">
+            <input type="number" class="input-field" id="withdraw-amount" placeholder="الكمية المراد سحبها (GRAM)" step="any">
+        </div>
+        <button class="btn-action btn-withdraw" onclick="handleWithdraw()">تأكيد السحب</button>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-item">
             <span class="nav-icon">💰</span>
-            <span id="nav-invest">الاستثمار</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('trade', this)">
+            <span>الاستثمار</span>
+        </a>
+        <a href="#" class="nav-item">
             <span class="nav-icon">📊</span>
-            <span id="nav-trade">التداول</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('friends', this)">
+            <span>التداول</span>
+        </a>
+        <a href="#" class="nav-item">
             <span class="nav-icon">👥</span>
-            <span id="nav-friends">الأصدقاء</span>
-        </div>
-    </div>
+            <span>الأصدقاء</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">👛</span>
+            <span>المحفظة</span>
+        </a>
+    </nav>
 
     <script>
-        // Telegram Web App Initialization
-        const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if (tg) {
-            tg.expand();
-        }
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // TON Connect UI Initialization
+        // تهيئة TON Connect
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://raw.githubusercontent.com/ton-community/ton-connect/main/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
+            manifestUrl: 'https://85p46zhr2g-ai.github.io/crypto-max-app/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-btn'
         });
 
-        // Tab Switching Logic
-        function switchTab(tabName, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            
-            document.getElementById('tab-' + tabName).classList.add('active');
-            element.classList.add('active');
-        }
-
-        // Language Menu Logic
-        function toggleLangMenu(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('lang-dropdown');
-            dropdown.classList.toggle('show');
-        }
-
-        document.addEventListener('click', function() {
-            const dropdown = document.getElementById('lang-dropdown');
-            if (dropdown) dropdown.classList.remove('show');
+        tonConnectUI.onStatusChange(wallet => {
+            if (wallet) {
+                document.getElementById('wallet-address').innerText = wallet.account.address;
+            } else {
+                document.getElementById('wallet-address').innerText = 'لم يتم ربط محفظة بعد';
+            }
         });
-
-        // Language Translation Translations Data
-        const translations = {
-            ar: {
-                balanceTitle: "الرصيد المتاح",
-                connectedWallet: "💳 المحفظة المربوطة",
-                depositTitle: "⚡ الإيداع والشحن",
-                depositPlaceholder: "الكمية المراد شحنها (GRAM)",
-                btnDeposit: "تأكيد الإيداع",
-                withdrawTitle: "📫 سحب الرصيد",
-                withdrawAddrPlaceholder: "عنوان المحفظة للمستلم",
-                withdrawAmtPlaceholder: "الكمية المراد سحبها",
-                btnWithdraw: "تأكيد السحب",
-                investTitle: "📈 الاستثمار",
-                investDesc: "باقات الاستثمار المتاحة قريباً...",
-                tradeTitle: "📊 التداول",
-                tradeDesc: "منصة التداول المباشر قريباً...",
-                friendsTitle: "👥 الأصدقاء",
-                friendsDesc: "دعوة الأصدقاء وكسب المكافآت.",
-                navWallet: "المحفظة",
-                navInvest: "الاستثمار",
-                navTrade: "التداول",
-                navFriends: "الأصدقاء",
-                langText: "العربية 🇸🇦",
-                dir: "rtl"
-            },
-            en: {
-                balanceTitle: "Available Balance",
-                connectedWallet: "💳 Connected Wallet",
-                depositTitle: "⚡ Deposit & Top Up",
-                depositPlaceholder: "Amount to top up (GRAM)",
-                btnDeposit: "Confirm Deposit",
-                withdrawTitle: "📫 Withdraw Balance",
-                withdrawAddrPlaceholder: "Recipient Wallet Address",
-                withdrawAmtPlaceholder: "Amount to withdraw",
-                btnWithdraw: "Confirm Withdraw",
-                investTitle: "📈 Investment",
-                investDesc: "Investment packages coming soon...",
-                tradeTitle: "📊 Trading",
-                tradeDesc: "Live trading platform coming soon...",
-                friendsTitle: "👥 Friends",
-                friendsDesc: "Invite friends and earn rewards.",
-                navWallet: "Wallet",
-                navInvest: "Invest",
-                navTrade: "Trade",
-                navFriends: "Friends",
-                langText: "English 🇺🇸",
-                dir: "ltr"
-            }
-        };
-
-        function changeLanguage(lang) {
-            const t = translations[lang];
-            document.documentElement.dir = t.dir;
-            document.documentElement.lang = lang;
-
-            document.getElementById('current-lang').innerText = t.langText;
-            document.getElementById('txt-balance-title').innerText = t.balanceTitle;
-            document.getElementById('txt-connected-wallet').innerText = t.connectedWallet;
-            document.getElementById('txt-deposit-title').innerText = t.depositTitle;
-            document.getElementById('deposit-amount').placeholder = t.depositPlaceholder;
-            document.getElementById('btn-deposit').innerText = t.btnDeposit;
-            document.getElementById('txt-withdraw-title').innerText = t.withdrawTitle;
-            document.getElementById('withdraw-address').placeholder = t.withdrawAddrPlaceholder;
-            document.getElementById('withdraw-amount').placeholder = t.withdrawAmtPlaceholder;
-            document.getElementById('btn-withdraw').innerText = t.btnWithdraw;
-            document.getElementById('txt-invest-title').innerText = t.investTitle;
-            document.getElementById('txt-invest-desc').innerText = t.investDesc;
-            document.getElementById('txt-trade-title').innerText = t.tradeTitle;
-            document.getElementById('txt-trade-desc').innerText = t.tradeDesc;
-            document.getElementById('txt-friends-title').innerText = t.friendsTitle;
-            document.getElementById('txt-friends-desc').innerText = t.friendsDesc;
-
-            document.getElementById('nav-wallet').innerText = t.navWallet;
-            document.getElementById('nav-invest').innerText = t.navInvest;
-            document.getElementById('nav-trade').innerText = t.navTrade;
-            document.getElementById('nav-friends').innerText = t.navFriends;
-
-            document.getElementById('lang-dropdown').classList.remove('show');
-        }
-
-        function handleDeposit() {
-            const amount = document.getElementById('deposit-amount').value;
-            if(!amount) {
-                alert('يرجى إدخال الكمية');
-                return;
-            }
-            alert('تم استلام طلب الإيداع بقيمة: ' + amount);
-        }
 
         function handleWithdraw() {
-            const address = document.getElementById('withdraw-address').value;
-            const amount = document.getElementById('withdraw-amount').value;
-            if(!address || !amount) {
-                alert('يرجى ملء جميع الحقول');
+            const address = document.getElementById('withdraw-address').value.trim();
+            const amountInput = document.getElementById('withdraw-amount').value;
+            const amount = parseFloat(amountInput);
+
+            if (!address) {
+                tg.showAlert('⚠️ يرجى إدخال عنوان المحفظة المراد السحب إليها.');
                 return;
             }
-            alert('تم تقديم طلب السحب بنجاح');
+
+            if (isNaN(amount) || amount < 1) {
+                tg.showAlert('⚠️ عذراً، الحد الأدنى للسحب هو 1 GRAM.');
+                return;
+            }
+
+            // حساب ضريبة السحب (1%) والمبلغ الصافي
+            const fee = amount * 0.01;
+            const netAmount = amount - fee;
+
+            tg.showAlert(`✅ تم تقديم طلب السحب بنجاح!\n\nالمبلغ المطلوب: ${amount} GRAM\nالرسوم (1%): ${fee.toFixed(4)} GRAM\nالمبلغ الصافي للوصول: ${netAmount.toFixed(4)} GRAM`);
         }
     </script>
 </body>
