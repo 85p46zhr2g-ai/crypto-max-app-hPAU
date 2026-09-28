@@ -1,941 +1,738 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="html-root">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GRAM MAX</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAM MAX</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #f59e0b;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --green-color: #22c55e;
+            --red-color: #ef4444;
+            --input-bg: #0f172a;
+            --border-color: #334155;
+        }
 
-  <!-- مكتبة تلجرام للألعاب والتطبيقات المصغرة -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  <!-- مكتبة TONConnect الرسمية -->
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 80px;
+        }
 
-  <style>
-    :root {
-      --bg-color: #0b0e14;
-      --card-bg: #151c24;
-      --primary-yellow: #f59e0b;
-      --text-main: #ffffff;
-      --text-sub: #8b949e;
-      --border-color: #21262d;
-      --green-status: #10b981;
-      --red-withdraw: #ef4444;
-    }
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            z-index: 10;
+        }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 12px;
-      padding-bottom: 80px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            overflow: hidden;
+        }
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    .user-profile-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 4px 10px 4px 6px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
 
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--primary-yellow);
-      color: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-      overflow: hidden;
-    }
+        .user-name {
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-    .user-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+        .user-id {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
 
-    .user-info-text {
-      display: flex;
-      flex-direction: column;
-    }
+        .lang-btn {
+            background: #334155;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
 
-    .user-name {
-      font-size: 11px;
-      font-weight: bold;
-      color: #fff;
-    }
+        .lang-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            left: 16px;
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
 
-    .user-id {
-      font-size: 9px;
-      color: var(--text-sub);
-    }
+        .lang-dropdown.show { display: block; }
 
-    .lang-select {
-      background: var(--card-bg);
-      color: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 5px 8px;
-      font-size: 12px;
-    }
+        .lang-option {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #fff;
+            cursor: pointer;
+        }
 
-    .header-title {
-      text-align: center;
-      color: var(--primary-yellow);
-      font-size: 22px;
-      font-weight: bold;
-      margin: 5px 0 15px 0;
-    }
+        .lang-option:hover { background: #334155; }
 
-    .balance-card {
-      background: var(--card-bg);
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      text-align: center;
-      margin-bottom: 15px;
-    }
+        /* Balance Card */
+        .balance-card {
+            background: var(--card-bg);
+            margin: 16px;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
 
-    .balance-card span { font-size: 12px; color: var(--text-sub); }
-    .balance-card h1 { color: var(--primary-yellow); margin: 5px 0 0 0; font-size: 26px; }
+        .balance-title {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+        .balance-amount {
+            font-size: 30px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
 
-    .level-card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      padding: 12px 15px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border-color);
-    }
+        /* Wallet Connect */
+        .wallet-section {
+            margin: 0 16px 16px;
+            display: flex;
+            justify-content: center;
+        }
 
-    .btn-yellow {
-      width: 100%;
-      padding: 11px;
-      background: var(--primary-yellow);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-    }
+        #ton-connect { width: 100%; }
 
-    .btn-withdraw {
-      width: 100%;
-      padding: 11px;
-      background: var(--red-withdraw);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-    }
+        /* Cards & Container */
+        .container {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
 
-    .btn-copy {
-      width: 100%;
-      padding: 11px;
-      background: #21262d;
-      color: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-      margin-top: 8px;
-    }
+        .card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
 
-    .btn-claim {
-      width: 100%;
-      padding: 11px;
-      background: var(--green-status);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-      animation: pulse 1.5s infinite;
-    }
+        .card-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-color);
+        }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-      100% { transform: scale(1); }
-    }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .btn-timer {
-      width: 100%;
-      padding: 11px;
-      background: #1f2937;
-      color: var(--primary-yellow);
-      border: 1px solid var(--primary-yellow);
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 13px;
-      cursor: not-allowed;
-    }
+        .input-field {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
 
-    .btn-locked {
-      width: 100%;
-      padding: 11px;
-      background: #21262d;
-      color: #6e7681;
-      border: none;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: not-allowed;
-    }
+        .input-field:focus { border-color: var(--accent-color); }
 
-    input {
-      font-size: 16px !important;
-    }
+        .btn {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+        }
 
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(5px);
-      z-index: 100;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+        .btn-withdraw {
+            background: var(--red-color);
+            color: #fff;
+        }
 
-    .modal-box {
-      background: var(--card-bg);
-      border: 1px solid var(--primary-yellow);
-      border-radius: 16px;
-      padding: 20px;
-      width: 100%;
-      max-width: 340px;
-      text-align: center;
-    }
+        .btn:active { opacity: 0.8; }
 
-    .modal-box h3 {
-      color: var(--primary-yellow);
-      margin: 0 0 10px 0;
-      font-size: 17px;
-    }
+        /* Admin Dashboard Elements */
+        .admin-toggle-btn {
+            background: #334155;
+            color: #fff;
+            border: 1px solid var(--accent-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 12px;
+        }
 
-    .modal-box p {
-      color: var(--text-sub);
-      font-size: 12px;
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
 
-    .nav-bar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: var(--card-bg);
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0;
-      border-top: 1px solid var(--border-color);
-      z-index: 10;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 12px;
+        }
 
-    .nav-btn {
-      background: none; border: none;
-      color: var(--text-sub); font-size: 11px;
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-    }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
 
-    .nav-btn.active { color: var(--primary-yellow); font-weight: bold; }
-  </style>
+        th { background: #0f172a; color: var(--text-secondary); }
+
+        .code-text {
+            font-family: monospace;
+            color: var(--accent-color);
+            background: #0f172a;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .btn-action {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-approve { background: var(--green-color); color: #000; }
+        .btn-reject { background: var(--red-color); color: #fff; }
+
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 50;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .nav-item.active { color: var(--accent-color); }
+        .nav-icon { font-size: 18px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div class="user-profile-btn" onclick="openProfileModal()">
-      <div class="user-avatar" id="avatar-container">U</div>
-      <div class="user-info-text">
-        <span class="user-name" id="user-display-name">المستخدم</span>
-        <span class="user-id" id="user-display-id">ID: -------</span>
-      </div>
+    <!-- Header -->
+    <div class="header">
+        <div class="user-info">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="user-details">
+                <span class="user-name" id="user-name">المستخدم</span>
+                <span class="user-id" id="user-id">ID: --------</span>
+            </div>
+        </div>
+        <button class="lang-btn" onclick="toggleLangMenu(event)">
+            <span id="current-lang">العربية 🇸🇦</span> ▼
+        </button>
+        <div class="lang-dropdown" id="lang-dropdown">
+            <div class="lang-option" onclick="changeLanguage('ar')">العربية 🇸🇦</div>
+            <div class="lang-option" onclick="changeLanguage('en')">English 🇺🇸</div>
+            <div class="lang-option" onclick="changeLanguage('ru')">Русский 🇷🇺</div>
+        </div>
     </div>
 
-    <select class="lang-select" id="lang-selector" onchange="changeLanguage(this.value)">
-      <option value="ar">🇸🇦 العربية</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="ru">🇷🇺 Русский</option>
-    </select>
-  </div>
-
-  <div class="header-title">GRAM MAX</div>
-
-  <div class="balance-card">
-    <span id="txt-balance-title">الرصيد المتاح</span>
-    <h1 id="user-balance">GRAM 0.00</h1>
-  </div>
-
-  <div class="content">
-    <!-- 1. الاستثمار -->
-    <div id="tab-invest" class="tab-content active">
-      <div id="investment-levels"></div>
+    <!-- Balance Card -->
+    <div class="balance-card">
+        <div class="balance-title" id="txt-balance-title">الرصيد المتاح</div>
+        <div class="balance-amount" id="user-balance">GRAM 0.00</div>
     </div>
 
-    <!-- 2. التداول -->
-    <div id="tab-trade" class="tab-content">
-      <div class="level-card" style="text-align: center; padding: 30px 10px;">
-        <h3 style="color: var(--primary-yellow);" id="txt-trade-title">🤖 روبوت التداول الذكي</h3>
-        <p style="color: var(--text-sub);" id="txt-trade-desc">ستفتح هذه الميزة قريباً...</p>
-      </div>
+    <!-- TON Connect Button -->
+    <div class="wallet-section">
+        <div id="ton-connect"></div>
     </div>
 
-    <!-- 3. الأصدقاء -->
-    <div id="tab-friends" class="tab-content">
-      <div class="level-card">
-        <h4 style="color: var(--primary-yellow); margin-top: 0;" id="txt-friends-title">👥 دعوة الأصدقاء</h4>
-        <input type="text" id="ref-link" readonly value="جاري التحميل..." style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px; font-size:12px;">
-        <button class="btn-yellow" onclick="shareRefLink()" id="btn-share">📢 مشاركة الرابط مباشر</button>
-        <button class="btn-copy" onclick="copyRefLink()" id="btn-copy">📋 نسخ الرابط</button>
-      </div>
-      <div class="level-card">
-        <p><span id="txt-ref-count">عدد الإحالات المؤكدة</span>: <b id="ref-count" style="color: var(--primary-yellow);">0</b></p>
-      </div>
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Wallet Tab -->
+        <div id="tab-wallet" class="tab-content active">
+            <div class="card" style="margin-bottom: 16px;">
+                <div class="card-title" id="txt-connected-wallet">💳 المحفظة المربوطة</div>
+                <input type="text" class="input-field" id="connected-wallet-address" value="غير مربوطة" readonly style="font-family: monospace; font-size: 11px; color: var(--accent-color);">
+            </div>
+
+            <div class="card" style="margin-bottom: 16px;">
+                <div class="card-title" id="txt-deposit-title">⚡ الإيداع والشحن</div>
+                <div class="input-group">
+                    <input type="text" class="input-field" id="admin-wallet-input" value="UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X" readonly style="font-size: 11px;">
+                    <input type="number" class="input-field" id="deposit-amount" placeholder="الكمية المراد شحنها (GRAM)">
+                    <button class="btn" id="btn-deposit" onclick="handleDeposit()">تأكيد الإيداع</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title" id="txt-withdraw-title">📫 سحب الرصيد</div>
+                <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;" id="txt-withdraw-note">⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)</p>
+                <div class="input-group">
+                    <input type="text" class="input-field" id="withdraw-address" placeholder="عنوان محفظة الاستلام">
+                    <input type="number" class="input-field" id="withdraw-amount" placeholder="الكمية المراد سحبها (GRAM)">
+                    <button class="btn btn-withdraw" id="btn-withdraw" onclick="handleWithdraw()">تأكيد السحب</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Tab -->
+        <div id="tab-invest" class="tab-content">
+            <div class="card">
+                <div class="card-title" id="txt-invest-title">📈 الاستثمار</div>
+                <p style="color: var(--text-secondary); font-size: 13px;" id="txt-invest-desc">باقات الاستثمار المتاحة قريباً...</p>
+            </div>
+        </div>
+
+        <!-- Trade Tab -->
+        <div id="tab-trade" class="tab-content">
+            <div class="card">
+                <div class="card-title" id="txt-trade-title">📊 التداول</div>
+                <p style="color: var(--text-secondary); font-size: 13px;" id="txt-trade-desc">منصة التداول الذكي قريباً...</p>
+            </div>
+        </div>
+
+        <!-- Friends Tab -->
+        <div id="tab-friends" class="tab-content">
+            <div class="card">
+                <div class="card-title" id="txt-friends-title">👥 الأصدقاء</div>
+                <input type="text" class="input-field" id="ref-link" readonly style="margin-bottom: 10px; font-size: 12px;">
+                <button class="btn" id="btn-copy-ref" onclick="copyRefLink()">📋 نسخ رابط الإحالة</button>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div id="tab-admin" class="tab-content">
+            <div class="card">
+                <div class="card-title">👑 لوحة التحكم وإدارة الطلبات</div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">مركز التحكم بالمشرفين - السجل المالي المباشر:</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الرقم التسلسلي</th>
+                                <th>المستخدم</th>
+                                <th>النوع</th>
+                                <th>المبلغ</th>
+                                <th>الحالة / الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-tx-table">
+                            <!-- سيتم إضافة الطلبات المباشرة هنا -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- 4. المحفظة -->
-    <div id="tab-wallet" class="tab-content">
-      <button class="btn-yellow" onclick="openWalletModal()" style="margin-bottom:12px; background:#238636; color:#fff;" id="btn-connect-wallet">🔗 ربط المحفظة الإلكترونية</button>
-
-      <div class="level-card">
-        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-wallet-title">💳 المحفظة المربوطة</h4>
-        <p id="connected-wallet-display" style="font-family: monospace; color: var(--primary-yellow); font-size: 11px; word-break: break-all;">غير مربوطة</p>
-      </div>
-
-      <div class="level-card">
-        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-deposit-title">⚡ الإيداع والشحن</h4>
-        <input type="text" id="admin-wallet-input" value="UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X" style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;" placeholder="عنوان محفظة المستلم">
-        <input type="number" id="deposit-amount" placeholder="الكمية المراد شحنها (GRAM)" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
-        <button class="btn-yellow" onclick="handleDeposit()" id="btn-deposit">تأكيد الإيداع</button>
-      </div>
-
-      <!-- قسم سحب الرصيد -->
-      <div class="level-card">
-        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-withdraw-title">📤 سحب الرصيد</h4>
-        <p style="font-size:11px; color:var(--text-sub); margin-bottom:8px;" id="txt-withdraw-note">⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)</p>
-        <input type="text" id="withdraw-address" placeholder="عنوان محفظة الاستلام" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px; font-size:11px;">
-        <input type="number" id="withdraw-amount" placeholder="الكمية المراد سحبها (GRAM)" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
-        <button class="btn-withdraw" onclick="handleWithdraw()" id="btn-withdraw">تأكيد السحب</button>
-      </div>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('wallet', this)">
+            <span class="nav-icon">👛</span>
+            <span id="nav-wallet">المحفظة</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('invest', this)">
+            <span class="nav-icon">💰</span>
+            <span id="nav-invest">الاستثمار</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('trade', this)">
+            <span class="nav-icon">📊</span>
+            <span id="nav-trade">التداول</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('friends', this)">
+            <span class="nav-icon">👥</span>
+            <span id="nav-friends">الأصدقاء</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('admin', this)">
+            <span class="nav-icon">👑</span>
+            <span>الإشراف</span>
+        </div>
     </div>
-  </div>
 
-  <!-- النافذة المنبثقة لربط المحفظة -->
-  <div id="wallet-modal" class="modal-overlay">
-    <div class="modal-box">
-      <h3 id="txt-modal-wallet-title">ربط المحفظة</h3>
-      <p id="txt-modal-wallet-desc">اضغط على الزر أدناه ليتم تحويلك إلى محفظتك المباشرة والتأكيد بنقرة واحدة</p>
-      <div id="ton-connect-btn-container" style="display:flex; justify-content:center; margin-bottom:12px;"></div>
-      <button class="btn-yellow" onclick="closeModal('wallet-modal')" style="background:#30363d; color:#fff;" id="btn-close-wallet-modal">إغلاق</button>
-    </div>
-  </div>
+    <script>
+        // بيانات التلجرام للبوت والمشرف
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        if (tg) tg.expand();
 
-  <!-- النافذة المنبثقة لملف المستخدم -->
-  <div id="profile-modal" class="modal-overlay">
-    <div class="modal-box">
-      <h3 id="txt-profile-title">📊 إحصائيات الحساب</h3>
-      <div style="text-align:start; font-size:12px; color:var(--text-sub); line-height:1.8; margin-bottom:15px;">
-        <p><span id="txt-prof-user">👤 المستخدم:</span> <span id="prof-username" style="color:#fff;">-</span></p>
-        <p><span id="txt-prof-id">🆔 معرف الحساب:</span> <span id="prof-id" style="color:#fff;">-</span></p>
-        <p><span id="txt-prof-refs">📈 إجمالي الإحالات:</span> <span id="prof-refs" style="color:var(--primary-yellow);">0</span></p>
-        <p><span id="txt-prof-bal">💰 الرصيد الحقيقي:</span> <span id="prof-balance" style="color:var(--green-status);">0.00 GRAM</span></p>
-        <hr style="border-color: var(--border-color);">
-        <p style="text-align:center; cursor:pointer; color:var(--primary-yellow);" id="txt-terms" onclick="showTermsAlert()">📄 سياسة الاستخدام والأحكام</p>
-      </div>
-      <button class="btn-yellow" onclick="closeModal('profile-modal')" style="background:#30363d; color:#fff;" id="btn-close-profile-modal">إغلاق</button>
-    </div>
-  </div>
+        const BOT_TOKEN = "7544062828:AAE_YourActualBotTokenHere"; // توكن البوت الخاص بك
+        const ADMIN_CHAT_ID = "8183652969"; // معرف التلجرام الخاص بالمشرف لاستلام الإشعارات
 
-  <!-- الشريط السفلي -->
-  <div class="nav-bar">
-    <button onclick="switchTab('invest', this)" class="nav-btn active"><span>💰</span><span id="nav-invest">الاستثمار</span></button>
-    <button onclick="switchTab('trade', this)" class="nav-btn"><span>🤖</span><span id="nav-trade">التداول</span></button>
-    <button onclick="switchTab('friends', this)" class="nav-btn"><span>👥</span><span id="nav-friends">الأصدقاء</span></button>
-    <button onclick="switchTab('wallet', this)" class="nav-btn"><span>👛</span><span id="nav-wallet">المحفظة</span></button>
-  </div>
+        let userData = {
+            id: tg?.initDataUnsafe?.user?.id || '8183652969',
+            name: tg?.initDataUnsafe?.user?.first_name || 'User',
+            photo: tg?.initDataUnsafe?.user?.photo_url || null,
+            balance: parseFloat(localStorage.getItem('user_balance')) || 0.00
+        };
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    const BOT_USERNAME = "GramMax3_Bot";
-    let currentLang = localStorage.getItem('app_lang') || 'ar';
-
-    const translations = {
-      ar: {
-        dir: "rtl",
-        userDefault: "المستخدم",
-        balanceTitle: "الرصيد المتاح",
-        navInvest: "الاستثمار",
-        navTrade: "التداول",
-        navFriends: "الأصدقاء",
-        navWallet: "المحفظة",
-        tradeTitle: "🤖 روبوت التداول الذكي",
-        tradeDesc: "ستفتح هذه الميزة قريباً...",
-        friendsTitle: "👥 دعوة الأصدقاء",
-        btnShare: "📢 مشاركة الرابط مباشر",
-        btnCopy: "📋 نسخ الرابط",
-        refCountText: "عدد الإحالات المؤكدة",
-        btnConnectWallet: "🔗 ربط المحفظة الإلكترونية",
-        walletTitle: "💳 المحفظة المربوطة",
-        notConnected: "غير مربوطة",
-        depositTitle: "⚡ الإيداع والشحن",
-        placeholderAmount: "الكمية المراد شحنها (GRAM)",
-        btnDeposit: "تأكيد الإيداع",
-        withdrawTitle: "📤 سحب الرصيد",
-        withdrawNote: "⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)",
-        withdrawAddressPlaceholder: "عنوان محفظة الاستلام",
-        withdrawAmountPlaceholder: "الكمية المراد سحبها (GRAM)",
-        btnWithdraw: "تأكيد السحب",
-        modalWalletTitle: "ربط المحفظة",
-        modalWalletDesc: "اضغط على الزر أدناه ليتم تحويلك إلى محفظتك المباشرة والتأكيد بنقرة واحدة",
-        btnClose: "إغلاق",
-        profileTitle: "📊 إحصائيات الحساب",
-        profUser: "👤 المستخدم:",
-        profId: "🆔 معرف الحساب:",
-        profRefs: "📈 إجمالي الإحالات:",
-        profBal: "💰 الرصيد الحقيقي:",
-        termsText: "📄 سياسة الاستخدام والأحكام",
-        lvlPrefix: "المستوى",
-        statusOpen: "🟢 مفتوح",
-        statusLocked: "🔒 مقفل",
-        txtInvest: "الاستثمار",
-        txtReturn: "العائد",
-        txtProfit: "الربح",
-        txtDuration: "المدة",
-        btnLocked: "🔒 مقفل حتى إكمال المستوى السابق",
-        btnInvest: "استثمار",
-        btnClaim: "🎁 مطالبة بالأرباح",
-        btnTimer: "⏳ جاري الاستثمار...",
-        timeRemaining: "⏳ المتبقي:",
-        hoursText: "ساعة",
-        alertNoBal: "⚠️ رصيدك المتاح غير كافٍ لإكمال هذا الاستثمار!",
-        alertStarted: "✅ تم بدء الاستثمار بنجاح!",
-        alertClaimed: "🎉 تم استلام الأرباح بنجاح!",
-        alertClaimedUnlocked: "🎉 تم استلام الأرباح وفتح المستوى التالي!",
-        alertDepositSent: "📩 تم إرسال الطلب بنجاح!\nسيتم إضافة الرصيد فور تأكيد الوصول.",
-        alertDepositFail: "❌ تم إلغاء العملية أو فشل التأكيد.",
-        alertNeedWallet: "⚠️ يجب ربط المحفظة أولاً لإتمام العملية.",
-        termsAlert: "سياسة الاستخدام: هذا البوت مخصص للاستثمار والتداول الافتراضي.",
-        copiedSuccess: "📋 تم نسخ رابط الإحالة بنجاح!",
-        alertWithdrawAddressReq: "⚠️ يرجى إدخال عنوان المحفظة المراد السحب إليها.",
-        alertWithdrawMin: "⚠️ عذراً، الحد الأدنى للسحب هو 1 GRAM.",
-        alertWithdrawInsBal: "⚠️ رصيدك الحالي غير كافٍ لإتمام عملية السحب.",
-        alertWithdrawSuccess: "✅ تم تقديم طلب السحب بنجاح!"
-      },
-      en: {
-        dir: "ltr",
-        userDefault: "User",
-        balanceTitle: "Available Balance",
-        navInvest: "Invest",
-        navTrade: "Trade",
-        navFriends: "Friends",
-        navWallet: "Wallet",
-        tradeTitle: "🤖 AI Smart Trading Bot",
-        tradeDesc: "This feature will be available soon...",
-        friendsTitle: "👥 Invite Friends",
-        btnShare: "📢 Share Direct Link",
-        btnCopy: "📋 Copy Link",
-        refCountText: "Confirmed Referrals",
-        btnConnectWallet: "🔗 Connect Wallet",
-        walletTitle: "💳 Connected Wallet",
-        notConnected: "Not Connected",
-        depositTitle: "⚡ Deposit & Top Up",
-        placeholderAmount: "Amount to deposit (GRAM)",
-        btnDeposit: "Confirm Deposit",
-        withdrawTitle: "📤 Withdraw Balance",
-        withdrawNote: "⚠️ Minimum withdrawal: 1 GRAM (1% fee)",
-        withdrawAddressPlaceholder: "Recipient Wallet Address",
-        withdrawAmountPlaceholder: "Amount to withdraw (GRAM)",
-        btnWithdraw: "Confirm Withdrawal",
-        modalWalletTitle: "Connect Wallet",
-        modalWalletDesc: "Click below to open your wallet and confirm with one tap",
-        btnClose: "Close",
-        profileTitle: "📊 Account Statistics",
-        profUser: "👤 User:",
-        profId: "🆔 Account ID:",
-        profRefs: "📈 Total Referrals:",
-        profBal: "💰 Real Balance:",
-        termsText: "📄 Terms & Conditions",
-        lvlPrefix: "Level",
-        statusOpen: "🟢 Open",
-        statusLocked: "🔒 Locked",
-        txtInvest: "Investment",
-        txtReturn: "Return",
-        txtProfit: "Profit",
-        txtDuration: "Duration",
-        btnLocked: "🔒 Locked until previous level complete",
-        btnInvest: "Invest",
-        btnClaim: "🎁 Claim Profit",
-        btnTimer: "⏳ Investing...",
-        timeRemaining: "⏳ Remaining:",
-        hoursText: "hours",
-        alertNoBal: "⚠️ Insufficient balance to complete this investment!",
-        alertStarted: "✅ Investment started successfully!",
-        alertClaimed: "🎉 Profit claimed successfully!",
-        alertClaimedUnlocked: "🎉 Profit claimed and next level unlocked!",
-        alertDepositSent: "📩 Request sent successfully!\nBalance will update upon confirmation.",
-        alertDepositFail: "❌ Transaction canceled or confirmation failed.",
-        alertNeedWallet: "⚠️ Please connect your wallet first.",
-        termsAlert: "Terms of Use: This bot is intended for virtual trading and investment.",
-        copiedSuccess: "📋 Referral link copied successfully!",
-        alertWithdrawAddressReq: "⚠️ Please enter the recipient wallet address.",
-        alertWithdrawMin: "⚠️ Minimum withdrawal amount is 1 GRAM.",
-        alertWithdrawInsBal: "⚠️ Insufficient balance for withdrawal.",
-        alertWithdrawSuccess: "✅ Withdrawal request submitted successfully!"
-      },
-      ru: {
-        dir: "ltr",
-        userDefault: "Пользователь",
-        balanceTitle: "Доступный баланс",
-        navInvest: "Инвестиции",
-        navTrade: "Торговля",
-        navFriends: "Друзья",
-        navWallet: "Кошелек",
-        tradeTitle: "🤖 Умный Торговый Бот",
-        tradeDesc: "Эта функция будет доступна скоро...",
-        friendsTitle: "👥 Пригласить друзей",
-        btnShare: "📢 Поделиться ссылкой",
-        btnCopy: "📋 Скопировать ссылку",
-        refCountText: "Подтвержденные рефералы",
-        btnConnectWallet: "🔗 Подключить кошелек",
-        walletTitle: "💳 Подключенный кошелек",
-        notConnected: "Не подключен",
-        depositTitle: "⚡ Пополнение",
-        placeholderAmount: "Сумма пополнения (GRAM)",
-        btnDeposit: "Подтвердить депозит",
-        withdrawTitle: "📤 Вывод средств",
-        withdrawNote: "⚠️ Мин. сумма вывода: 1 GRAM (комиссия 1%)",
-        withdrawAddressPlaceholder: "Адрес кошелька для получения",
-        withdrawAmountPlaceholder: "Сумма для вывода (GRAM)",
-        btnWithdraw: "Подтвердить вывод",
-        modalWalletTitle: "Подключить кошелек",
-        modalWalletDesc: "Нажмите ниже, чтобы перейти в кошелек и подтвердить в один клик",
-        btnClose: "Закрыть",
-        profileTitle: "📊 Статистика аккаунта",
-        profUser: "👤 Пользователь:",
-        profId: "🆔 ID Аккаунта:",
-        profRefs: "📈 Всего рефералов:",
-        profBal: "💰 Реальный баланс:",
-        termsText: "📄 Условия использования",
-        lvlPrefix: "Уровень",
-        statusOpen: "🟢 Открыт",
-        statusLocked: "🔒 Заблокирован",
-        txtInvest: "Инвестиция",
-        txtReturn: "Доход",
-        txtProfit: "Прибыль",
-        txtDuration: "Длительность",
-        btnLocked: "🔒 Заблокировано до завершения пред. уровня",
-        btnInvest: "Инвестировать",
-        btnClaim: "🎁 Забрать прибыль",
-        btnTimer: "⏳ Инвестирование...",
-        timeRemaining: "⏳ Осталось:",
-        hoursText: "ч.",
-        alertNoBal: "⚠️ Недостаточно средств для инвестиции!",
-        alertStarted: "✅ Инвестиция успешно начата!",
-        alertClaimed: "🎉 Прибыль успешно получена!",
-        alertClaimedUnlocked: "🎉 Прибыль получена, следующий уровень открыт!",
-        alertDepositSent: "📩 Запрос успешно отправлен!\nБаланс обновится после подтверждения.",
-        alertDepositFail: "❌ Транзакция отменена или произошла ошибка.",
-        alertNeedWallet: "⚠️ Пожалуйста, сначала подключите кошелек.",
-        termsAlert: "Условия использования: Данный бот предназначен для виртуальной торговли.",
-        copiedSuccess: "📋 Реферальная ссылка скопирована!",
-        alertWithdrawAddressReq: "⚠️ Пожалуйста, введите адрес кошелька.",
-        alertWithdrawMin: "⚠️ Минимальная сумма вывода — 1 GRAM.",
-        alertWithdrawInsBal: "⚠️ Недостаточно средств для вывода.",
-        alertWithdrawSuccess: "✅ Заявка на вывод успешно отправлена!"
-      }
-    };
-
-    let userData = {
-      balance: parseFloat(localStorage.getItem('user_balance')) || 0.00,
-      refCount: 0,
-      currentUnlockedLevel: parseInt(localStorage.getItem('unlocked_level')) || 1,
-      userId: tg.initDataUnsafe?.user?.id || '8183652969',
-      first_name: tg.initDataUnsafe?.user?.first_name || 'User',
-      photo_url: tg.initDataUnsafe?.user?.photo_url || null
-    };
-
-    const levels = [
-      { id: 1, cost: 1, return: 1.15, profit: 0.15, durationHours: 12 },
-      { id: 2, cost: 2, return: 2.30, profit: 0.30, durationHours: 24 },
-      { id: 3, cost: 5, return: 5.70, profit: 0.70, durationHours: 48 },
-      { id: 4, cost: 7, return: 8.30, profit: 1.30, durationHours: 72 },
-      { id: 5, cost: 10, return: 13.00, profit: 3.00, durationHours: 120 }
-    ];
-
-    // تحديد رابط المانفيست المستضاف على الموقع المباشر لحل مشكلة الخطأ مع المحافظ
-    const manifestUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/') + 'tonconnect-manifest.json';
-
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: manifestUrl,
-        buttonRootId: 'ton-connect-btn-container'
-    });
-
-    tonConnectUI.onStatusChange(wallet => {
-        const lang = translations[currentLang];
-        if (wallet) {
-            document.getElementById('connected-wallet-display').innerText = wallet.account.address;
-            closeModal('wallet-modal');
+        // إعداد بيانات المستخدم
+        document.getElementById('user-name').innerText = userData.name;
+        document.getElementById('user-id').innerText = `ID: ${userData.id}`;
+        document.getElementById('ref-link').value = `https://t.me/GramMax3_Bot?start=ref_${userData.id}`;
+        if (userData.photo) {
+            document.getElementById('user-avatar').innerHTML = `<img src="${userData.photo}">`;
         } else {
-            document.getElementById('connected-wallet-display').innerText = lang.notConnected;
+            document.getElementById('user-avatar').innerText = userData.name.charAt(0).toUpperCase();
         }
-    });
+        updateBalanceUI();
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('lang-selector').value = currentLang;
-      document.getElementById('user-display-name').innerText = userData.first_name;
-      document.getElementById('user-display-id').innerText = `ID: ${userData.userId}`;
-      updateBalanceUI();
+        // TON Connect UI
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/ton-community/ton-connect/main/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect'
+        });
 
-      if (userData.photo_url) {
-        document.getElementById('avatar-container').innerHTML = `<img src="${userData.photo_url}">`;
-      } else {
-        document.getElementById('avatar-container').innerText = userData.first_name.charAt(0).toUpperCase();
-      }
+        tonConnectUI.onStatusChange(wallet => {
+            if (wallet) {
+                document.getElementById('connected-wallet-address').value = wallet.account.address;
+            } else {
+                document.getElementById('connected-wallet-address').value = "غير مربوطة";
+            }
+        });
 
-      document.getElementById('ref-link').value = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
-      applyLanguage(currentLang);
-      setInterval(checkTimers, 1000);
-
-      document.getElementById('ton-connect-btn-container').addEventListener('click', () => {
-        closeModal('wallet-modal');
-      });
-    });
-
-    function updateBalanceUI() {
-      document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
-      localStorage.setItem('user_balance', userData.balance);
-    }
-
-    function changeLanguage(langKey) {
-      currentLang = langKey;
-      localStorage.setItem('app_lang', langKey);
-      applyLanguage(langKey);
-    }
-
-    function applyLanguage(langKey) {
-      const lang = translations[langKey] || translations.ar;
-      
-      document.getElementById('html-root').dir = lang.dir;
-
-      document.getElementById('txt-balance-title').innerText = lang.balanceTitle;
-      document.getElementById('nav-invest').innerText = lang.navInvest;
-      document.getElementById('nav-trade').innerText = lang.navTrade;
-      document.getElementById('nav-friends').innerText = lang.navFriends;
-      document.getElementById('nav-wallet').innerText = lang.navWallet;
-      
-      document.getElementById('txt-trade-title').innerText = lang.tradeTitle;
-      document.getElementById('txt-trade-desc').innerText = lang.tradeDesc;
-
-      document.getElementById('txt-friends-title').innerText = lang.friendsTitle;
-      document.getElementById('btn-share').innerText = lang.btnShare;
-      document.getElementById('btn-copy').innerText = lang.btnCopy;
-      document.getElementById('txt-ref-count').innerText = lang.refCountText;
-
-      document.getElementById('btn-connect-wallet').innerText = lang.btnConnectWallet;
-      document.getElementById('txt-wallet-title').innerText = lang.walletTitle;
-      if (!tonConnectUI.connected) {
-        document.getElementById('connected-wallet-display').innerText = lang.notConnected;
-      }
-      document.getElementById('txt-deposit-title').innerText = lang.depositTitle;
-      document.getElementById('deposit-amount').placeholder = lang.placeholderAmount;
-      document.getElementById('btn-deposit').innerText = lang.btnDeposit;
-
-      document.getElementById('txt-withdraw-title').innerText = lang.withdrawTitle;
-      document.getElementById('txt-withdraw-note').innerText = lang.withdrawNote;
-      document.getElementById('withdraw-address').placeholder = lang.withdrawAddressPlaceholder;
-      document.getElementById('withdraw-amount').placeholder = lang.withdrawAmountPlaceholder;
-      document.getElementById('btn-withdraw').innerText = lang.btnWithdraw;
-
-      document.getElementById('txt-modal-wallet-title').innerText = lang.modalWalletTitle;
-      document.getElementById('txt-modal-wallet-desc').innerText = lang.modalWalletDesc;
-      document.getElementById('btn-close-wallet-modal').innerText = lang.btnClose;
-
-      document.getElementById('txt-profile-title').innerText = lang.profileTitle;
-      document.getElementById('txt-prof-user').innerText = lang.profUser;
-      document.getElementById('txt-prof-id').innerText = lang.profId;
-      document.getElementById('txt-prof-refs').innerText = lang.profRefs;
-      document.getElementById('txt-prof-bal').innerText = lang.profBal;
-      document.getElementById('txt-terms').innerText = lang.termsText;
-      document.getElementById('btn-close-profile-modal').innerText = lang.btnClose;
-
-      renderLevels();
-    }
-
-    function renderLevels() {
-      const lang = translations[currentLang] || translations.ar;
-      const container = document.getElementById('investment-levels');
-      container.innerHTML = '';
-
-      levels.forEach(lvl => {
-        const isUnlocked = lvl.id <= userData.currentUnlockedLevel;
-        const card = document.createElement('div');
-        card.className = 'level-card';
-
-        let buttonArea = '';
-        const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${lvl.id}`));
-
-        if (!isUnlocked) {
-          buttonArea = `<button class="btn-locked" disabled>${lang.btnLocked}</button>`;
-        } else if (timerData) {
-          const now = Date.now();
-          if (now >= timerData.endTime) {
-            buttonArea = `<button class="btn-claim" onclick="claimProfit(${lvl.id})">${lang.btnClaim} (+${lvl.return} GRAM)</button>`;
-          } else {
-            buttonArea = `<button class="btn-timer" id="timer-btn-${lvl.id}" disabled>${lang.btnTimer}</button>`;
-          }
-        } else {
-          buttonArea = `<button class="btn-yellow" onclick="startInvestment(${lvl.id})">${lang.btnInvest} (${lvl.cost} GRAM)</button>`;
+        function updateBalanceUI() {
+            document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
+            localStorage.setItem('user_balance', userData.balance);
         }
 
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span style="color:var(--primary-yellow); font-weight:bold;">🔷 ${lang.lvlPrefix} ${lvl.id}</span>
-            <span style="font-size:11px; color:${isUnlocked ? 'var(--green-status)' : 'var(--text-sub)'}">${isUnlocked ? lang.statusOpen : lang.statusLocked}</span>
-          </div>
-          <div style="font-size:12px; color:var(--text-sub); margin-bottom:8px;">
-            <p>${lang.txtInvest}: <b style="color:#fff;">${lvl.cost} GRAM</b></p>
-            <p>${lang.txtReturn}: <b style="color:#fff;">${lvl.return} GRAM</b></p>
-            <p>${lang.txtProfit}: <span style="color:var(--green-status); font-weight:bold;">+GRAM ${lvl.profit.toFixed(2)}</span></p>
-            <p>${lang.txtDuration}: <b style="color:#fff;">${lvl.durationHours} ${lang.hoursText}</b></p>
-          </div>
-          <div id="btn-container-${lvl.id}">${buttonArea}</div>
-        `;
-        container.appendChild(card);
-      });
-      checkTimers();
-    }
-
-    function startInvestment(levelId) {
-      const lang = translations[currentLang] || translations.ar;
-      const lvl = levels.find(l => l.id === levelId);
-      
-      if (userData.balance < lvl.cost) {
-        tg.showAlert(lang.alertNoBal);
-        return;
-      }
-
-      userData.balance -= lvl.cost;
-      updateBalanceUI();
-
-      const durationMs = lvl.durationHours * 60 * 60 * 1000;
-      const timerInfo = {
-        startTime: Date.now(),
-        endTime: Date.now() + durationMs,
-        cost: lvl.cost,
-        returnAmount: lvl.return
-      };
-
-      localStorage.setItem(`investment_lvl_${levelId}`, JSON.stringify(timerInfo));
-      tg.showAlert(lang.alertStarted);
-      renderLevels();
-    }
-
-    function checkTimers() {
-      const lang = translations[currentLang] || translations.ar;
-
-      levels.forEach(lvl => {
-        const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${lvl.id}`));
-        const btn = document.getElementById(`timer-btn-${lvl.id}`);
-
-        if (timerData && btn) {
-          const now = Date.now();
-          const distance = timerData.endTime - now;
-
-          if (distance <= 0) {
-            renderLevels();
-          } else {
-            let hours = Math.floor(distance / (1000 * 60 * 60));
-            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            const hStr = hours < 10 ? '0' + hours : hours;
-            const mStr = minutes < 10 ? '0' + minutes : minutes;
-            const sStr = seconds < 10 ? '0' + seconds : seconds;
-
-            btn.innerText = `${lang.timeRemaining} ${hStr}:${mStr}:${sStr}`;
-          }
+        // إرسال التنبيه الفوري لبوت تلجرام الخاص بالمشرف
+        function sendTelegramAdminNotification(messageText) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: ADMIN_CHAT_ID,
+                    text: messageText,
+                    parse_mode: 'Markdown'
+                })
+            }).catch(e => console.log('Notification sent'));
         }
-      });
-    }
 
-    function claimProfit(levelId) {
-      const lang = translations[currentLang] || translations.ar;
-      const lvl = levels.find(l => l.id === levelId);
-      const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${levelId}`));
-
-      if (!timerData) return;
-
-      userData.balance += lvl.return;
-      updateBalanceUI();
-      localStorage.removeItem(`investment_lvl_${levelId}`);
-
-      if (levelId === userData.currentUnlockedLevel && userData.currentUnlockedLevel < levels.length) {
-        userData.currentUnlockedLevel += 1;
-        localStorage.setItem('unlocked_level', userData.currentUnlockedLevel);
-        tg.showAlert(lang.alertClaimedUnlocked);
-      } else {
-        tg.showAlert(lang.alertClaimed);
-      }
-
-      renderLevels();
-    }
-
-    function openWalletModal() {
-      document.getElementById('wallet-modal').style.display = 'flex';
-    }
-
-    function openProfileModal() {
-      document.getElementById('prof-username').innerText = userData.first_name;
-      document.getElementById('prof-id').innerText = userData.userId;
-      document.getElementById('prof-refs').innerText = userData.refCount;
-      document.getElementById('prof-balance').innerText = `${userData.balance.toFixed(2)} GRAM`;
-      document.getElementById('profile-modal').style.display = 'flex';
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    function showTermsAlert() {
-      const lang = translations[currentLang] || translations.ar;
-      alert(lang.termsAlert);
-    }
-
-    async function handleDeposit() {
-      const lang = translations[currentLang] || translations.ar;
-      const adminWallet = document.getElementById('admin-wallet-input').value.trim();
-      const amountInput = document.getElementById('deposit-amount').value;
-      const amount = parseFloat(amountInput);
-
-      if (!adminWallet || adminWallet.length < 20) {
-        tg.showAlert("⚠️ Invalid recipient wallet address.");
-        return;
-      }
-
-      if (!amount || amount <= 0) {
-        tg.showAlert("⚠️ Invalid deposit amount.");
-        return;
-      }
-
-      if (!tonConnectUI.connected) {
-        tg.showAlert(lang.alertNeedWallet);
-        openWalletModal();
-        return;
-      }
-
-      const nanoTonAmount = Math.floor(amount * 1000000000).toString();
-
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 300,
-        messages: [
-          {
-            address: adminWallet,
-            amount: nanoTonAmount
-          }
-        ]
-      };
-
-      try {
-        const result = await tonConnectUI.sendTransaction(transaction);
-        if (result) {
-          tg.showAlert(lang.alertDepositSent);
-          document.getElementById('deposit-amount').value = '';
+        // إنشاء رقم تسلسلي فريد
+        function generateTxId() {
+            return 'TX-' + Math.floor(100000 + Math.random() * 900000);
         }
-      } catch (error) {
-        tg.showAlert(lang.alertDepositFail);
-      }
-    }
 
-    function handleWithdraw() {
-      const lang = translations[currentLang] || translations.ar;
-      const address = document.getElementById('withdraw-address').value.trim();
-      const amountInput = document.getElementById('withdraw-amount').value;
-      const amount = parseFloat(amountInput);
+        // إضافة العملية إلى لوحة التحكم
+        function addTransactionToAdminTable(txId, user, type, amount, status) {
+            const tbody = document.getElementById('admin-tx-table');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><span class="code-text">${txId}</span></td>
+                <td><span class="code-text">${user}</span></td>
+                <td><b>${type}</b></td>
+                <td><b>${amount} GRAM</b></td>
+                <td>
+                    <button class="btn-action btn-approve" onclick="approveTx(this)">قبول</button>
+                    <button class="btn-action btn-reject" onclick="rejectTx(this)">رفض</button>
+                </td>
+            `;
+            tbody.prepend(row);
+        }
 
-      if (!address) {
-        tg.showAlert(lang.alertWithdrawAddressReq);
-        return;
-      }
+        function approveTx(btn) {
+            btn.parentElement.innerHTML = '<span style="color:var(--green-color); font-weight:bold;">✅ مقبول</span>';
+        }
 
-      if (isNaN(amount) || amount < 1) {
-        tg.showAlert(lang.alertWithdrawMin);
-        return;
-      }
+        function rejectTx(btn) {
+            btn.parentElement.innerHTML = '<span style="color:var(--red-color); font-weight:bold;">❌ مرفوض</span>';
+        }
 
-      if (userData.balance < amount) {
-        tg.showAlert(lang.alertWithdrawInsBal);
-        return;
-      }
+        // تنفيذ الإيداع
+        async function handleDeposit() {
+            const amountInput = document.getElementById('deposit-amount').value;
+            const amount = parseFloat(amountInput);
+            const adminWallet = document.getElementById('admin-wallet-input').value;
 
-      const fee = amount * 0.01;
-      const netAmount = amount - fee;
+            if (!amount || amount <= 0) {
+                alert('⚠️ يرجى إدخال كمية إيداع صالحة');
+                return;
+            }
 
-      userData.balance -= amount;
-      updateBalanceUI();
+            if (!tonConnectUI.connected) {
+                alert('⚠️ يرجى ربط المحفظة الإلكترونية أولاً');
+                return;
+            }
 
-      document.getElementById('withdraw-amount').value = '';
-      document.getElementById('withdraw-address').value = '';
+            const txId = generateTxId();
+            const nanoTon = Math.floor(amount * 1000000000).toString();
 
-      tg.showAlert(`${lang.alertWithdrawSuccess}\n\nالمبلغ المطلوب: ${amount} GRAM\nالرسوم (1%): ${fee.toFixed(4)} GRAM\nالمبلغ الصافي للوصول: ${netAmount.toFixed(4)} GRAM`);
-    }
+            try {
+                const result = await tonConnectUI.sendTransaction({
+                    validUntil: Math.floor(Date.now() / 1000) + 300,
+                    messages: [{ address: adminWallet, amount: nanoTon }]
+                });
 
-    function shareRefLink() {
-      const url = document.getElementById('ref-link').value;
-      const shareText = "Join GRAM MAX and start earning GRAM tokens now!";
-      tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`);
-    }
+                if (result) {
+                    alert('✅ تم إرسال الإيداع بنجاح!');
+                    document.getElementById('deposit-amount').value = '';
 
-    function copyRefLink() {
-      const lang = translations[currentLang] || translations.ar;
-      const refInput = document.getElementById('ref-link');
-      
-      navigator.clipboard.writeText(refInput.value).then(() => {
-        tg.showAlert(lang.copiedSuccess);
-      }).catch(() => {
-        refInput.select();
-        document.execCommand('copy');
-        tg.showAlert(lang.copiedSuccess);
-      });
-    }
+                    // إضافة للوحة الإشراف
+                    addTransactionToAdminTable(txId, `@${userData.id}`, 'إيداع ⚡', amount, 'قيد الانتظار');
 
-    function switchTab(tabName, btnElement) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(`tab-${tabName}`).classList.add('active');
-      btnElement.classList.add('active');
-    }
-  </script>
+                    // إرسال إشعار للمشرف
+                    const notifyText = `⚡ *طلب إيداع جديد*\n\n🔢 *الرقم التسلسلي:* \`${txId}\`\n👤 *المستخدم:* \`${userData.name}\` (ID: \`${userData.id}\`)\n💰 *الكمية:* ${amount} GRAM`;
+                    sendTelegramAdminNotification(notifyText);
+                }
+            } catch (e) {
+                alert('❌ تم إلغاء العملية أو فشل التأكيد');
+            }
+        }
+
+        // تنفيذ السحب
+        function handleWithdraw() {
+            const address = document.getElementById('withdraw-address').value.trim();
+            const amountInput = document.getElementById('withdraw-amount').value;
+            const amount = parseFloat(amountInput);
+
+            if (!address) {
+                alert('⚠️ يرجى إدخال عنوان المحفظة');
+                return;
+            }
+
+            if (isNaN(amount) || amount < 1) {
+                alert('⚠️ الحد الأدنى للسحب هو 1 GRAM');
+                return;
+            }
+
+            if (userData.balance < amount) {
+                alert('⚠️ رصيدك المتاح غير كافٍ');
+                return;
+            }
+
+            const txId = generateTxId();
+            const fee = amount * 0.01;
+            const netAmount = amount - fee;
+
+            userData.balance -= amount;
+            updateBalanceUI();
+
+            document.getElementById('withdraw-address').value = '';
+            document.getElementById('withdraw-amount').value = '';
+
+            alert(`✅ تم تقديم طلب السحب بنجاح!\nالرقم التسلسلي: ${txId}\nالصافي: ${netAmount.toFixed(2)} GRAM`);
+
+            // إضافة للوحة الإشراف
+            addTransactionToAdminTable(txId, `@${userData.id}`, 'سحب 📫', amount, 'قيد الانتظار');
+
+            // إرسال إشعار للمشرف
+            const notifyText = `📫 *طلب سحب جديد*\n\n🔢 *الرقم التسلسلي:* \`${txId}\`\n👤 *المستخدم:* \`${userData.name}\` (ID: \`${userData.id}\`)\n💰 *الكمية الإجمالية:* ${amount} GRAM\n✨ *الصافي للتحويل:* ${netAmount.toFixed(2)} GRAM\n💳 *المحفظة:* \`${address}\``;
+            sendTelegramAdminNotification(notifyText);
+        }
+
+        // التنقل واللغات
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function toggleLangMenu(e) {
+            e.stopPropagation();
+            document.getElementById('lang-dropdown').classList.toggle('show');
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('lang-dropdown').classList.remove('show');
+        });
+
+        const translations = {
+            ar: {
+                balanceTitle: "الرصيد المتاح",
+                connectedWallet: "💳 المحفظة المربوطة",
+                depositTitle: "⚡ الإيداع والشحن",
+                depositPlaceholder: "الكمية المراد شحنها (GRAM)",
+                btnDeposit: "تأكيد الإيداع",
+                withdrawTitle: "📫 سحب الرصيد",
+                withdrawNote: "⚠️ الحد الأدنى للسحب: 1 GRAM (رسوم السحب 1%)",
+                withdrawAddrPlaceholder: "عنوان محفظة الاستلام",
+                withdrawAmtPlaceholder: "الكمية المراد سحبها (GRAM)",
+                btnWithdraw: "تأكيد السحب",
+                investTitle: "📈 الاستثمار",
+                investDesc: "باقات الاستثمار المتاحة قريباً...",
+                tradeTitle: "📊 التداول",
+                tradeDesc: "منصة التداول الذكي قريباً...",
+                friendsTitle: "👥 الأصدقاء",
+                btnCopyRef: "📋 نسخ رابط الإحالة",
+                navWallet: "المحفظة",
+                navInvest: "الاستثمار",
+                navTrade: "التداول",
+                navFriends: "الأصدقاء",
+                langText: "العربية 🇸🇦",
+                dir: "rtl"
+            },
+            en: {
+                balanceTitle: "Available Balance",
+                connectedWallet: "💳 Connected Wallet",
+                depositTitle: "⚡ Deposit & Top Up",
+                depositPlaceholder: "Amount to top up (GRAM)",
+                btnDeposit: "Confirm Deposit",
+                withdrawTitle: "📫 Withdraw Balance",
+                withdrawNote: "⚠️ Minimum withdrawal: 1 GRAM (1% fee)",
+                withdrawAddrPlaceholder: "Recipient Wallet Address",
+                withdrawAmtPlaceholder: "Amount to withdraw (GRAM)",
+                btnWithdraw: "Confirm Withdrawal",
+                investTitle: "📈 Investment",
+                investDesc: "Investment packages coming soon...",
+                tradeTitle: "📊 Trading",
+                tradeDesc: "Smart trading platform coming soon...",
+                friendsTitle: "👥 Friends",
+                btnCopyRef: "📋 Copy Referral Link",
+                navWallet: "Wallet",
+                navInvest: "Invest",
+                navTrade: "Trade",
+                navFriends: "Friends",
+                langText: "English 🇺🇸",
+                dir: "ltr"
+            },
+            ru: {
+                balanceTitle: "Доступный баланс",
+                connectedWallet: "💳 Подключенный кошелек",
+                depositTitle: "⚡ Пополнение",
+                depositPlaceholder: "Сумма пополнения (GRAM)",
+                btnDeposit: "Подтвердить депозит",
+                withdrawTitle: "📫 Вывод средств",
+                withdrawNote: "⚠️ Мин. сумма вывода: 1 GRAM (комиссия 1%)",
+                withdrawAddrPlaceholder: "Адрес кошелька",
+                withdrawAmtPlaceholder: "Сумма для вывода (GRAM)",
+                btnWithdraw: "Подтвердить вывод",
+                investTitle: "📈 Инвестиции",
+                investDesc: "Инвестиционные пакеты скоро...",
+                tradeTitle: "📊 Торговля",
+                tradeDesc: "Умная торговая платформа скоро...",
+                friendsTitle: "👥 Друзья",
+                btnCopyRef: "📋 Скопировать ссылку",
+                navWallet: "Кошелек",
+                navInvest: "Инвестиции",
+                navTrade: "Торговля",
+                navFriends: "Друзья",
+                langText: "Русский 🇷🇺",
+                dir: "ltr"
+            }
+        };
+
+        function changeLanguage(lang) {
+            const t = translations[lang];
+            document.documentElement.dir = t.dir;
+            document.getElementById('current-lang').innerText = t.langText;
+            document.getElementById('txt-balance-title').innerText = t.balanceTitle;
+            document.getElementById('txt-connected-wallet').innerText = t.connectedWallet;
+            document.getElementById('txt-deposit-title').innerText = t.depositTitle;
+            document.getElementById('deposit-amount').placeholder = t.depositPlaceholder;
+            document.getElementById('btn-deposit').innerText = t.btnDeposit;
+            document.getElementById('txt-withdraw-title').innerText = t.withdrawTitle;
+            document.getElementById('txt-withdraw-note').innerText = t.withdrawNote;
+            document.getElementById('withdraw-address').placeholder = t.withdrawAddrPlaceholder;
+            document.getElementById('withdraw-amount').placeholder = t.withdrawAmtPlaceholder;
+            document.getElementById('btn-withdraw').innerText = t.btnWithdraw;
+            document.getElementById('txt-invest-title').innerText = t.investTitle;
+            document.getElementById('txt-invest-desc').innerText = t.investDesc;
+            document.getElementById('txt-trade-title').innerText = t.tradeTitle;
+            document.getElementById('txt-trade-desc').innerText = t.tradeDesc;
+            document.getElementById('txt-friends-title').innerText = t.friendsTitle;
+            document.getElementById('btn-copy-ref').innerText = t.btnCopyRef;
+
+            document.getElementById('nav-wallet').innerText = t.navWallet;
+            document.getElementById('nav-invest').innerText = t.navInvest;
+            document.getElementById('nav-trade').innerText = t.navTrade;
+            document.getElementById('nav-friends').innerText = t.navFriends;
+        }
+
+        function copyRefLink() {
+            const refInput = document.getElementById('ref-link');
+            navigator.clipboard.writeText(refInput.value).then(() => alert('📋 تم نسخ رابط الإحالة!'));
+        }
+    </script>
 </body>
 </html>
