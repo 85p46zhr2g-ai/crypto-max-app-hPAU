@@ -525,8 +525,17 @@
       { id: 5, cost: 10, return: 13.00, profit: 3.00, durationHours: 120 }
     ];
 
+    // إعداد المانفيست المباشر لضمان الاتصال الصحيح بـ Telegram Wallet و DeFi
+    const manifestObject = {
+      url: window.location.href,
+      name: "GRAM MAX App",
+      iconUrl: "https://ton.org/download/ton_symbol.png",
+      termsOfDeliveryUrl: window.location.href
+    };
+    const manifestDataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifestObject));
+
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test-manifest.json',
+        manifestUrl: manifestDataUrl,
         buttonRootId: 'ton-connect-btn-container'
     });
 
