@@ -276,10 +276,9 @@
       </div>
 
       <div class="level-card">
-        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-deposit-title">⚡ الإيداع والشحن</h4>
-        <!-- يوضع هنا عنوان محفظة TON الحقيقي الخاص بك كأدمن دون تغيير أي عنصر آخر -->
-        <input type="text" id="admin-wallet-input" style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;" placeholder="ضع عنوان محفظة المشرف هنا">
-        <input type="number" id="deposit-amount" placeholder="الكمية بـ GRAM" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
+        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-deposit-title">⚡ الإيداع والشحن (1 TON = 1 GRAM)</h4>
+        <input type="text" id="admin-wallet-input" value="UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X" style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;" placeholder="عنوان محفظة المستلم">
+        <input type="number" id="deposit-amount" placeholder="الكمية المراد شحنها (TON/GRAM)" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
         <button class="btn-yellow" onclick="handleDeposit()" id="btn-deposit">تأكيد الإيداع</button>
       </div>
     </div>
@@ -439,7 +438,7 @@
         return;
       }
 
-      // تحويل المبلغ إلى وحدة NanoTON السليمة للشبكة
+      // تحويل قيمة TON المطلوبة إلى NanoTON
       const nanoTonAmount = Math.floor(amount * 1000000000).toString();
 
       const transaction = {
@@ -460,7 +459,7 @@
           localStorage.setItem('user_balance', userData.balance);
           document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
           
-          tg.showAlert(`✅ تم التحويل بنجاح! تم إضافة ${amount} GRAM إلى حسابك وترحيل الأموال إلى محفظتك.`);
+          tg.showAlert(`✅ تم تحويل ${amount} TON بنجاح! وتم إضافة ${amount} GRAM إلى رصيدك.`);
           document.getElementById('deposit-amount').value = '';
         }
       } catch (error) {
