@@ -277,7 +277,8 @@
 
       <div class="level-card">
         <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-deposit-title">⚡ الإيداع والشحن</h4>
-        <input type="text" id="admin-wallet-input" readonly value="UQBr_XZ5X_2j0SF_ADMIN_WALLET" style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;">
+        <!-- يوضع هنا عنوان محفظة TON الحقيقي الخاص بك كأدمن دون تغيير أي عنصر آخر -->
+        <input type="text" id="admin-wallet-input" style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;" placeholder="ضع عنوان محفظة المشرف هنا">
         <input type="number" id="deposit-amount" placeholder="الكمية بـ GRAM" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
         <button class="btn-yellow" onclick="handleDeposit()" id="btn-deposit">تأكيد الإيداع</button>
       </div>
@@ -323,8 +324,6 @@
     tg.expand();
 
     const BOT_USERNAME = "GramMax3_Bot";
-    // تم وضع عنوان محفظتك المباشرة بشكل صريح
-    const ADMIN_WALLET_ADDRESS = "UQBr_XZ5X_2j0SF_ADMIN_WALLET";
 
     let userData = {
       balance: parseFloat(localStorage.getItem('user_balance')) || 0.00,
@@ -362,7 +361,6 @@
       document.getElementById('user-display-name').innerText = userData.first_name;
       document.getElementById('user-display-id').innerText = `ID: ${userData.userId}`;
       document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
-      document.getElementById('admin-wallet-input').value = ADMIN_WALLET_ADDRESS;
       
       if (userData.photo_url) {
         document.getElementById('avatar-container').innerHTML = `<img src="${userData.photo_url}">`;
@@ -421,8 +419,14 @@
     }
 
     async function handleDeposit() {
+      const adminWallet = document.getElementById('admin-wallet-input').value.trim();
       const amountInput = document.getElementById('deposit-amount').value;
       const amount = parseFloat(amountInput);
+
+      if (!adminWallet || adminWallet.length < 20) {
+        tg.showAlert("⚠️ يرجى التأكد من كتابة عنوان محفظة المشرف بشكل صحيح وبدون أخطاء.");
+        return;
+      }
 
       if (!amount || amount <= 0) {
         tg.showAlert("⚠️ يرجى إدخال مبلغ إيداع صحيح.");
@@ -430,18 +434,19 @@
       }
 
       if (!tonConnectUI.connected) {
-        tg.showAlert("⚠️ يجب ربط المحفظة أولاً لإلزامية عملية الشحن.");
+        tg.showAlert("⚠️ يجب ربط المحفظة أولاً لإتمام العملية.");
         openWalletModal();
         return;
       }
 
+      // تحويل المبلغ إلى وحدة NanoTON السليمة للشبكة
       const nanoTonAmount = Math.floor(amount * 1000000000).toString();
 
       const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 600,
+        validUntil: Math.floor(Date.now() / 1000) + 300,
         messages: [
           {
-            address: ADMIN_WALLET_ADDRESS,
+            address: adminWallet,
             amount: nanoTonAmount
           }
         ]
@@ -455,11 +460,11 @@
           localStorage.setItem('user_balance', userData.balance);
           document.getElementById('user-balance').innerText = `GRAM ${userData.balance.toFixed(2)}`;
           
-          tg.showAlert(`✅ تم التحويل بنجاح! نزل رصيد بقيمة ${amount} GRAM وحُوّلت الأموال إلى المشرف.`);
+          tg.showAlert(`✅ تم التحويل بنجاح! تم إضافة ${amount} GRAM إلى حسابك وترحيل الأموال إلى محفظتك.`);
           document.getElementById('deposit-amount').value = '';
         }
       } catch (error) {
-        tg.showAlert("❌ تم إلغاء العملية أو لم يتم التأكيد من المحفظة.");
+        tg.showAlert("❌ تم إلغاء العملية أو فشل التأكيد من المحفظة.");
       }
     }
 
