@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="html-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,7 +8,7 @@
   <!-- مكتبة تلجرام للألعاب والتطبيقات المصغرة -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- مكتبة TONConnect الرسمية للمعاملات المباشرة -->
+  <!-- مكتبة TONConnect الرسمية -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
   <style>
@@ -34,7 +34,6 @@
       margin: 0;
       padding: 12px;
       padding-bottom: 80px;
-      direction: rtl;
       user-select: none;
       -webkit-user-select: none;
     }
@@ -80,7 +79,6 @@
     .user-info-text {
       display: flex;
       flex-direction: column;
-      text-align: right;
     }
 
     .user-name {
@@ -257,7 +255,7 @@
       </div>
     </div>
 
-    <select class="lang-select" onchange="changeLanguage(this.value)">
+    <select class="lang-select" id="lang-selector" onchange="changeLanguage(this.value)">
       <option value="ar">🇸🇦 العربية</option>
       <option value="en">🇬🇧 English</option>
       <option value="ru">🇷🇺 Русский</option>
@@ -321,23 +319,23 @@
       <h3 id="txt-modal-wallet-title">ربط محفظة TON</h3>
       <p id="txt-modal-wallet-desc">اضغط على الزر أدناه ليتم تحويلك إلى محفظتك المباشرة والتأكيد بنقرة واحدة</p>
       <div id="ton-connect-btn-container" style="display:flex; justify-content:center; margin-bottom:12px;"></div>
-      <button class="btn-yellow" onclick="closeModal('wallet-modal')" style="background:#30363d; color:#fff;">إغلاق</button>
+      <button class="btn-yellow" onclick="closeModal('wallet-modal')" style="background:#30363d; color:#fff;" id="btn-close-wallet-modal">إغلاق</button>
     </div>
   </div>
 
-  <!-- النافذة المنبثقة لملف المستخدم والإحصائيات -->
+  <!-- النافذة المنبثقة لملف المستخدم -->
   <div id="profile-modal" class="modal-overlay">
     <div class="modal-box">
-      <h3>📊 إحصائيات الحساب</h3>
-      <div style="text-align:right; font-size:12px; color:var(--text-sub); line-height:1.8; margin-bottom:15px;">
-        <p>👤 **المستخدم**: <span id="prof-username" style="color:#fff;">-</span></p>
-        <p>🆔 **معرف الحساب**: <span id="prof-id" style="color:#fff;">-</span></p>
-        <p>📈 **إجمالي الإحالات**: <span id="prof-refs" style="color:var(--primary-yellow);">0</span></p>
-        <p>💰 **الرصيد الحقيقي**: <span id="prof-balance" style="color:var(--green-status);">0.00 GRAM</span></p>
+      <h3 id="txt-profile-title">📊 إحصائيات الحساب</h3>
+      <div style="text-align:start; font-size:12px; color:var(--text-sub); line-height:1.8; margin-bottom:15px;">
+        <p><span id="txt-prof-user">👤 المستخدم:</span> <span id="prof-username" style="color:#fff;">-</span></p>
+        <p><span id="txt-prof-id">🆔 معرف الحساب:</span> <span id="prof-id" style="color:#fff;">-</span></p>
+        <p><span id="txt-prof-refs">📈 إجمالي الإحالات:</span> <span id="prof-refs" style="color:var(--primary-yellow);">0</span></p>
+        <p><span id="txt-prof-bal">💰 الرصيد الحقيقي:</span> <span id="prof-balance" style="color:var(--green-status);">0.00 GRAM</span></p>
         <hr style="border-color: var(--border-color);">
-        <p style="text-align:center; cursor:pointer; color:var(--primary-yellow);" onclick="alert('سياسة الاستخدام: هذا البوت مخصص للاستثمار والتداول الافتراضي.')">📄 سياسة الاستخدام والأحكام</p>
+        <p style="text-align:center; cursor:pointer; color:var(--primary-yellow);" id="txt-terms" onclick="showTermsAlert()">📄 سياسة الاستخدام والأحكام</p>
       </div>
-      <button class="btn-yellow" onclick="closeModal('profile-modal')" style="background:#30363d; color:#fff;">إغلاق</button>
+      <button class="btn-yellow" onclick="closeModal('profile-modal')" style="background:#30363d; color:#fff;" id="btn-close-profile-modal">إغلاق</button>
     </div>
   </div>
 
@@ -354,6 +352,161 @@
     tg.expand();
 
     const BOT_USERNAME = "GramMax3_Bot";
+    let currentLang = localStorage.getItem('app_lang') || 'ar';
+
+    // قاموس الترجمات الكامل مع الحفاظ على أسطر واسم العملات GRAM / TON
+    const translations = {
+      ar: {
+        dir: "rtl",
+        userDefault: "المستخدم",
+        balanceTitle: "الرصيد المتاح",
+        navInvest: "الاستثمار",
+        navTrade: "التداول",
+        navFriends: "الأصدقاء",
+        navWallet: "المحفظة",
+        tradeTitle: "🤖 روبوت التداول الذكي",
+        tradeDesc: "ستفتح هذه الميزة قريباً...",
+        friendsTitle: "👥 دعوة الأصدقاء",
+        btnShare: "📢 مشاركة الرابط مباشر",
+        refCountText: "عدد الإحالات المؤكدة",
+        btnConnectWallet: "🔗 ربط المحفظة الإلكترونية",
+        walletTitle: "💳 المحفظة المربوطة",
+        notConnected: "غير مربوطة",
+        depositTitle: "⚡ الإيداع والشحن (1 TON = 1 GRAM)",
+        placeholderAmount: "الكمية المراد شحنها (TON/GRAM)",
+        btnDeposit: "تأكيد الإيداع",
+        modalWalletTitle: "ربط محفظة TON",
+        modalWalletDesc: "اضغط على الزر أدناه ليتم تحويلك إلى محفظتك المباشرة والتأكيد بنقرة واحدة",
+        btnClose: "إغلاق",
+        profileTitle: "📊 إحصائيات الحساب",
+        profUser: "👤 المستخدم:",
+        profId: "🆔 معرف الحساب:",
+        profRefs: "📈 إجمالي الإحالات:",
+        profBal: "💰 الرصيد الحقيقي:",
+        termsText: "📄 سياسة الاستخدام والأحكام",
+        lvlPrefix: "المستوى",
+        statusOpen: "🟢 مفتوح",
+        statusLocked: "🔒 مقفل",
+        txtInvest: "الاستثمار",
+        txtReturn: "العائد",
+        txtProfit: "الربح",
+        txtDuration: "المدة",
+        btnLocked: "🔒 مقفل حتى إكمال المستوى السابق",
+        btnInvest: "استثمار",
+        btnClaim: "🎁 مطالبة بالأرباح",
+        btnTimer: "⏳ جاري الاستثمار...",
+        timeRemaining: "⏳ المتبقي:",
+        hoursText: "ساعة",
+        alertNoBal: "⚠️ رصيدك المتاح غير كافٍ لإكمال هذا الاستثمار!",
+        alertStarted: "✅ تم بدء الاستثمار بنجاح!",
+        alertClaimed: "🎉 تم استلام الأرباح بنجاح!",
+        alertClaimedUnlocked: "🎉 تم استلام الأرباح وفتح المستوى التالي!",
+        alertDepositSent: "📩 تم إرسال الطلب إلى شبكة TON بنجاح!\nسيتم إضافة الرصيد فور تأكيد الوصول.",
+        alertDepositFail: "❌ تم إلغاء العملية أو فشل التأكيد.",
+        alertNeedWallet: "⚠️ يجب ربط المحفظة أولاً لإتمام العملية.",
+        termsAlert: "سياسة الاستخدام: هذا البوت مخصص للاستثمار والتداول الافتراضي."
+      },
+      en: {
+        dir: "ltr",
+        userDefault: "User",
+        balanceTitle: "Available Balance",
+        navInvest: "Invest",
+        navTrade: "Trade",
+        navFriends: "Friends",
+        navWallet: "Wallet",
+        tradeTitle: "🤖 AI Smart Trading Bot",
+        tradeDesc: "This feature will be available soon...",
+        friendsTitle: "👥 Invite Friends",
+        btnShare: "📢 Share Direct Link",
+        refCountText: "Confirmed Referrals",
+        btnConnectWallet: "🔗 Connect Wallet",
+        walletTitle: "💳 Connected Wallet",
+        notConnected: "Not Connected",
+        depositTitle: "⚡ Deposit & Top Up (1 TON = 1 GRAM)",
+        placeholderAmount: "Amount to deposit (TON/GRAM)",
+        btnDeposit: "Confirm Deposit",
+        modalWalletTitle: "Connect TON Wallet",
+        modalWalletDesc: "Click below to open your wallet and confirm with one tap",
+        btnClose: "Close",
+        profileTitle: "📊 Account Statistics",
+        profUser: "👤 User:",
+        profId: "🆔 Account ID:",
+        profRefs: "📈 Total Referrals:",
+        profBal: "💰 Real Balance:",
+        termsText: "📄 Terms & Conditions",
+        lvlPrefix: "Level",
+        statusOpen: "🟢 Open",
+        statusLocked: "🔒 Locked",
+        txtInvest: "Investment",
+        txtReturn: "Return",
+        txtProfit: "Profit",
+        txtDuration: "Duration",
+        btnLocked: "🔒 Locked until previous level complete",
+        btnInvest: "Invest",
+        btnClaim: "🎁 Claim Profit",
+        btnTimer: "⏳ Investing...",
+        timeRemaining: "⏳ Remaining:",
+        hoursText: "hours",
+        alertNoBal: "⚠️ Insufficient balance to complete this investment!",
+        alertStarted: "✅ Investment started successfully!",
+        alertClaimed: "🎉 Profit claimed successfully!",
+        alertClaimedUnlocked: "🎉 Profit claimed and next level unlocked!",
+        alertDepositSent: "📩 Request sent to TON network successfully!\nBalance will update upon blockchain confirmation.",
+        alertDepositFail: "❌ Transaction canceled or confirmation failed.",
+        alertNeedWallet: "⚠️ Please connect your wallet first.",
+        termsAlert: "Terms of Use: This bot is intended for virtual trading and investment."
+      },
+      ru: {
+        dir: "ltr",
+        userDefault: "Пользователь",
+        balanceTitle: "Доступный баланс",
+        navInvest: "Инвестиции",
+        navTrade: "Торговля",
+        navFriends: "Друзья",
+        navWallet: "Кошелек",
+        tradeTitle: "🤖 Умный Торговый Бот",
+        tradeDesc: "Эта функция будет доступна скоро...",
+        friendsTitle: "👥 Пригласить друзей",
+        btnShare: "📢 Поделиться ссылкой",
+        refCountText: "Подтвержденные рефералы",
+        btnConnectWallet: "🔗 Подключить кошелек",
+        walletTitle: "💳 Подключенный кошелек",
+        notConnected: "Не подключен",
+        depositTitle: "⚡ Пополнение (1 TON = 1 GRAM)",
+        placeholderAmount: "Сумма пополнения (TON/GRAM)",
+        btnDeposit: "Подтвердить депозит",
+        modalWalletTitle: "Подключить TON Кошелек",
+        modalWalletDesc: "Нажмите ниже, чтобы перейти в кошелек и подтвердить в один клик",
+        btnClose: "Закрыть",
+        profileTitle: "📊 Статистика аккаунта",
+        profUser: "👤 Пользователь:",
+        profId: "🆔 ID Аккаунта:",
+        profRefs: "📈 Всего рефералов:",
+        profBal: "💰 Реальный баланс:",
+        termsText: "📄 Условия использования",
+        lvlPrefix: "Уровень",
+        statusOpen: "🟢 Открыт",
+        statusLocked: "🔒 Заблокирован",
+        txtInvest: "Инвестиция",
+        txtReturn: "Доход",
+        txtProfit: "Прибыль",
+        txtDuration: "Длительность",
+        btnLocked: "🔒 Заблокировано до завершения пред. уровня",
+        btnInvest: "Инвестировать",
+        btnClaim: "🎁 Забрать прибыль",
+        btnTimer: "⏳ Инвестирование...",
+        timeRemaining: "⏳ Осталось:",
+        hoursText: "ч.",
+        alertNoBal: "⚠️ Недостаточно средств для инвестиции!",
+        alertStarted: "✅ Инвестиция успешно начата!",
+        alertClaimed: "🎉 Прибыль успешно получена!",
+        alertClaimedUnlocked: "🎉 Прибыль получена, следующий уровень открыт!",
+        alertDepositSent: "📩 Запрос успешно отправлен в сеть TON!\nБаланс обновится после подтверждения.",
+        alertDepositFail: "❌ Транзакция отменена или произошла ошибка.",
+        alertNeedWallet: "⚠️ Пожалуйста, сначала подключите кошелек.",
+        termsAlert: "Условия использования: Данный бот предназначен для виртуальной торговли."
+      }
+    };
 
     let userData = {
       balance: parseFloat(localStorage.getItem('user_balance')) || 0.00,
@@ -364,13 +517,12 @@
       photo_url: tg.initDataUnsafe?.user?.photo_url || null
     };
 
-    // مدة المستويات بالساعات (موزعة للتطبيق)
     const levels = [
-      { id: 1, name: "المستوى 1", cost: 1, return: 1.15, profit: 0.15, durationHours: 12, durationText: "12 ساعة" },
-      { id: 2, name: "المستوى 2", cost: 2, return: 2.30, profit: 0.30, durationHours: 24, durationText: "24 ساعة" },
-      { id: 3, name: "المستوى 3", cost: 5, return: 5.70, profit: 0.70, durationHours: 48, durationText: "48 ساعة" },
-      { id: 4, name: "المستوى 4", cost: 7, return: 8.30, profit: 1.30, durationHours: 72, durationText: "72 ساعة" },
-      { id: 5, name: "المستوى 5", cost: 10, return: 13.00, profit: 3.00, durationHours: 120, durationText: "120 ساعة" }
+      { id: 1, cost: 1, return: 1.15, profit: 0.15, durationHours: 12 },
+      { id: 2, cost: 2, return: 2.30, profit: 0.30, durationHours: 24 },
+      { id: 3, cost: 5, return: 5.70, profit: 0.70, durationHours: 48 },
+      { id: 4, cost: 7, return: 8.30, profit: 1.30, durationHours: 72 },
+      { id: 5, cost: 10, return: 13.00, profit: 3.00, durationHours: 120 }
     ];
 
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -379,16 +531,17 @@
     });
 
     tonConnectUI.onStatusChange(wallet => {
+        const lang = translations[currentLang];
         if (wallet) {
-            const address = wallet.account.address;
-            document.getElementById('connected-wallet-display').innerText = address;
+            document.getElementById('connected-wallet-display').innerText = wallet.account.address;
             closeModal('wallet-modal');
         } else {
-            document.getElementById('connected-wallet-display').innerText = "غير مربوطة";
+            document.getElementById('connected-wallet-display').innerText = lang.notConnected;
         }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('lang-selector').value = currentLang;
       document.getElementById('user-display-name').innerText = userData.first_name;
       document.getElementById('user-display-id').innerText = `ID: ${userData.userId}`;
       updateBalanceUI();
@@ -400,7 +553,7 @@
       }
 
       document.getElementById('ref-link').value = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
-      renderLevels();
+      applyLanguage(currentLang);
       setInterval(checkTimers, 1000);
     });
 
@@ -409,7 +562,56 @@
       localStorage.setItem('user_balance', userData.balance);
     }
 
+    function changeLanguage(langKey) {
+      currentLang = langKey;
+      localStorage.setItem('app_lang', langKey);
+      applyLanguage(langKey);
+    }
+
+    function applyLanguage(langKey) {
+      const lang = translations[langKey] || translations.ar;
+      
+      document.getElementById('html-root').dir = lang.dir;
+
+      document.getElementById('txt-balance-title').innerText = lang.balanceTitle;
+      document.getElementById('nav-invest').innerText = lang.navInvest;
+      document.getElementById('nav-trade').innerText = lang.navTrade;
+      document.getElementById('nav-friends').innerText = lang.navFriends;
+      document.getElementById('nav-wallet').innerText = lang.navWallet;
+      
+      document.getElementById('txt-trade-title').innerText = lang.tradeTitle;
+      document.getElementById('txt-trade-desc').innerText = lang.tradeDesc;
+
+      document.getElementById('txt-friends-title').innerText = lang.friendsTitle;
+      document.getElementById('btn-share').innerText = lang.btnShare;
+      document.getElementById('txt-ref-count').innerText = lang.refCountText;
+
+      document.getElementById('btn-connect-wallet').innerText = lang.btnConnectWallet;
+      document.getElementById('txt-wallet-title').innerText = lang.walletTitle;
+      if (!tonConnectUI.connected) {
+        document.getElementById('connected-wallet-display').innerText = lang.notConnected;
+      }
+      document.getElementById('txt-deposit-title').innerText = lang.depositTitle;
+      document.getElementById('deposit-amount').placeholder = lang.placeholderAmount;
+      document.getElementById('btn-deposit').innerText = lang.btnDeposit;
+
+      document.getElementById('txt-modal-wallet-title').innerText = lang.modalWalletTitle;
+      document.getElementById('txt-modal-wallet-desc').innerText = lang.modalWalletDesc;
+      document.getElementById('btn-close-wallet-modal').innerText = lang.btnClose;
+
+      document.getElementById('txt-profile-title').innerText = lang.profileTitle;
+      document.getElementById('txt-prof-user').innerText = lang.profUser;
+      document.getElementById('txt-prof-id').innerText = lang.profId;
+      document.getElementById('txt-prof-refs').innerText = lang.profRefs;
+      document.getElementById('txt-prof-bal').innerText = lang.profBal;
+      document.getElementById('txt-terms').innerText = lang.termsText;
+      document.getElementById('btn-close-profile-modal').innerText = lang.btnClose;
+
+      renderLevels();
+    }
+
     function renderLevels() {
+      const lang = translations[currentLang] || translations.ar;
       const container = document.getElementById('investment-levels');
       container.innerHTML = '';
 
@@ -422,28 +624,28 @@
         const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${lvl.id}`));
 
         if (!isUnlocked) {
-          buttonArea = `<button class="btn-locked" disabled>🔒 مقفل حتى إكمال المستوى السابق</button>`;
+          buttonArea = `<button class="btn-locked" disabled>${lang.btnLocked}</button>`;
         } else if (timerData) {
           const now = Date.now();
           if (now >= timerData.endTime) {
-            buttonArea = `<button class="btn-claim" onclick="claimProfit(${lvl.id})">🎁 مطالبة بالأرباح (+${lvl.return} GRAM)</button>`;
+            buttonArea = `<button class="btn-claim" onclick="claimProfit(${lvl.id})">${lang.btnClaim} (+${lvl.return} GRAM)</button>`;
           } else {
-            buttonArea = `<button class="btn-timer" id="timer-btn-${lvl.id}" disabled>⏳ جاري الاستثمار...</button>`;
+            buttonArea = `<button class="btn-timer" id="timer-btn-${lvl.id}" disabled>${lang.btnTimer}</button>`;
           }
         } else {
-          buttonArea = `<button class="btn-yellow" onclick="startInvestment(${lvl.id})">استثمار (${lvl.cost} GRAM)</button>`;
+          buttonArea = `<button class="btn-yellow" onclick="startInvestment(${lvl.id})">${lang.btnInvest} (${lvl.cost} GRAM)</button>`;
         }
 
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span style="color:var(--primary-yellow); font-weight:bold;">🔷 ${lvl.name}</span>
-            <span style="font-size:11px; color:${isUnlocked ? 'var(--green-status)' : 'var(--text-sub)'}">${isUnlocked ? '🟢 مفتوح' : '🔒 مقفل'}</span>
+            <span style="color:var(--primary-yellow); font-weight:bold;">🔷 ${lang.lvlPrefix} ${lvl.id}</span>
+            <span style="font-size:11px; color:${isUnlocked ? 'var(--green-status)' : 'var(--text-sub)'}">${isUnlocked ? lang.statusOpen : lang.statusLocked}</span>
           </div>
           <div style="font-size:12px; color:var(--text-sub); margin-bottom:8px;">
-            <p>الاستثمار: <b style="color:#fff;">${lvl.cost} GRAM</b></p>
-            <p>العائد: <b style="color:#fff;">${lvl.return} GRAM</b></p>
-            <p>الربح: <span style="color:var(--green-status); font-weight:bold;">+GRAM ${lvl.profit.toFixed(2)}</span></p>
-            <p>المدة: <b style="color:#fff;">${lvl.durationText}</b></p>
+            <p>${lang.txtInvest}: <b style="color:#fff;">${lvl.cost} GRAM</b></p>
+            <p>${lang.txtReturn}: <b style="color:#fff;">${lvl.return} GRAM</b></p>
+            <p>${lang.txtProfit}: <span style="color:var(--green-status); font-weight:bold;">+GRAM ${lvl.profit.toFixed(2)}</span></p>
+            <p>${lang.txtDuration}: <b style="color:#fff;">${lvl.durationHours} ${lang.hoursText}</b></p>
           </div>
           <div id="btn-container-${lvl.id}">${buttonArea}</div>
         `;
@@ -453,17 +655,17 @@
     }
 
     function startInvestment(levelId) {
+      const lang = translations[currentLang] || translations.ar;
       const lvl = levels.find(l => l.id === levelId);
+      
       if (userData.balance < lvl.cost) {
-        tg.showAlert("⚠️ رصيدك المتاح غير كافٍ لإكمال هذا الاستثمار!");
+        tg.showAlert(lang.alertNoBal);
         return;
       }
 
-      // خصم المبلغ من الرصيد
       userData.balance -= lvl.cost;
       updateBalanceUI();
 
-      // إعداد وقت انتهاء العداد
       const durationMs = lvl.durationHours * 60 * 60 * 1000;
       const timerInfo = {
         startTime: Date.now(),
@@ -473,11 +675,13 @@
       };
 
       localStorage.setItem(`investment_lvl_${levelId}`, JSON.stringify(timerInfo));
-      tg.showAlert(`✅ تم بدء ${lvl.name} بنجاح! بدأ العداد التنازلي.`);
+      tg.showAlert(lang.alertStarted);
       renderLevels();
     }
 
     function checkTimers() {
+      const lang = translations[currentLang] || translations.ar;
+
       levels.forEach(lvl => {
         const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${lvl.id}`));
         const btn = document.getElementById(`timer-btn-${lvl.id}`);
@@ -497,32 +701,29 @@
             const mStr = minutes < 10 ? '0' + minutes : minutes;
             const sStr = seconds < 10 ? '0' + seconds : seconds;
 
-            btn.innerText = `⏳ المتبقي: ${hStr}:${mStr}:${sStr}`;
+            btn.innerText = `${lang.timeRemaining} ${hStr}:${mStr}:${sStr}`;
           }
         }
       });
     }
 
     function claimProfit(levelId) {
+      const lang = translations[currentLang] || translations.ar;
       const lvl = levels.find(l => l.id === levelId);
       const timerData = JSON.parse(localStorage.getItem(`investment_lvl_${levelId}`));
 
       if (!timerData) return;
 
-      // إضافة العائد كاملاً إلى الرصيد
       userData.balance += lvl.return;
       updateBalanceUI();
-
-      // حذف العداد المستهلك
       localStorage.removeItem(`investment_lvl_${levelId}`);
 
-      // فتح المستوى التالي إذا كان هذا أقصى مستوى مفتوح
       if (levelId === userData.currentUnlockedLevel && userData.currentUnlockedLevel < levels.length) {
         userData.currentUnlockedLevel += 1;
         localStorage.setItem('unlocked_level', userData.currentUnlockedLevel);
-        tg.showAlert(`🎉 تم استلام الأرباح (+${lvl.return} GRAM) وفتح ${levels[userData.currentUnlockedLevel - 1].name}!`);
+        tg.showAlert(lang.alertClaimedUnlocked);
       } else {
-        tg.showAlert(`🎉 تم استلام الأرباح (+${lvl.return} GRAM) بنجاح!`);
+        tg.showAlert(lang.alertClaimed);
       }
 
       renderLevels();
@@ -544,23 +745,29 @@
       document.getElementById(id).style.display = 'none';
     }
 
+    function showTermsAlert() {
+      const lang = translations[currentLang] || translations.ar;
+      alert(lang.termsAlert);
+    }
+
     async function handleDeposit() {
+      const lang = translations[currentLang] || translations.ar;
       const adminWallet = document.getElementById('admin-wallet-input').value.trim();
       const amountInput = document.getElementById('deposit-amount').value;
       const amount = parseFloat(amountInput);
 
       if (!adminWallet || adminWallet.length < 20) {
-        tg.showAlert("⚠️ يرجى التأكد من كتابة عنوان محفظة المشرف بشكل صحيح.");
+        tg.showAlert("⚠️ Invalid recipient wallet address.");
         return;
       }
 
       if (!amount || amount <= 0) {
-        tg.showAlert("⚠️ يرجى إدخال مبلغ إيداع صحيح.");
+        tg.showAlert("⚠️ Invalid deposit amount.");
         return;
       }
 
       if (!tonConnectUI.connected) {
-        tg.showAlert("⚠️ يجب ربط المحفظة أولاً لإتمام العملية.");
+        tg.showAlert(lang.alertNeedWallet);
         openWalletModal();
         return;
       }
@@ -579,20 +786,18 @@
 
       try {
         const result = await tonConnectUI.sendTransaction(transaction);
-
         if (result) {
-          // تم الإرسال من المحفظة بنجاح ولكن لن تتم إضافة الرصيد تلقائياً لمنع التلاعب
-          tg.showAlert(`📩 تم إرسال الطلب إلى شبكة TON بنجاح!\n\nسيتم مراجعة العملية وتحديث رصيدك بـ (${amount} GRAM) فور تأكيد وصول الأموال على البلوكشين.`);
+          tg.showAlert(lang.alertDepositSent);
           document.getElementById('deposit-amount').value = '';
         }
       } catch (error) {
-        tg.showAlert("❌ تم إلغاء العملية أو فشل التأكيد من المحفظة.");
+        tg.showAlert(lang.alertDepositFail);
       }
     }
 
     function shareRefLink() {
       const url = document.getElementById('ref-link').value;
-      const shareText = "انضم معي في منصة GRAM MAX واكسب عملات GRAM الرقمية!";
+      const shareText = "Join GRAM MAX and start earning GRAM tokens now!";
       tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`);
     }
 
@@ -601,28 +806,6 @@
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
       btnElement.classList.add('active');
-    }
-
-    function changeLanguage(lang) {
-      if (lang === 'en') {
-        document.getElementById('txt-balance-title').innerText = "Available Balance";
-        document.getElementById('nav-invest').innerText = "Invest";
-        document.getElementById('nav-trade').innerText = "Trade";
-        document.getElementById('nav-friends').innerText = "Friends";
-        document.getElementById('nav-wallet').innerText = "Wallet";
-        document.getElementById('btn-share').innerText = "📢 Share Link Direct";
-        document.getElementById('btn-connect-wallet').innerText = "🔗 Connect Wallet";
-      } else if (lang === 'ru') {
-        document.getElementById('txt-balance-title').innerText = "Доступный баланс";
-        document.getElementById('nav-invest').innerText = "Инвестиции";
-        document.getElementById('nav-trade').innerText = "Торговля";
-        document.getElementById('nav-friends').innerText = "Друзья";
-        document.getElementById('nav-wallet').innerText = "Кошелек";
-        document.getElementById('btn-share').innerText = "📢 Поделиться ссылкой";
-        document.getElementById('btn-connect-wallet').innerText = "🔗 Подключить кошелек";
-      } else {
-        location.reload();
-      }
     }
   </script>
 </body>
