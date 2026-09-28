@@ -195,7 +195,7 @@
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(5px);
-      z-index: 9999;
+      z-index: 100;
       display: none;
       justify-content: center;
       align-items: center;
@@ -233,6 +233,7 @@
       justify-content: space-around;
       padding: 8px 0;
       border-top: 1px solid var(--border-color);
+      z-index: 10;
     }
 
     .nav-btn {
@@ -305,9 +306,9 @@
       </div>
 
       <div class="level-card">
-        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-deposit-title">⚡ الإيداع والشحن (1 TON = 1 GRAM)</h4>
+        <h4 style="color: var(--primary-yellow); margin-top:0;" id="txt-deposit-title">⚡ الإيداع والشحن</h4>
         <input type="text" id="admin-wallet-input" value="UQBrfxfxzB5-op8FGLs-BxnZgOBv0CveJ8VJbC3Xc9pVXZ5X" style="width:100%; padding:10px; margin:8px 0; background:#0d1117; border:1px solid var(--border-color); color:var(--primary-yellow); border-radius:6px; font-size:11px;" placeholder="عنوان محفظة المستلم">
-        <input type="number" id="deposit-amount" placeholder="الكمية المراد شحنها (TON/GRAM)" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
+        <input type="number" id="deposit-amount" placeholder="الكمية المراد شحنها (GRAM)" style="width:100%; padding:10px; margin-bottom:8px; background:#0d1117; border:1px solid var(--border-color); color:#fff; border-radius:6px;">
         <button class="btn-yellow" onclick="handleDeposit()" id="btn-deposit">تأكيد الإيداع</button>
       </div>
     </div>
@@ -316,7 +317,7 @@
   <!-- النافذة المنبثقة لربط المحفظة -->
   <div id="wallet-modal" class="modal-overlay">
     <div class="modal-box">
-      <h3 id="txt-modal-wallet-title">ربط محفظة TON</h3>
+      <h3 id="txt-modal-wallet-title">ربط المحفظة</h3>
       <p id="txt-modal-wallet-desc">اضغط على الزر أدناه ليتم تحويلك إلى محفظتك المباشرة والتأكيد بنقرة واحدة</p>
       <div id="ton-connect-btn-container" style="display:flex; justify-content:center; margin-bottom:12px;"></div>
       <button class="btn-yellow" onclick="closeModal('wallet-modal')" style="background:#30363d; color:#fff;" id="btn-close-wallet-modal">إغلاق</button>
@@ -354,7 +355,6 @@
     const BOT_USERNAME = "GramMax3_Bot";
     let currentLang = localStorage.getItem('app_lang') || 'ar';
 
-    // قاموس الترجمات الكامل مع الحفاظ على أسطر واسم العملات GRAM / TON
     const translations = {
       ar: {
         dir: "rtl",
@@ -372,10 +372,10 @@
         btnConnectWallet: "🔗 ربط المحفظة الإلكترونية",
         walletTitle: "💳 المحفظة المربوطة",
         notConnected: "غير مربوطة",
-        depositTitle: "⚡ الإيداع والشحن (1 TON = 1 GRAM)",
-        placeholderAmount: "الكمية المراد شحنها (TON/GRAM)",
+        depositTitle: "⚡ الإيداع والشحن",
+        placeholderAmount: "الكمية المراد شحنها (GRAM)",
         btnDeposit: "تأكيد الإيداع",
-        modalWalletTitle: "ربط محفظة TON",
+        modalWalletTitle: "ربط المحفظة",
         modalWalletDesc: "اضغط على الزر أدناه ليتم تحويلك إلى محفظتك المباشرة والتأكيد بنقرة واحدة",
         btnClose: "إغلاق",
         profileTitle: "📊 إحصائيات الحساب",
@@ -401,7 +401,7 @@
         alertStarted: "✅ تم بدء الاستثمار بنجاح!",
         alertClaimed: "🎉 تم استلام الأرباح بنجاح!",
         alertClaimedUnlocked: "🎉 تم استلام الأرباح وفتح المستوى التالي!",
-        alertDepositSent: "📩 تم إرسال الطلب إلى شبكة TON بنجاح!\nسيتم إضافة الرصيد فور تأكيد الوصول.",
+        alertDepositSent: "📩 تم إرسال الطلب بنجاح!\nسيتم إضافة الرصيد فور تأكيد الوصول.",
         alertDepositFail: "❌ تم إلغاء العملية أو فشل التأكيد.",
         alertNeedWallet: "⚠️ يجب ربط المحفظة أولاً لإتمام العملية.",
         termsAlert: "سياسة الاستخدام: هذا البوت مخصص للاستثمار والتداول الافتراضي."
@@ -422,10 +422,10 @@
         btnConnectWallet: "🔗 Connect Wallet",
         walletTitle: "💳 Connected Wallet",
         notConnected: "Not Connected",
-        depositTitle: "⚡ Deposit & Top Up (1 TON = 1 GRAM)",
-        placeholderAmount: "Amount to deposit (TON/GRAM)",
+        depositTitle: "⚡ Deposit & Top Up",
+        placeholderAmount: "Amount to deposit (GRAM)",
         btnDeposit: "Confirm Deposit",
-        modalWalletTitle: "Connect TON Wallet",
+        modalWalletTitle: "Connect Wallet",
         modalWalletDesc: "Click below to open your wallet and confirm with one tap",
         btnClose: "Close",
         profileTitle: "📊 Account Statistics",
@@ -451,7 +451,7 @@
         alertStarted: "✅ Investment started successfully!",
         alertClaimed: "🎉 Profit claimed successfully!",
         alertClaimedUnlocked: "🎉 Profit claimed and next level unlocked!",
-        alertDepositSent: "📩 Request sent to TON network successfully!\nBalance will update upon blockchain confirmation.",
+        alertDepositSent: "📩 Request sent successfully!\nBalance will update upon confirmation.",
         alertDepositFail: "❌ Transaction canceled or confirmation failed.",
         alertNeedWallet: "⚠️ Please connect your wallet first.",
         termsAlert: "Terms of Use: This bot is intended for virtual trading and investment."
@@ -472,10 +472,10 @@
         btnConnectWallet: "🔗 Подключить кошелек",
         walletTitle: "💳 Подключенный кошелек",
         notConnected: "Не подключен",
-        depositTitle: "⚡ Пополнение (1 TON = 1 GRAM)",
-        placeholderAmount: "Сумма пополнения (TON/GRAM)",
+        depositTitle: "⚡ Пополнение",
+        placeholderAmount: "Сумма пополнения (GRAM)",
         btnDeposit: "Подтвердить депозит",
-        modalWalletTitle: "Подключить TON Кошелек",
+        modalWalletTitle: "Подключить кошелек",
         modalWalletDesc: "Нажмите ниже, чтобы перейти в кошелек и подтвердить в один клик",
         btnClose: "Закрыть",
         profileTitle: "📊 Статистика аккаунта",
@@ -501,7 +501,7 @@
         alertStarted: "✅ Инвестиция успешно начата!",
         alertClaimed: "🎉 Прибыль успешно получена!",
         alertClaimedUnlocked: "🎉 Прибыль получена, следующий уровень открыт!",
-        alertDepositSent: "📩 Запрос успешно отправлен в сеть TON!\nБаланс обновится после подтверждения.",
+        alertDepositSent: "📩 Запрос успешно отправлен!\nБаланс обновится после подтверждения.",
         alertDepositFail: "❌ Транзакция отменена или произошла ошибка.",
         alertNeedWallet: "⚠️ Пожалуйста, сначала подключите кошелек.",
         termsAlert: "Условия использования: Данный бот предназначен для виртуальной торговли."
@@ -555,6 +555,10 @@
       document.getElementById('ref-link').value = `https://t.me/${BOT_USERNAME}?start=ref_${userData.userId}`;
       applyLanguage(currentLang);
       setInterval(checkTimers, 1000);
+
+      document.getElementById('ton-connect-btn-container').addEventListener('click', () => {
+        closeModal('wallet-modal');
+      });
     });
 
     function updateBalanceUI() {
